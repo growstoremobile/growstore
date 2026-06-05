@@ -1,0 +1,642 @@
+{
+  "project": "GrowStore Mobile Flutter",
+  "source": "Desafio_Final_GrowStore.pdf - Trilha 03 Mobile",
+  "lists": [
+    "Backlog",
+    "Semana 1",
+    "Semana 2",
+    "Semana 3",
+    "Em andamento",
+    "Revisao / QA",
+    "Concluido",
+    "Bloqueios"
+  ],
+  "labelColors": {
+    "Mobile": "green",
+    "Semana 1": "blue",
+    "Semana 2": "yellow",
+    "Semana 3": "orange",
+    "Arquitetura": "purple",
+    "Autenticacao": "red",
+    "Catalogo": "sky",
+    "Carrinho": "lime",
+    "Favoritos": "pink",
+    "Perfil/Pedidos": "black",
+    "API": "blue",
+    "QA": "yellow",
+    "Docs": "orange",
+    "Extra": "purple"
+  },
+  "teamProfiles": [
+    "P01 Tech Lead / Arquitetura",
+    "P02 Auth / Firebase",
+    "P03 Catalogo / Home",
+    "P04 PDP / Variacoes",
+    "P05 Carrinho / Checkout",
+    "P06 Favoritos / Hive",
+    "P07 Perfil / Pedidos / Enderecos",
+    "P08 API / Services / Mock",
+    "P09 UI / Tema / Componentes",
+    "P10 QA / Testes / Docs"
+  ],
+  "cards": [
+    {
+      "name": "W1 - Kickoff tecnico e divisao de responsabilidades",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 1", "Arquitetura", "Docs"],
+      "dueWorkday": 1,
+      "description": "Alinhar escopo mobile do GrowStore, papeis da equipe de 10 pessoas, criterios de aceite e fluxo de trabalho com commits semanticos.",
+      "checklist": [
+        "Confirmar que o escopo sera apenas Flutter mobile",
+        "Definir responsaveis por feature e apoio de QA",
+        "Definir branch strategy e padrao de commits semanticos",
+        "Criar checklist de entrega baseado no PDF",
+        "Registrar decisoes no README ou documento de planejamento"
+      ]
+    },
+    {
+      "name": "W1 - Configurar dependencias mobile obrigatorias",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P08 API / Services / Mock"],
+      "labels": ["Mobile", "Semana 1", "Arquitetura"],
+      "dueWorkday": 2,
+      "description": "Preparar o projeto Flutter para MobX, GetIt, Hive, Firebase Auth, HTTP client, geracao de codigo e testes.",
+      "checklist": [
+        "Adicionar dependencias MobX, flutter_mobx, mobx_codegen e build_runner",
+        "Adicionar GetIt para injecao de dependencia",
+        "Adicionar Hive e Hive Flutter para token e favoritos",
+        "Adicionar Firebase Auth e Google Sign-In",
+        "Adicionar dio ou http para consumo de API REST",
+        "Rodar flutter pub get e registrar qualquer ajuste necessario"
+      ]
+    },
+    {
+      "name": "W1 - Criar arquitetura por feature e core compartilhado",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura"],
+      "labels": ["Mobile", "Semana 1", "Arquitetura"],
+      "dueWorkday": 3,
+      "description": "Substituir a estrutura inicial do template por uma base organizada por feature, conforme exigencia do desafio.",
+      "checklist": [
+        "Criar lib/core para config, theme, routing, http, errors e storage",
+        "Criar lib/features/auth",
+        "Criar lib/features/catalog",
+        "Criar lib/features/cart",
+        "Criar lib/features/favorites",
+        "Criar lib/features/profile",
+        "Criar lib/features/orders",
+        "Remover fluxo de contador do template inicial"
+      ]
+    },
+    {
+      "name": "W1 - Definir tema claro GrowStore e componentes visuais base",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 1", "Arquitetura"],
+      "dueWorkday": 3,
+      "description": "Criar identidade visual inicial do app com tema claro em verde e branco, mantendo componentes reutilizaveis para telas futuras.",
+      "checklist": [
+        "Definir color scheme com paleta verde e branco",
+        "Criar tipografia, espacamentos e bordas padrao",
+        "Criar botoes primario e secundario",
+        "Criar campos de formulario padronizados",
+        "Criar cards de produto, estados vazios, loading e erro",
+        "Aplicar tema no MaterialApp"
+      ]
+    },
+    {
+      "name": "W1 - Configurar navegacao com rotas nomeadas",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 1", "Arquitetura"],
+      "dueWorkday": 4,
+      "description": "Implementar navegacao principal do app com rotas nomeadas para splash, login, cadastro, home, catalogo, produto, carrinho, favoritos, perfil e pedidos.",
+      "checklist": [
+        "Definir nomes de rotas",
+        "Criar AppRouter ou estrutura equivalente",
+        "Conectar MaterialApp ao sistema de rotas",
+        "Adicionar guards simples para rotas autenticadas",
+        "Validar navegacao basica entre telas placeholder"
+      ]
+    },
+    {
+      "name": "W1 - Modelar entidades de dominio do app",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P08 API / Services / Mock", "P01 Tech Lead / Arquitetura"],
+      "labels": ["Mobile", "Semana 1", "API", "Arquitetura"],
+      "dueWorkday": 4,
+      "description": "Criar modelos para User, Product, Category, SkuVariation, CartItem, Order, OrderItem e Address com serializacao para API.",
+      "checklist": [
+        "Definir campos minimos de cada entidade",
+        "Criar modelos Dart e mappers JSON",
+        "Prever variacoes de produto por tamanho e cor",
+        "Prever status de pedido PENDING, PROCESSING, SHIPPED e DELIVERED",
+        "Adicionar testes simples de parse quando aplicavel"
+      ]
+    },
+    {
+      "name": "W1 - Implementar client HTTP e camada de services",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P08 API / Services / Mock"],
+      "labels": ["Mobile", "Semana 1", "API"],
+      "dueWorkday": 5,
+      "description": "Criar a base de integracao REST com suporte a token JWT, erros padronizados e troca facil entre API real, MockAPI ou JSON Server.",
+      "checklist": [
+        "Criar ApiClient com baseUrl configuravel",
+        "Criar interceptor para JWT",
+        "Padronizar excecoes de rede e mensagens de erro",
+        "Criar AuthService, CatalogService, CartService e OrderService iniciais",
+        "Documentar como trocar endpoint no README"
+      ]
+    },
+    {
+      "name": "W1 - Configurar Firebase Auth e login Google",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P02 Auth / Firebase"],
+      "labels": ["Mobile", "Semana 1", "Autenticacao"],
+      "dueWorkday": 5,
+      "description": "Preparar Firebase Authentication para login social com Google, sem versionar credenciais sensiveis.",
+      "checklist": [
+        "Criar checklist de configuracao Firebase Android/iOS",
+        "Adicionar arquivos de configuracao ao .gitignore quando necessario",
+        "Implementar metodo de login com Google no AuthService",
+        "Tratar sucesso, cancelamento e erro de autenticacao",
+        "Documentar variaveis e arquivos exigidos no README"
+      ]
+    },
+    {
+      "name": "W1 - Implementar splash e restauracao de sessao",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P02 Auth / Firebase", "P06 Favoritos / Hive"],
+      "labels": ["Mobile", "Semana 1", "Autenticacao", "Favoritos"],
+      "dueWorkday": 6,
+      "description": "Criar splash screen com logo GrowStore e restauracao de token/sessao persistida com Hive.",
+      "checklist": [
+        "Criar SplashPage com identidade GrowStore",
+        "Inicializar Hive antes do app principal",
+        "Ler token salvo localmente",
+        "Redirecionar usuario autenticado para Home",
+        "Redirecionar usuario nao autenticado para Login"
+      ]
+    },
+    {
+      "name": "W1 - Implementar login e cadastro por e-mail/senha",
+      "list": "Semana 1",
+      "priority": "Alta",
+      "ownerProfiles": ["P02 Auth / Firebase", "P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 1", "Autenticacao"],
+      "dueWorkday": 7,
+      "description": "Criar telas de login e cadastro com validacoes, estados de loading, erro e integracao ao AuthStore.",
+      "checklist": [
+        "Criar LoginPage com e-mail e senha",
+        "Criar RegisterPage com nome, e-mail, senha e confirmacao",
+        "Validar campos obrigatorios e confirmacao de senha",
+        "Exibir loading durante autenticacao",
+        "Persistir token no Hive apos login",
+        "Implementar logout com limpeza de estado global"
+      ]
+    },
+    {
+      "name": "W1 - Criar API mock inicial para catalogo e pedidos",
+      "list": "Semana 1",
+      "priority": "Media",
+      "ownerProfiles": ["P08 API / Services / Mock"],
+      "labels": ["Mobile", "Semana 1", "API"],
+      "dueWorkday": 7,
+      "description": "Garantir que o app avance mesmo sem API back-end real, usando MockAPI, JSON Server ou fixtures equivalentes.",
+      "checklist": [
+        "Definir dataset com pelo menos 8 produtos",
+        "Organizar produtos em pelo menos 3 categorias",
+        "Incluir imagens, descricoes, precos, estoque e variacoes",
+        "Criar dados de pedidos e enderecos",
+        "Validar endpoints ou fixtures com o CatalogService"
+      ]
+    },
+    {
+      "name": "W1 - Setup de qualidade, lint e README inicial",
+      "list": "Semana 1",
+      "priority": "Media",
+      "ownerProfiles": ["P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 1", "QA", "Docs"],
+      "dueWorkday": 7,
+      "description": "Preparar a base de qualidade exigida na entrega, com instrucoes claras para rodar o projeto.",
+      "checklist": [
+        "Validar analysis_options.yaml",
+        "Documentar Flutter SDK e comandos de execucao",
+        "Documentar configuracao de Firebase e API",
+        "Criar secao de convencao de commits",
+        "Criar checklist de testes manuais"
+      ]
+    },
+    {
+      "name": "W2 - Implementar Home com banner rotativo e destaques",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P03 Catalogo / Home", "P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 2", "Catalogo"],
+      "dueWorkday": 8,
+      "description": "Criar tela inicial com banner rotativo e produtos em destaque consumidos da API/MockAPI.",
+      "checklist": [
+        "Criar HomePage",
+        "Exibir banner rotativo",
+        "Exibir produtos em destaque",
+        "Adicionar acesso rapido a categorias",
+        "Tratar loading, erro e lista vazia",
+        "Garantir responsividade em tamanhos comuns de tela"
+      ]
+    },
+    {
+      "name": "W2 - Implementar listagem por categoria com busca e filtros",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P03 Catalogo / Home"],
+      "labels": ["Mobile", "Semana 2", "Catalogo"],
+      "dueWorkday": 9,
+      "description": "Criar listagem de produtos por categoria com busca por nome, filtro, paginacao ou scroll infinito, e alternancia Grid/List.",
+      "checklist": [
+        "Criar CatalogPage",
+        "Adicionar busca por nome",
+        "Adicionar filtro por categoria",
+        "Implementar paginacao ou scroll infinito",
+        "Implementar alternancia GridView/ListView",
+        "Tratar loading, erro e lista vazia"
+      ]
+    },
+    {
+      "name": "W2 - Implementar detalhe do produto com galeria e variacoes",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P04 PDP / Variacoes"],
+      "labels": ["Mobile", "Semana 2", "Catalogo", "Carrinho"],
+      "dueWorkday": 9,
+      "description": "Criar PDP mobile com galeria, variacoes de tamanho/cor, preco, descricao, estoque e CTA de adicionar ao carrinho.",
+      "checklist": [
+        "Criar ProductDetailPage",
+        "Exibir galeria de imagens",
+        "Exibir preco e descricao",
+        "Permitir escolha de tamanho e cor quando existirem",
+        "Exibir disponibilidade em estoque",
+        "Validar selecao de variacao antes de adicionar ao carrinho"
+      ]
+    },
+    {
+      "name": "W2 - Implementar favoritos com persistencia Hive",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P06 Favoritos / Hive"],
+      "labels": ["Mobile", "Semana 2", "Favoritos"],
+      "dueWorkday": 10,
+      "description": "Permitir adicionar/remover produtos dos favoritos e manter a lista entre sessoes usando Hive.",
+      "checklist": [
+        "Criar FavoritesStore",
+        "Persistir IDs ou objetos favoritos no Hive",
+        "Adicionar botao de favorito nos cards e PDP",
+        "Criar FavoritesPage",
+        "Tratar lista vazia",
+        "Testar persistencia apos reiniciar o app"
+      ]
+    },
+    {
+      "name": "W2 - Implementar store do carrinho e feedback ao adicionar",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P05 Carrinho / Checkout", "P04 PDP / Variacoes"],
+      "labels": ["Mobile", "Semana 2", "Carrinho"],
+      "dueWorkday": 10,
+      "description": "Criar CartStore com suporte a produto, variacao e quantidade, incluindo animacao ou feedback visual ao adicionar item.",
+      "checklist": [
+        "Criar CartStore com MobX",
+        "Adicionar item com produto, variacao e quantidade",
+        "Somar quantidades quando item equivalente ja existir",
+        "Calcular subtotal",
+        "Exibir feedback visual ao adicionar produto",
+        "Garantir limpeza do carrinho apos checkout"
+      ]
+    },
+    {
+      "name": "W2 - Implementar tela de carrinho com Dismissible e subtotal",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P05 Carrinho / Checkout", "P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 2", "Carrinho"],
+      "dueWorkday": 11,
+      "description": "Criar a tela de carrinho com lista de itens, atualizacao de quantidade, remocao por gesto Dismissible, subtotal e botao de finalizar compra.",
+      "checklist": [
+        "Criar CartPage",
+        "Listar itens com imagem, nome, variacao, quantidade e preco",
+        "Permitir aumentar e reduzir quantidade",
+        "Permitir remover com Dismissible",
+        "Exibir subtotal atualizado",
+        "Exibir botao de finalizar compra"
+      ]
+    },
+    {
+      "name": "W2 - Implementar perfil e logout",
+      "list": "Semana 2",
+      "priority": "Media",
+      "ownerProfiles": ["P07 Perfil / Pedidos / Enderecos", "P02 Auth / Firebase"],
+      "labels": ["Mobile", "Semana 2", "Perfil/Pedidos", "Autenticacao"],
+      "dueWorkday": 11,
+      "description": "Criar tela de perfil com dados do usuario logado e acao de logout limpando estado global.",
+      "checklist": [
+        "Criar ProfilePage",
+        "Exibir nome e e-mail do usuario",
+        "Adicionar atalhos para pedidos, enderecos e favoritos",
+        "Implementar logout",
+        "Limpar token e stores sensiveis no logout"
+      ]
+    },
+    {
+      "name": "W2 - Implementar gerenciamento de enderecos",
+      "list": "Semana 2",
+      "priority": "Media",
+      "ownerProfiles": ["P07 Perfil / Pedidos / Enderecos"],
+      "labels": ["Mobile", "Semana 2", "Perfil/Pedidos"],
+      "dueWorkday": 12,
+      "description": "Permitir cadastrar, listar, editar e remover enderecos de entrega vinculados ao usuario.",
+      "checklist": [
+        "Criar AddressListPage",
+        "Criar formulario de endereco",
+        "Validar campos obrigatorios",
+        "Integrar com service ou storage mock",
+        "Permitir selecionar endereco principal para checkout"
+      ]
+    },
+    {
+      "name": "W2 - Implementar historico e detalhe de pedidos",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P07 Perfil / Pedidos / Enderecos"],
+      "labels": ["Mobile", "Semana 2", "Perfil/Pedidos"],
+      "dueWorkday": 12,
+      "description": "Criar telas para historico de pedidos e detalhe com itens, valores e status.",
+      "checklist": [
+        "Criar OrdersPage",
+        "Exibir status PENDING, PROCESSING, SHIPPED e DELIVERED",
+        "Criar OrderDetailPage",
+        "Exibir itens, quantidades e valores",
+        "Tratar loading, erro e lista vazia"
+      ]
+    },
+    {
+      "name": "W2 - Aplicar estados loading, erro e vazio nas telas de dados",
+      "list": "Semana 2",
+      "priority": "Alta",
+      "ownerProfiles": ["P09 UI / Tema / Componentes", "P08 API / Services / Mock"],
+      "labels": ["Mobile", "Semana 2", "API", "QA"],
+      "dueWorkday": 13,
+      "description": "Garantir que todas as telas que consomem dados tenham feedback adequado de carregamento, erro e lista vazia.",
+      "checklist": [
+        "Mapear telas com dados remotos ou locais",
+        "Aplicar componente de loading",
+        "Aplicar componente de erro com retry",
+        "Aplicar componente de estado vazio",
+        "Validar comportamento offline ou API indisponivel"
+      ]
+    },
+    {
+      "name": "W2 - Criar testes unitarios iniciais para stores e services",
+      "list": "Semana 2",
+      "priority": "Media",
+      "ownerProfiles": ["P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 2", "QA"],
+      "dueWorkday": 13,
+      "description": "Iniciar a suite minima de testes cobrindo regras de AuthStore, CartStore, FavoritesStore e services.",
+      "checklist": [
+        "Configurar mocks para services",
+        "Testar login com sucesso e falha",
+        "Testar persistencia de favoritos",
+        "Testar calculo de subtotal do carrinho",
+        "Testar parse de produto e pedido",
+        "Rodar flutter test"
+      ]
+    },
+    {
+      "name": "W3 - Implementar checkout simulado e criacao de pedido",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P05 Carrinho / Checkout", "P07 Perfil / Pedidos / Enderecos"],
+      "labels": ["Mobile", "Semana 3", "Carrinho", "Perfil/Pedidos"],
+      "dueWorkday": 14,
+      "description": "Finalizar fluxo de compra simulada criando pedido a partir do carrinho e endereco selecionado.",
+      "checklist": [
+        "Criar CheckoutPage",
+        "Selecionar ou cadastrar endereco de entrega",
+        "Confirmar resumo do pedido",
+        "Criar pedido via OrderService",
+        "Limpar carrinho apos sucesso",
+        "Redirecionar para detalhe do pedido"
+      ]
+    },
+    {
+      "name": "W3 - Integrar JWT no fluxo autenticado completo",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P02 Auth / Firebase", "P08 API / Services / Mock"],
+      "labels": ["Mobile", "Semana 3", "Autenticacao", "API"],
+      "dueWorkday": 14,
+      "description": "Garantir que token JWT salvo localmente seja usado nas chamadas protegidas e renovado ou tratado corretamente quando expirar.",
+      "checklist": [
+        "Anexar token JWT nas chamadas privadas",
+        "Tratar resposta 401",
+        "Forcar logout quando sessao expirar",
+        "Validar rotas privadas",
+        "Documentar comportamento quando usar API mock"
+      ]
+    },
+    {
+      "name": "W3 - Implementar tratamento global de erros",
+      "list": "Semana 3",
+      "priority": "Media",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 3", "Arquitetura", "QA"],
+      "dueWorkday": 15,
+      "description": "Padronizar mensagens de erro, snackbars/dialogs e logs para falhas de autenticacao, rede, validacao e dados vazios.",
+      "checklist": [
+        "Definir AppException ou estrutura equivalente",
+        "Criar mapper de mensagens amigaveis",
+        "Adicionar feedback global com snackbar ou dialog",
+        "Evitar exposes tecnicos ao usuario final",
+        "Testar erros de rede, formulario e sessao"
+      ]
+    },
+    {
+      "name": "W3 - Polimento visual, responsividade e animacoes",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Semana 3", "QA"],
+      "dueWorkday": 15,
+      "description": "Ajustar UX mobile, espacamentos, animacoes e fidelidade visual a identidade GrowStore.",
+      "checklist": [
+        "Revisar telas em dispositivos pequenos e grandes",
+        "Ajustar overflow e textos longos",
+        "Adicionar animacoes explicitas onde agregarem valor",
+        "Revisar consistencia de botoes e formularios",
+        "Validar tema claro em todas as telas"
+      ]
+    },
+    {
+      "name": "W3 - Fechar minimo de 8 testes unitarios",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 3", "QA"],
+      "dueWorkday": 16,
+      "description": "Completar a exigencia de testes unitarios com mocks cobrindo stores MobX e services principais.",
+      "checklist": [
+        "Cobrir AuthStore",
+        "Cobrir CatalogStore",
+        "Cobrir CartStore",
+        "Cobrir FavoritesStore",
+        "Cobrir OrderService",
+        "Cobrir tratamento de erro",
+        "Garantir pelo menos 8 testes passando",
+        "Registrar comando flutter test no README"
+      ]
+    },
+    {
+      "name": "W3 - QA manual completo em emulador Android/iOS",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 3", "QA"],
+      "dueWorkday": 16,
+      "description": "Executar roteiro manual cobrindo os fluxos principais exigidos no desafio em emulador ou dispositivo real.",
+      "checklist": [
+        "Validar splash e login",
+        "Validar cadastro e logout",
+        "Validar Home e catalogo",
+        "Validar PDP e variacoes",
+        "Validar carrinho e checkout",
+        "Validar favoritos persistidos",
+        "Validar perfil, enderecos e pedidos",
+        "Registrar bugs em cards separados"
+      ]
+    },
+    {
+      "name": "W3 - README final com instalacao, execucao e configuracoes",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P10 QA / Testes / Docs", "P01 Tech Lead / Arquitetura"],
+      "labels": ["Mobile", "Semana 3", "Docs"],
+      "dueWorkday": 17,
+      "description": "Finalizar README conforme requisitos gerais do PDF: descricao, tecnologias, instalacao, execucao, configuracoes e screenshots/video.",
+      "checklist": [
+        "Descrever o app GrowStore Mobile",
+        "Listar tecnologias utilizadas",
+        "Documentar instalacao e flutter pub get",
+        "Documentar Firebase e API/baseUrl",
+        "Documentar como executar em emulador",
+        "Adicionar screenshots ou link de video demonstrativo",
+        "Adicionar checklist de features entregues"
+      ]
+    },
+    {
+      "name": "W3 - Preparar apresentacao de 10 a 15 minutos",
+      "list": "Semana 3",
+      "priority": "Media",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 3", "Docs"],
+      "dueWorkday": 18,
+      "description": "Preparar roteiro de demonstracao com visao geral do produto, decisoes tecnicas, dificuldades e superacoes.",
+      "checklist": [
+        "Criar roteiro de apresentacao",
+        "Definir fluxo de demo no emulador",
+        "Separar decisoes tecnicas relevantes",
+        "Separar dificuldades e solucoes",
+        "Ensaiar dentro do tempo de 10 a 15 minutos"
+      ]
+    },
+    {
+      "name": "W3 - Revisao final de entrega e higiene do repositorio",
+      "list": "Semana 3",
+      "priority": "Alta",
+      "ownerProfiles": ["P01 Tech Lead / Arquitetura", "P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Semana 3", "QA", "Docs"],
+      "dueWorkday": 18,
+      "description": "Garantir que o projeto esteja executavel, sem credenciais, com commits semanticos e branch principal estavel.",
+      "checklist": [
+        "Rodar flutter analyze",
+        "Rodar flutter test",
+        "Validar que nao ha credenciais versionadas",
+        "Confirmar minimo de 10 commits semanticos",
+        "Garantir main/master com versao estavel",
+        "Enviar link do repositorio conforme orientacao da Growdev"
+      ]
+    },
+    {
+      "name": "Backlog - Tema escuro com alternancia",
+      "list": "Backlog",
+      "priority": "Baixa",
+      "ownerProfiles": ["P09 UI / Tema / Componentes"],
+      "labels": ["Mobile", "Extra"],
+      "dueWorkday": null,
+      "description": "Diferencial de pontuacao extra: dark mode com alternancia por configuracao.",
+      "checklist": [
+        "Criar dark color scheme",
+        "Persistir preferencia de tema",
+        "Adicionar toggle em configuracoes/perfil",
+        "Validar contraste nas telas principais"
+      ]
+    },
+    {
+      "name": "Backlog - Rastreamento de pedido com Google Maps simulado",
+      "list": "Backlog",
+      "priority": "Baixa",
+      "ownerProfiles": ["P07 Perfil / Pedidos / Enderecos"],
+      "labels": ["Mobile", "Extra", "Perfil/Pedidos"],
+      "dueWorkday": null,
+      "description": "Diferencial de pontuacao extra: tela de rastreamento de pedido usando Google Maps com localizacao simulada.",
+      "checklist": [
+        "Configurar Google Maps Flutter",
+        "Criar TrackingPage",
+        "Exibir marcador de localizacao simulada",
+        "Adicionar acesso pelo detalhe do pedido",
+        "Documentar chaves/configuracao sem expor segredo"
+      ]
+    },
+    {
+      "name": "Backlog - Push notifications com Firebase Cloud Messaging",
+      "list": "Backlog",
+      "priority": "Baixa",
+      "ownerProfiles": ["P02 Auth / Firebase"],
+      "labels": ["Mobile", "Extra", "Autenticacao"],
+      "dueWorkday": null,
+      "description": "Diferencial de pontuacao extra: notificacoes push para atualizacao simulada de status do pedido.",
+      "checklist": [
+        "Configurar Firebase Cloud Messaging",
+        "Solicitar permissao no app",
+        "Registrar token do dispositivo",
+        "Simular notificacao de status de pedido",
+        "Documentar limitacoes e configuracao"
+      ]
+    },
+    {
+      "name": "Backlog - Internacionalizacao pt-BR e en-US",
+      "list": "Backlog",
+      "priority": "Baixa",
+      "ownerProfiles": ["P09 UI / Tema / Componentes", "P10 QA / Testes / Docs"],
+      "labels": ["Mobile", "Extra", "Docs"],
+      "dueWorkday": null,
+      "description": "Diferencial de pontuacao extra: internacionalizacao com suporte a portugues e ingles.",
+      "checklist": [
+        "Configurar localizations",
+        "Extrair strings fixas",
+        "Criar arquivos pt-BR e en-US",
+        "Adicionar troca conforme locale do sistema",
+        "Validar telas principais nos dois idiomas"
+      ]
+    }
+  ]
+}

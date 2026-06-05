@@ -1,0 +1,12 @@
+{
+  "P01 Tech Lead / Arquitetura": ["trello_member_id_p01"],
+  "P02 Auth / Firebase": ["trello_member_id_p02"],
+  "P03 Catalogo / Home": ["trello_member_id_p03"],
+  "P04 PDP / Variacoes": ["trello_member_id_p04"],
+  "P05 Carrinho / Checkout": ["trello_member_id_p05"],
+  "P06 Favoritos / Hive": ["trello_member_id_p06"],
+  "P07 Perfil / Pedidos / Enderecos": ["trello_member_id_p07"],
+  "P08 API / Services / Mock": ["trello_member_id_p08"],
+  "P09 UI / Tema / Componentes": ["trello_member_id_p09"],
+  "P10 QA / Testes / Docs": ["trello_member_id_p10"]
+}
