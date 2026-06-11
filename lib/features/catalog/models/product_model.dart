@@ -1,5 +1,5 @@
 class ProductModel {
-  final String id;
+  final int id;
   final String title;
   final double price;
   final String description;
@@ -19,8 +19,8 @@ class ProductModel {
     return ProductModel(
       id: map['id'],
       title: map['title'],
-      price: map['price'],
-      description: map['dexcription'],
+      price: map['price'].toDouble(),
+      description: map['description'],
       category: map['category'],
       imageUrl: map['image'],
     );
