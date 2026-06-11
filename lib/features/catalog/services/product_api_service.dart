@@ -15,8 +15,6 @@ class ProductApiService {
       throw Exception('Erro ao buscar os produtos na API');
     }
 
-    return (response.data as List).map(
-      (item) => ProductModel.fromMap(item).toString(),
-    );
+    return (response.data as List).map((item) => ProductModel.fromMap(item));
   }
 }
