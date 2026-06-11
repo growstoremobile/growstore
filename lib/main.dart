@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growstore/features/catalog/pages/catalog_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
+      home: CatalogPage(),
     );
   }
 }
