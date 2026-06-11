@@ -4,93 +4,93 @@ import 'colors_theme.dart';
 import 'typography_theme.dart';
 import 'text_theme.dart';
 
-final ThemeData growStoreLightTheme = ThemeData(
+final ThemeData growLightTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.light,
 
   colorScheme: const ColorScheme.light(
-    primary: GrowStoreColors.primaryDark,
+    primary: GrowColors.primaryDark,
     onPrimary: Colors.white,
     primaryContainer: Color(0xFFC8E6C5),
     onPrimaryContainer: Color(0xFF1A3D18),
-    secondary: GrowStoreColors.badgeBestSeller,
+    secondary: GrowColors.badgeBestSeller,
     onSecondary: Colors.white,
-    error: GrowStoreColors.error,
+    error: GrowColors.error,
     onError: Colors.white,
-    surface: GrowStoreColors.lightSurface,
-    onSurface: GrowStoreColors.lightTextPrimary,
-    surfaceContainerHighest: GrowStoreColors.lightSurfaceElevated,
-    outline: GrowStoreColors.lightBorder,
-    outlineVariant: GrowStoreColors.lightBorderHighlight,
+    surface: GrowColors.lightSurface,
+    onSurface: GrowColors.lightTextPrimary,
+    surfaceContainerHighest: GrowColors.lightSurfaceElevated,
+    outline: GrowColors.lightBorder,
+    outlineVariant: GrowColors.lightBorderHighlight,
   ),
 
-  scaffoldBackgroundColor: GrowStoreColors.lightBg,
+  scaffoldBackgroundColor: GrowColors.lightBg,
 
   appBarTheme: AppBarTheme(
-    backgroundColor: GrowStoreColors.lightSurface,
-    foregroundColor: GrowStoreColors.lightTextPrimary,
+    backgroundColor: GrowColors.lightSurface,
+    foregroundColor: GrowColors.lightTextPrimary,
     elevation: 0,
     scrolledUnderElevation: 1,
-    shadowColor: GrowStoreColors.lightBorder.withValues(alpha: 0.4),
+    shadowColor: GrowColors.lightBorder.withValues(alpha: 0.4),
     centerTitle: false,
     titleTextStyle: const TextStyle(
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
       fontSize: 20,
-      fontWeight: GrowStoreTypography.heavy,
-      color: GrowStoreColors.lightTextPrimary,
+      fontWeight: GrowTypography.heavy,
+      color: GrowColors.lightTextPrimary,
       letterSpacing: 0.5,
     ),
-    iconTheme: const IconThemeData(color: GrowStoreColors.lightTextPrimary),
+    iconTheme: const IconThemeData(color: GrowColors.lightTextPrimary),
   ),
 
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-    backgroundColor: GrowStoreColors.lightSurface,
-    selectedItemColor: GrowStoreColors.primaryDark,
-    unselectedItemColor: GrowStoreColors.lightTextSecondary,
+    backgroundColor: GrowColors.lightSurface,
+    selectedItemColor: GrowColors.primaryDark,
+    unselectedItemColor: GrowColors.lightTextSecondary,
     type: BottomNavigationBarType.fixed,
     elevation: 4,
     selectedLabelStyle: TextStyle(
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
       fontSize: 11,
-      fontWeight: GrowStoreTypography.bold,
+      fontWeight: GrowTypography.bold,
       letterSpacing: 0.3,
     ),
     unselectedLabelStyle: TextStyle(
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
       fontSize: 11,
-      fontWeight: GrowStoreTypography.medium,
+      fontWeight: GrowTypography.medium,
     ),
   ),
 
   cardTheme: CardThemeData(
-    color: GrowStoreColors.lightSurface,
+    color: GrowColors.lightSurface,
     surfaceTintColor: Colors.transparent,
     elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: GrowStoreColors.lightBorder, width: 1),
+      side: const BorderSide(color: GrowColors.lightBorder, width: 1),
     ),
     margin: EdgeInsets.zero,
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: GrowStoreColors.primaryDark,
+      backgroundColor: GrowColors.primaryDark,
       foregroundColor: Colors.white,
-      disabledBackgroundColor: GrowStoreColors.lightBorder,
-      disabledForegroundColor: GrowStoreColors.lightTextDisabled,
+      disabledBackgroundColor: GrowColors.lightBorder,
+      disabledForegroundColor: GrowColors.lightTextDisabled,
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
       textStyle: const TextStyle(
-        fontFamily: GrowStoreTypography.fontFamily,
-        fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-        fontSize: GrowStoreTypography.labelLarge,
-        fontWeight: GrowStoreTypography.heavy,
+        fontFamily: GrowTypography.fontFamily,
+        fontFamilyFallback: GrowTypography.fontFamilyFallback,
+        fontSize: GrowTypography.labelLarge,
+        fontWeight: GrowTypography.heavy,
         letterSpacing: 1.2,
       ),
     ),
@@ -98,15 +98,15 @@ final ThemeData growStoreLightTheme = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      foregroundColor: GrowStoreColors.primaryDark,
-      side: const BorderSide(color: GrowStoreColors.primaryDark, width: 1.5),
+      foregroundColor: GrowColors.primaryDark,
+      side: const BorderSide(color: GrowColors.primaryDark, width: 1.5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       textStyle: const TextStyle(
-        fontFamily: GrowStoreTypography.fontFamily,
-        fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-        fontSize: GrowStoreTypography.labelLarge,
-        fontWeight: GrowStoreTypography.bold,
+        fontFamily: GrowTypography.fontFamily,
+        fontFamilyFallback: GrowTypography.fontFamilyFallback,
+        fontSize: GrowTypography.labelLarge,
+        fontWeight: GrowTypography.bold,
         letterSpacing: 1.0,
       ),
     ),
@@ -114,12 +114,12 @@ final ThemeData growStoreLightTheme = ThemeData(
 
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: GrowStoreColors.primaryDark,
+      foregroundColor: GrowColors.primaryDark,
       textStyle: const TextStyle(
-        fontFamily: GrowStoreTypography.fontFamily,
-        fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-        fontSize: GrowStoreTypography.bodyLarge,
-        fontWeight: GrowStoreTypography.bold,
+        fontFamily: GrowTypography.fontFamily,
+        fontFamilyFallback: GrowTypography.fontFamilyFallback,
+        fontSize: GrowTypography.bodyLarge,
+        fontWeight: GrowTypography.bold,
         letterSpacing: 0.5,
       ),
     ),
@@ -127,92 +127,83 @@ final ThemeData growStoreLightTheme = ThemeData(
 
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
-    fillColor: GrowStoreColors.lightSurfaceElevated,
+    fillColor: GrowColors.lightSurfaceElevated,
     hintStyle: const TextStyle(
-      color: GrowStoreColors.lightTextDisabled,
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-      fontSize: GrowStoreTypography.bodyLarge,
+      color: GrowColors.lightTextDisabled,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
+      fontSize: GrowTypography.bodyLarge,
     ),
     labelStyle: const TextStyle(
-      color: GrowStoreColors.lightTextSecondary,
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
+      color: GrowColors.lightTextSecondary,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(
-        color: GrowStoreColors.lightBorder,
-        width: 1,
-      ),
+      borderSide: const BorderSide(color: GrowColors.lightBorder, width: 1),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(
-        color: GrowStoreColors.primaryDark,
-        width: 1.5,
-      ),
+      borderSide: const BorderSide(color: GrowColors.primaryDark, width: 1.5),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: GrowStoreColors.error, width: 1),
+      borderSide: const BorderSide(color: GrowColors.error, width: 1),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: GrowStoreColors.error, width: 1.5),
+      borderSide: const BorderSide(color: GrowColors.error, width: 1.5),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
   ),
 
   chipTheme: ChipThemeData(
     backgroundColor: Colors.transparent,
-    selectedColor: GrowStoreColors.primaryDark,
-    disabledColor: GrowStoreColors.lightBorder,
+    selectedColor: GrowColors.primaryDark,
+    disabledColor: GrowColors.lightBorder,
     labelStyle: const TextStyle(
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-      fontSize: GrowStoreTypography.bodyLarge,
-      fontWeight: GrowStoreTypography.bold,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
+      fontSize: GrowTypography.bodyLarge,
+      fontWeight: GrowTypography.bold,
     ),
-    side: const BorderSide(color: GrowStoreColors.lightBorder, width: 1),
+    side: const BorderSide(color: GrowColors.lightBorder, width: 1),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     showCheckmark: false,
   ),
 
   dividerTheme: const DividerThemeData(
-    color: GrowStoreColors.lightBorder,
+    color: GrowColors.lightBorder,
     thickness: 1,
     space: 1,
   ),
 
-  iconTheme: const IconThemeData(
-    color: GrowStoreColors.lightTextPrimary,
-    size: 24,
-  ),
+  iconTheme: const IconThemeData(color: GrowColors.lightTextPrimary, size: 24),
 
   snackBarTheme: SnackBarThemeData(
-    backgroundColor: GrowStoreColors.lightTextPrimary,
+    backgroundColor: GrowColors.lightTextPrimary,
     contentTextStyle: const TextStyle(
-      fontFamily: GrowStoreTypography.fontFamily,
-      fontFamilyFallback: GrowStoreTypography.fontFamilyFallback,
-      color: GrowStoreColors.lightSurface,
-      fontSize: GrowStoreTypography.bodyLarge,
+      fontFamily: GrowTypography.fontFamily,
+      fontFamilyFallback: GrowTypography.fontFamilyFallback,
+      color: GrowColors.lightSurface,
+      fontSize: GrowTypography.bodyLarge,
     ),
-    actionTextColor: GrowStoreColors.primary,
+    actionTextColor: GrowColors.primary,
     behavior: SnackBarBehavior.floating,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
   ),
 
   badgeTheme: const BadgeThemeData(
-    backgroundColor: GrowStoreColors.primaryDark,
+    backgroundColor: GrowColors.primaryDark,
     textColor: Colors.white,
     smallSize: 8,
     largeSize: 16,
   ),
 
   textTheme: buildGrowTextTheme(
-    GrowStoreColors.lightTextPrimary,
-    GrowStoreColors.lightTextSecondary,
+    GrowColors.lightTextPrimary,
+    GrowColors.lightTextSecondary,
   ),
 );

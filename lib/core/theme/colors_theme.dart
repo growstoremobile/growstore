@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GrowStoreColors {
-  GrowStoreColors._();
+class GrowColors {
+  GrowColors._();
 
   static const primary = Color(0xFF40A937);
   static const primaryDark = Color(0xFF338A2B); // estado pressionado/sobreposto

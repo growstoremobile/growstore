@@ -2,36 +2,30 @@ import 'package:flutter/material.dart';
 
 import '../colors_theme.dart';
 
-enum GrowStoreBadgeType { novo, maisVendido, discount }
+enum GrowBadgeType { novo, maisVendido, discount }
 
 /// Sobreposição de etiqueta para cartões de produtos.
 
 /// /// Uso:
 /// ```dart
-/// GrowStoreBadge(type: GrowStoreBadgeType.novo)
-/// GrowStoreBadge(type: GrowStoreBadgeType.maisVendido)
-/// GrowStoreBadge(type: GrowStoreBadgeType.discount, customLabel: '-25%')
+/// GrowBadge(type: GrowBadgeType.novo)
+/// GrowBadge(type: GrowBadgeType.maisVendido)
+/// GrowBadge(type: GrowBadgeType.discount, customLabel: '-25%')
 /// ```
-class GrowStoreBadge extends StatelessWidget {
-  final GrowStoreBadgeType type;
+class GrowBadge extends StatelessWidget {
+  final GrowBadgeType type;
 
-  /// Only used when [type] is [GrowStoreBadgeType.discount].
+  /// Usado somente quando [type] for [GrowBadgeType.discount].
   final String? customLabel;
 
-  const GrowStoreBadge({super.key, required this.type, this.customLabel});
+  const GrowBadge({super.key, required this.type, this.customLabel});
 
   @override
   Widget build(BuildContext context) {
     final (label, bg) = switch (type) {
-      GrowStoreBadgeType.novo => ('NOVO', GrowStoreColors.badgeNew),
-      GrowStoreBadgeType.maisVendido => (
-        'MAIS VENDIDO',
-        GrowStoreColors.badgeBestSeller,
-      ),
-      GrowStoreBadgeType.discount => (
-        customLabel ?? '-25%',
-        GrowStoreColors.discount,
-      ),
+      GrowBadgeType.novo => ('NOVO', GrowColors.badgeNew),
+      GrowBadgeType.maisVendido => ('MAIS VENDIDO', GrowColors.badgeBestSeller),
+      GrowBadgeType.discount => (customLabel ?? '-25%', GrowColors.discount),
     };
 
     return Container(

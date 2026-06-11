@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class GrowStoreTypography {
-  GrowStoreTypography._();
+class GrowTypography {
+  GrowTypography._();
 
   // Fonte Primária: Inter (Google Fonts)
   static const fontFamily = 'Inter';

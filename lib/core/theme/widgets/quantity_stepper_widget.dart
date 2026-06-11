@@ -13,12 +13,12 @@ import '../typography_theme.dart';
 /// onIncrement: () => setState(() => _qty++),
 /// )
 /// ```
-class GrowStoreQuantityStepper extends StatelessWidget {
+class GrowQuantityStepper extends StatelessWidget {
   final int quantity;
   final VoidCallback onDecrement;
   final VoidCallback onIncrement;
 
-  const GrowStoreQuantityStepper({
+  const GrowQuantityStepper({
     super.key,
     required this.quantity,
     required this.onDecrement,
@@ -28,12 +28,10 @@ class GrowStoreQuantityStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor = isDark
-        ? GrowStoreColors.darkBorder
-        : GrowStoreColors.lightBorder;
+    final borderColor = isDark ? GrowColors.darkBorder : GrowColors.lightBorder;
     final textColor = isDark
-        ? GrowStoreColors.darkTextPrimary
-        : GrowStoreColors.lightTextPrimary;
+        ? GrowColors.darkTextPrimary
+        : GrowColors.lightTextPrimary;
 
     return Container(
       decoration: BoxDecoration(
@@ -49,9 +47,9 @@ class GrowStoreQuantityStepper extends StatelessWidget {
             child: Text(
               '$quantity',
               style: TextStyle(
-                fontFamily: GrowStoreTypography.fontFamily,
-                fontSize: GrowStoreTypography.bodyLarge,
-                fontWeight: GrowStoreTypography.bold,
+                fontFamily: GrowTypography.fontFamily,
+                fontSize: GrowTypography.bodyLarge,
+                fontWeight: GrowTypography.bold,
                 color: textColor,
               ),
             ),
@@ -76,7 +74,7 @@ class _StepButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(4),
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Icon(icon, size: 16, color: GrowStoreColors.primary),
+        child: Icon(icon, size: 16, color: GrowColors.primary),
       ),
     );
   }
