@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/shared/colors/colors_login_page.dart';
-import 'package:growstore/features/auth/widgets/login_header.dart';
-import 'package:growstore/features/auth/widgets/login_email_field.dart';
-import 'package:growstore/features/auth/widgets/login_password_field.dart';
-import 'package:growstore/features/auth/widgets/login_button.dart';
-import 'package:growstore/features/auth/widgets/login_divider.dart';
-import 'package:growstore/features/auth/widgets/login_google_button.dart';
-import 'package:growstore/features/auth/widgets/login_footer.dart';
+import 'package:growstore/features/auth/widgets/login/login_header.dart';
+import 'package:growstore/features/auth/widgets/login/login_email_field.dart';
+import 'package:growstore/features/auth/widgets/login/login_password_field.dart';
+import 'package:growstore/features/auth/widgets/login/login_button.dart';
+import 'package:growstore/features/auth/widgets/login/login_divider.dart';
+import 'package:growstore/features/auth/widgets/login/login_google_button.dart';
+import 'package:growstore/features/auth/widgets/login/login_footer.dart';
+import 'package:growstore/features/auth/stores/login_store.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _loginStore = LoginStore();
 
   @override
   void dispose() {
@@ -27,12 +29,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // TODO: Integrar com AuthService
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Processando login...')));
+      final success = await _loginStore.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // Garante que o widget ainda está na tela antes de mostrar a mensagem
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login realizado com sucesso!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(_loginStore.error ?? 'Erro ao fazer login')),
+          );
+        }
+      }
     }
   }
 

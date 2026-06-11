@@ -1,23 +1,17 @@
-import 'package:growstore/core/errors/custom_error.dart';
 import 'package:growstore/features/auth/dtos/auth_dto.dart';
+import 'package:growstore/features/auth/repositories/auth_repository.dart';
 
 class AuthService {
+  final AuthRepository _repository;
+
+  AuthService([AuthRepository? repository])
+    : _repository = repository ?? AuthRepositoryMock();
 
   Future<bool> createAccount(AuthDto auth) async {
-    // MOCK
-    if (auth.email == 'erro@teste.com') {
-      throw CustomError('E-mail já cadastrado.');
-    }
-
-    return true;
+    return await _repository.createAccount(auth);
   }
 
   Future<String> login(AuthDto auth) async {
-    // MOCK
-    if (auth.email == 'teste@teste.com' && auth.pass == '123456') {
-      return 'fake-jwt-token-eyJJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-    }
-
-    throw CustomError('E-mail ou senha inválidos.');
+    return await _repository.login(auth);
   }
 }
