@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:growstore/shared/colors/colors.dart';
+import 'package:growstore/features/auth/stores/login/login_store.dart';
 
-class LoginPasswordFieldWidget extends StatefulWidget {
+class LoginPasswordFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSubmitted;
+  final LoginStore store;
 
   const LoginPasswordFieldWidget({
     super.key,
     required this.controller,
     required this.onSubmitted,
+    required this.store,
   });
-
-  @override
-  State<LoginPasswordFieldWidget> createState() =>
-      _LoginPasswordFieldWidgetState();
-}
-
-class _LoginPasswordFieldWidgetState extends State<LoginPasswordFieldWidget> {
-  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,63 +36,68 @@ class _LoginPasswordFieldWidgetState extends State<LoginPasswordFieldWidget> {
             ],
           ),
         ),
-        TextFormField(
-          controller: widget.controller,
-          obscureText: !_isPasswordVisible,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => widget.onSubmitted(),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor, insira sua senha';
-            }
-            return null;
+        Observer(
+          builder: (_) {
+            return TextFormField(
+              controller: controller,
+              obscureText: !store.showPassword,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => onSubmitted(),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, insira sua senha';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                hintText: '••••••••',
+                hintStyle: TextStyle(
+                  color: AppColors.outline.withValues(alpha: 0.6),
+                ),
+                prefixIcon: const Icon(
+                  Icons.lock_outline,
+                  color: AppColors.onSurfaceVariant,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    store.showPassword
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                  onPressed: store.toggleShowPassword,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.outline),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: AppColors.outline,
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(
+                    color: AppColors.primaryColor,
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+              ),
+            );
           },
-          decoration: InputDecoration(
-            hintText: '••••••••',
-            hintStyle: TextStyle(
-              color: AppColors.outline.withValues(alpha: 0.6),
-            ),
-            prefixIcon: const Icon(
-              Icons.lock_outline,
-              color: AppColors.onSurfaceVariant,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                color: AppColors.onSurfaceVariant,
-              ),
-              onPressed: () =>
-                  setState(() => _isPasswordVisible = !_isPasswordVisible),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.outline),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: AppColors.outline,
-                width: 0.5,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
-            ),
-          ),
         ),
       ],
     );

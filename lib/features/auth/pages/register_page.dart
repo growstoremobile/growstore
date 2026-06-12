@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:growstore/shared/colors/colors.dart';
 import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_app_bar_widget.dart';
@@ -8,7 +9,8 @@ import 'package:growstore/features/auth/widgets/register/register_divider_widget
 import 'package:growstore/features/auth/widgets/register/register_footer_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_header_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_terms_checkbox_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_text_field_widget.dart';
+import 'package:growstore/features/auth/widgets/register/register_form_fields_widget.dart';
+import 'package:growstore/features/auth/stores/register/register_store.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -24,9 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  bool _acceptedTerms = false;
+  final _registerStore = RegisterStore();
 
   @override
   void dispose() {
@@ -37,9 +37,11 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  Future<void> _handleRegister() async {
+    if (_registerStore.isLoading) return;
+
     if (_formKey.currentState?.validate() ?? false) {
-      if (!_acceptedTerms) {
+      if (!_registerStore.acceptedTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Você precisa aceitar os Termos de Uso.'),
@@ -48,7 +50,41 @@ class _RegisterPageState extends State<RegisterPage> {
         );
         return;
       }
-      // TODO: Implementar lógica de cadastro
+
+      if (_passwordController.text != _confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('As senhas não coincidem.')),
+        );
+        return;
+      }
+
+      final success = await _registerStore.register(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (mounted) {
+        if (success) {
+          // Redireciona para a tela inicial e limpa a pilha de navegação
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const Scaffold(
+                body: Center(
+                  child: Text('Sua Home Page Aqui'),
+                ), // TODO: Substitua pela Home
+              ),
+            ),
+            (route) =>
+                false, // O (route) => false é o que remove as telas de login/cadastro do histórico
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(_registerStore.error ?? 'Erro ao cadastrar'),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -68,11 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
             right: -20,
             child: Opacity(
               opacity: 0.1,
-              child: Icon(
-                Icons.eco,
-                size: 160,
-                color: AppColors.growthGreen,
-              ),
+              child: Icon(Icons.eco, size: 160, color: AppColors.growthGreen),
             ),
           ),
           // Conteúdo Principal
@@ -96,15 +128,35 @@ class _RegisterPageState extends State<RegisterPage> {
                             children: [
                               const RegisterHeaderWidget(),
                               const SizedBox(height: 40),
-                              _buildFormFields(),
-                              const SizedBox(height: 24),
-                              RegisterTermsCheckboxWidget(
-                                value: _acceptedTerms,
-                                onChanged: (v) =>
-                                    setState(() => _acceptedTerms = v ?? false),
+                              RegisterFormFieldsWidget(
+                                nameController: _nameController,
+                                emailController: _emailController,
+                                passwordController: _passwordController,
+                                confirmPasswordController:
+                                    _confirmPasswordController,
+                                store: _registerStore,
                               ),
                               const SizedBox(height: 24),
-                              RegisterButtonWidget(onPressed: _handleRegister),
+                              Observer(
+                                builder: (_) {
+                                  return RegisterTermsCheckboxWidget(
+                                    value: _registerStore.acceptedTerms,
+                                    onChanged: (v) => _registerStore
+                                        .setAcceptedTerms(v ?? false),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 24),
+                              Observer(
+                                builder: (_) {
+                                  return RegisterButtonWidget(
+                                    isLoading: _registerStore.isLoading,
+                                    onPressed: () {
+                                      _handleRegister();
+                                    },
+                                  );
+                                },
+                              ),
                               const SizedBox(height: 32),
                               const RegisterDividerWidget(),
                               const SizedBox(height: 24),
@@ -123,50 +175,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFormFields() {
-    return Column(
-      children: [
-        RegisterTextFieldWidget(
-          controller: _nameController,
-          label: 'Nome Completo',
-          hint: 'Como deseja ser chamado?',
-          prefixIcon: Icons.person_outline,
-        ),
-        const SizedBox(height: 16),
-        RegisterTextFieldWidget(
-          controller: _emailController,
-          label: 'E-mail Corporativo',
-          hint: 'exemplo@growstore.com',
-          prefixIcon: Icons.mail_outline,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 16),
-        RegisterTextFieldWidget(
-          controller: _passwordController,
-          label: 'Senha',
-          hint: 'Mínimo 8 caracteres',
-          prefixIcon: Icons.lock_outline,
-          isPassword: true,
-          obscureText: _obscurePassword,
-          onToggleVisibility: () =>
-              setState(() => _obscurePassword = !_obscurePassword),
-        ),
-        const SizedBox(height: 16),
-        RegisterTextFieldWidget(
-          controller: _confirmPasswordController,
-          label: 'Confirmar Senha',
-          hint: 'Repita sua senha',
-          prefixIcon: Icons.shield_outlined,
-          isPassword: true,
-          obscureText: _obscureConfirmPassword,
-          onToggleVisibility: () => setState(
-            () => _obscureConfirmPassword = !_obscureConfirmPassword,
-          ),
-        ),
-      ],
     );
   }
 }

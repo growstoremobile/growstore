@@ -1,8 +1,6 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:growstore/core/errors/custom_error.dart';
 import 'package:growstore/features/auth/dtos/auth_dto.dart';
-import 'package:growstore/features/auth/services/auth_service.dart';
-import 'package:growstore/shared/utils/constants.dart';
+import 'package:growstore/features/auth/repositories/auth_repository.dart';
 import 'package:mobx/mobx.dart';
 
 part 'login_store.g.dart';
@@ -10,38 +8,42 @@ part 'login_store.g.dart';
 class LoginStore = LoginStoreBase with _$LoginStore;
 
 abstract class LoginStoreBase with Store {
+  LoginStoreBase([AuthRepository? repository])
+    : _repository = repository ?? AuthRepository();
+
+  final AuthRepository _repository;
+
   @observable
-  bool isLoading = false;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   @observable
   String? error;
 
   @observable
-  bool showPassword = false;
+  bool _showPassword = false;
+  bool get showPassword => _showPassword;
 
   @action
-  void toggleShowPassword() => showPassword = !showPassword;
+  void toggleShowPassword() => _showPassword = !_showPassword;
 
   @action
   Future<bool> login(String email, String pass) async {
     try {
       error = null;
-      isLoading = true;
+      _isLoading = true;
 
-      final service = AuthService();
-      final tokenUser = await service.login(AuthDto(email: email, pass: pass));
+      // Simula o tempo de resposta da API
+      await Future.delayed(const Duration(seconds: 2));
 
-      Constants.userToken = tokenUser;
-
-      const secureStorage = FlutterSecureStorage();
-      await secureStorage.write(key: 'token_user', value: tokenUser);
+      await _repository.login(AuthDto(email: email, pass: pass));
 
       return true;
     } on CustomError catch (e) {
       error = e.message;
       return false;
     } finally {
-      isLoading = false;
+      _isLoading = false;
     }
   }
 }

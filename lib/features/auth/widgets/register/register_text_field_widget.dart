@@ -10,6 +10,7 @@ class RegisterTextFieldWidget extends StatelessWidget {
   final bool? obscureText;
   final VoidCallback? onToggleVisibility;
   final TextInputType? keyboardType;
+  final FormFieldValidator<String>? validator;
 
   const RegisterTextFieldWidget({
     super.key,
@@ -21,6 +22,7 @@ class RegisterTextFieldWidget extends StatelessWidget {
     this.obscureText,
     this.onToggleVisibility,
     this.keyboardType,
+    this.validator,
   });
 
   @override
@@ -43,8 +45,11 @@ class RegisterTextFieldWidget extends StatelessWidget {
           controller: controller,
           obscureText: obscureText ?? false,
           keyboardType: keyboardType,
-          validator: (value) =>
-              (value == null || value.isEmpty) ? 'Campo obrigatório' : null,
+          validator:
+              validator ??
+              ((value) => (value == null || value.isEmpty)
+                  ? 'Campo obrigatório'
+                  : null),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(

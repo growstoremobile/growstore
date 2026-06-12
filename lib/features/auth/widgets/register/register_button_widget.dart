@@ -3,8 +3,13 @@ import 'package:growstore/shared/colors/colors.dart';
 
 class RegisterButtonWidget extends StatelessWidget {
   final VoidCallback onPressed;
+  final bool isLoading;
 
-  const RegisterButtonWidget({super.key, required this.onPressed});
+  const RegisterButtonWidget({
+    super.key,
+    required this.onPressed,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +25,27 @@ class RegisterButtonWidget extends StatelessWidget {
           ),
           elevation: 2,
         ),
-        onPressed: onPressed,
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Cadastrar',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 20),
-          ],
-        ),
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Cadastrar',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.arrow_forward, size: 20),
+                ],
+              ),
       ),
     );
   }

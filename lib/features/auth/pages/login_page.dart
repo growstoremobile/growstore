@@ -42,8 +42,17 @@ class _LoginPageState extends State<LoginPage> {
       // Garante que o widget ainda está na tela antes de mostrar a mensagem
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login realizado com sucesso!')),
+          // Redireciona para a tela inicial e limpa a pilha de navegação
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const Scaffold(
+                body: Center(
+                  child: Text('Sua Home Page Aqui'),
+                ), // TODO: Substitua pela Home
+              ),
+            ),
+            (route) =>
+                false, // O (route) => false é o que remove as telas de login/cadastro do histórico
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -70,9 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: AppColors.surfaceLowest.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.outlineVariant.withValues(
-                      alpha: 0.3,
-                    ),
+                    color: AppColors.outlineVariant.withValues(alpha: 0.3),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -94,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       LoginPasswordFieldWidget(
                         controller: _passwordController,
                         onSubmitted: _handleLogin,
+                        store: _loginStore,
                       ),
                       const SizedBox(height: 32),
                       Observer(
