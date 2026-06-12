@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
-class LoginHeader extends StatelessWidget {
-  const LoginHeader({super.key});
+class LoginHeaderWidget extends StatelessWidget {
+  const LoginHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class LoginHeader extends StatelessWidget {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: LoginPageColors.primaryContainer,
+            color: AppColors.primaryContainer,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -25,7 +25,7 @@ class LoginHeader extends StatelessWidget {
           // TODO: Alterar icon para o padrão da GrowStore
           child: const Icon(
             Icons.eco,
-            color: LoginPageColors.onPrimaryContainer,
+            color: AppColors.onPrimaryContainer,
             size: 36,
           ),
         ),
@@ -35,7 +35,7 @@ class LoginHeader extends StatelessWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: LoginPageColors.growthGreen,
+            color: AppColors.growthGreen,
             letterSpacing: -0.5,
           ),
         ),
@@ -45,7 +45,7 @@ class LoginHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
-            color: LoginPageColors.onSurfaceVariant,
+            color: AppColors.onSurfaceVariant,
           ),
         ),
       ],

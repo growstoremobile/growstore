@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
-import 'package:growstore/features/auth/widgets/login/login_header.dart';
-import 'package:growstore/features/auth/widgets/login/login_email_field.dart';
-import 'package:growstore/features/auth/widgets/login/login_password_field.dart';
-import 'package:growstore/features/auth/widgets/login/login_button.dart';
-import 'package:growstore/features/auth/widgets/login/login_divider.dart';
-import 'package:growstore/features/auth/widgets/login/login_google_button.dart';
-import 'package:growstore/features/auth/widgets/login/login_footer.dart';
-import 'package:growstore/features/auth/stores/login_store.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/shared/colors/colors.dart';
+import 'package:growstore/features/auth/widgets/login/login_header_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_email_field_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_password_field_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_button_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_divider_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_footer_widget.dart';
+import 'package:growstore/features/auth/stores/login/login_store.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,6 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
+    if (_loginStore.isLoading) return;
+
     if (_formKey.currentState?.validate() ?? false) {
       final success = await _loginStore.login(
         _emailController.text,
@@ -54,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: LoginPageColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -64,10 +67,10 @@ class _LoginPageState extends State<LoginPage> {
               child: Container(
                 padding: const EdgeInsets.all(32.0),
                 decoration: BoxDecoration(
-                  color: LoginPageColors.surfaceLowest.withValues(alpha: 0.9),
+                  color: AppColors.surfaceLowest.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: LoginPageColors.outlineVariant.withValues(
+                    color: AppColors.outlineVariant.withValues(
                       alpha: 0.3,
                     ),
                   ),
@@ -84,22 +87,29 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const LoginHeader(),
+                      const LoginHeaderWidget(),
                       const SizedBox(height: 40),
-                      LoginEmailField(controller: _emailController),
+                      LoginEmailFieldWidget(controller: _emailController),
                       const SizedBox(height: 24),
-                      LoginPasswordField(
+                      LoginPasswordFieldWidget(
                         controller: _passwordController,
                         onSubmitted: _handleLogin,
                       ),
                       const SizedBox(height: 32),
-                      LoginButton(onPressed: _handleLogin),
+                      Observer(
+                        builder: (_) {
+                          return LoginButtonWidget(
+                            isLoading: _loginStore.isLoading,
+                            onPressed: _handleLogin,
+                          );
+                        },
+                      ),
                       const SizedBox(height: 32),
-                      const LoginDivider(),
+                      const LoginDividerWidget(),
                       const SizedBox(height: 24),
-                      const LoginGoogleButton(),
+                      const LoginGoogleButtonWidget(),
                       const SizedBox(height: 32),
-                      const LoginFooter(),
+                      const LoginFooterWidget(),
                     ],
                   ),
                 ),

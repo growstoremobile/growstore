@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoginPageColors {
+class AppColors {
   static const Color backgroundColor = Color(0xFFF9F9F9);
   static const Color primaryColor = Color(0xFF006E20);
   static const Color growthGreen = Color(0xFF39B54A);

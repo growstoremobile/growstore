@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
-class LoginGoogleButton extends StatelessWidget {
-  const LoginGoogleButton({super.key});
+class LoginGoogleButtonWidget extends StatelessWidget {
+  const LoginGoogleButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class LoginGoogleButton extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            color: LoginPageColors.deepNavy,
+            color: AppColors.deepNavy,
           ),
         ),
         label: const Text(
@@ -26,9 +26,9 @@ class LoginGoogleButton extends StatelessWidget {
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
         style: OutlinedButton.styleFrom(
-          foregroundColor: LoginPageColors.deepNavy,
+          foregroundColor: AppColors.deepNavy,
           side: BorderSide(
-            color: LoginPageColors.outline.withValues(alpha: 0.5),
+            color: AppColors.outline.withValues(alpha: 0.5),
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26),

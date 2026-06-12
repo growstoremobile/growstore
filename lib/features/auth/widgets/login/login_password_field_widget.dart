@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
-class LoginPasswordField extends StatefulWidget {
+class LoginPasswordFieldWidget extends StatefulWidget {
   final TextEditingController controller;
   final VoidCallback onSubmitted;
 
-  const LoginPasswordField({
+  const LoginPasswordFieldWidget({
     super.key,
     required this.controller,
     required this.onSubmitted,
   });
 
   @override
-  State<LoginPasswordField> createState() => _LoginPasswordFieldState();
+  State<LoginPasswordFieldWidget> createState() =>
+      _LoginPasswordFieldWidgetState();
 }
 
-class _LoginPasswordFieldState extends State<LoginPasswordField> {
+class _LoginPasswordFieldWidgetState extends State<LoginPasswordFieldWidget> {
   bool _isPasswordVisible = false;
 
   @override
@@ -33,7 +34,7 @@ class _LoginPasswordFieldState extends State<LoginPasswordField> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: LoginPageColors.deepNavy,
+                  color: AppColors.deepNavy,
                 ),
               ),
             ],
@@ -53,16 +54,16 @@ class _LoginPasswordFieldState extends State<LoginPasswordField> {
           decoration: InputDecoration(
             hintText: '••••••••',
             hintStyle: TextStyle(
-              color: LoginPageColors.outline.withValues(alpha: 0.6),
+              color: AppColors.outline.withValues(alpha: 0.6),
             ),
             prefixIcon: const Icon(
               Icons.lock_outline,
-              color: LoginPageColors.onSurfaceVariant,
+              color: AppColors.onSurfaceVariant,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                color: LoginPageColors.onSurfaceVariant,
+                color: AppColors.onSurfaceVariant,
               ),
               onPressed: () =>
                   setState(() => _isPasswordVisible = !_isPasswordVisible),
@@ -75,19 +76,19 @@ class _LoginPasswordFieldState extends State<LoginPasswordField> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: LoginPageColors.outline),
+              borderSide: const BorderSide(color: AppColors.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
-                color: LoginPageColors.outline,
+                color: AppColors.outline,
                 width: 0.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
-                color: LoginPageColors.primaryColor,
+                color: AppColors.primaryColor,
                 width: 2,
               ),
             ),

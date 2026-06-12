@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
-class LoginDivider extends StatelessWidget {
-  const LoginDivider({super.key});
+class LoginDividerWidget extends StatelessWidget {
+  const LoginDividerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class LoginDivider extends StatelessWidget {
       children: [
         Expanded(
           child: Divider(
-            color: LoginPageColors.outlineVariant.withValues(alpha: 0.5),
+            color: AppColors.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         const Padding(
@@ -19,7 +19,7 @@ class LoginDivider extends StatelessWidget {
             'OU ACESSE COM',
             style: TextStyle(
               fontSize: 12,
-              color: LoginPageColors.onSurfaceVariant,
+              color: AppColors.onSurfaceVariant,
               fontWeight: FontWeight.w600,
               letterSpacing: 1.2,
             ),
@@ -27,7 +27,7 @@ class LoginDivider extends StatelessWidget {
         ),
         Expanded(
           child: Divider(
-            color: LoginPageColors.outlineVariant.withValues(alpha: 0.5),
+            color: AppColors.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
       ],

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors_login_page.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
-class LoginEmailField extends StatelessWidget {
+class LoginEmailFieldWidget extends StatelessWidget {
   final TextEditingController controller;
 
-  const LoginEmailField({super.key, required this.controller});
+  const LoginEmailFieldWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class LoginEmailField extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: LoginPageColors.deepNavy,
+              color: AppColors.deepNavy,
             ),
           ),
         ),
@@ -35,11 +35,11 @@ class LoginEmailField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: 'seu@email.com',
             hintStyle: TextStyle(
-              color: LoginPageColors.outline.withValues(alpha: 0.6),
+              color: AppColors.outline.withValues(alpha: 0.6),
             ),
             prefixIcon: const Icon(
               Icons.mail_outline,
-              color: LoginPageColors.onSurfaceVariant,
+              color: AppColors.onSurfaceVariant,
             ),
             filled: true,
             fillColor: Colors.white,
@@ -49,19 +49,19 @@ class LoginEmailField extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: LoginPageColors.outline),
+              borderSide: const BorderSide(color: AppColors.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
-                color: LoginPageColors.outline,
+                color: AppColors.outline,
                 width: 0.5,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: const BorderSide(
-                color: LoginPageColors.primaryColor,
+                color: AppColors.primaryColor,
                 width: 2,
               ),
             ),
