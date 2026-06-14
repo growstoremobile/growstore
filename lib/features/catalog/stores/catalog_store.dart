@@ -1,4 +1,6 @@
+import 'package:growstore/features/catalog/models/catalog_model.dart';
 import 'package:growstore/features/catalog/models/product_model.dart';
+import 'package:growstore/features/catalog/services/catalog_api_service.dart';
 import 'package:growstore/features/catalog/services/product_api_service.dart';
 import 'package:mobx/mobx.dart';
 
@@ -10,23 +12,34 @@ class CatalogStore = CatalogStoreBase with _$CatalogStore;
 
 // The store-class
 abstract class CatalogStoreBase with Store {
-  final ProductApiService _service = ProductApiService();
+  final ProductApiService _serviceProduct = ProductApiService();
+  final CatalogApiService _serviceCatalog = CatalogApiService();
 
   @observable
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   @observable
-  ObservableList<ProductModel> _products = <ProductModel>[].asObservable();
-  ObservableList<ProductModel> get products => _products;
+  // ignore: prefer_final_fields
+  ObservableList<CatalogModel> _catalog = <CatalogModel>[].asObservable();
+  ObservableList<CatalogModel> get catalog => _catalog;
 
   @action
-  Future<void> loadProducts() async {
+  Future<void> loadCatalog() async {
     _isLoading = true;
 
-    final responseProducts = await _service.responseProduct();
+    final responseCatalogs = await _serviceCatalog.responseCatalog();
+    final responseProducts = await _serviceProduct.responseProduct();
 
-    _products.addAll(responseProducts);
+    for (CatalogModel catalog in responseCatalogs) {
+      for (ProductModel product in responseProducts) {
+        if (product.categoryId == catalog.id) {
+          catalog.products.add(product);
+        }
+      }
+    }
+
+    _catalog.addAll(responseCatalogs);
 
     _isLoading = false;
   }

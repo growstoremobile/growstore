@@ -25,28 +25,28 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
     });
   }
 
-  late final _$_productsAtom =
-      Atom(name: 'CatalogStoreBase._products', context: context);
+  late final _$_catalogAtom =
+      Atom(name: 'CatalogStoreBase._catalog', context: context);
 
   @override
-  ObservableList<ProductModel> get _products {
-    _$_productsAtom.reportRead();
-    return super._products;
+  ObservableList<CatalogModel> get _catalog {
+    _$_catalogAtom.reportRead();
+    return super._catalog;
   }
 
   @override
-  set _products(ObservableList<ProductModel> value) {
-    _$_productsAtom.reportWrite(value, super._products, () {
-      super._products = value;
+  set _catalog(ObservableList<CatalogModel> value) {
+    _$_catalogAtom.reportWrite(value, super._catalog, () {
+      super._catalog = value;
     });
   }
 
-  late final _$loadProductsAsyncAction =
-      AsyncAction('CatalogStoreBase.loadProducts', context: context);
+  late final _$loadCatalogAsyncAction =
+      AsyncAction('CatalogStoreBase.loadCatalog', context: context);
 
   @override
-  Future<void> loadProducts() {
-    return _$loadProductsAsyncAction.run(() => super.loadProducts());
+  Future<void> loadCatalog() {
+    return _$loadCatalogAsyncAction.run(() => super.loadCatalog());
   }
 
   @override
