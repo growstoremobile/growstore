@@ -5,7 +5,7 @@ import 'package:growstore/features/catalog/stores/catalog_store.dart';
 class CatalogPage extends StatelessWidget {
   final CatalogStore _store = CatalogStore();
   CatalogPage({super.key}) {
-    _store.loadProducts();
+    _store.loadCatalog();
   }
 
   @override
@@ -29,26 +29,36 @@ class CatalogPage extends StatelessWidget {
               builder: (context) {
                 return Expanded(
                   child: GridView.builder(
-                    itemCount: _store.products.length,
+                    itemCount: _store.catalogs.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           childAspectRatio: 1,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 19,
                         ),
                     itemBuilder: (BuildContext context, int index) {
-                      return const Card(
-                        child: Column(
-                          children: [
-                            Icon(Icons.person),
-                            Text(
-                              'Nome da categorias',
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              'Quantidade de cada item',
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                      final catalog = _store.catalogs[index];
+
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Image(
+                                  image: NetworkImage(
+                                    catalog.products[index].imageUrl,
+                                  ),
+                                ),
+                              ),
+                              Text(catalog.title, textAlign: TextAlign.center),
+                              Text(
+                                '${catalog.products.length} itens',
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

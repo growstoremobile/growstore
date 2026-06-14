@@ -21,8 +21,8 @@ abstract class CatalogStoreBase with Store {
 
   @observable
   // ignore: prefer_final_fields
-  ObservableList<CatalogModel> _catalog = <CatalogModel>[].asObservable();
-  ObservableList<CatalogModel> get catalog => _catalog;
+  ObservableList<CatalogModel> _catalogs = <CatalogModel>[].asObservable();
+  ObservableList<CatalogModel> get catalogs => _catalogs;
 
   @action
   Future<void> loadCatalog() async {
@@ -39,7 +39,7 @@ abstract class CatalogStoreBase with Store {
       }
     }
 
-    _catalog.addAll(responseCatalogs);
+    _catalogs.addAll(responseCatalogs);
 
     _isLoading = false;
   }

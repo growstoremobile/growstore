@@ -25,19 +25,19 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
     });
   }
 
-  late final _$_catalogAtom =
-      Atom(name: 'CatalogStoreBase._catalog', context: context);
+  late final _$_catalogsAtom =
+      Atom(name: 'CatalogStoreBase._catalogs', context: context);
 
   @override
-  ObservableList<CatalogModel> get _catalog {
-    _$_catalogAtom.reportRead();
-    return super._catalog;
+  ObservableList<CatalogModel> get _catalogs {
+    _$_catalogsAtom.reportRead();
+    return super._catalogs;
   }
 
   @override
-  set _catalog(ObservableList<CatalogModel> value) {
-    _$_catalogAtom.reportWrite(value, super._catalog, () {
-      super._catalog = value;
+  set _catalogs(ObservableList<CatalogModel> value) {
+    _$_catalogsAtom.reportWrite(value, super._catalogs, () {
+      super._catalogs = value;
     });
   }
 
