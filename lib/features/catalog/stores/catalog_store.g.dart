@@ -9,6 +9,14 @@ part of 'catalog_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$CatalogStore on CatalogStoreBase, Store {
+  Computed<List<CatalogModel>>? _$filteredCatalogsComputed;
+
+  @override
+  List<CatalogModel> get filteredCatalogs => (_$filteredCatalogsComputed ??=
+          Computed<List<CatalogModel>>(() => super.filteredCatalogs,
+              name: 'CatalogStoreBase.filteredCatalogs'))
+      .value;
+
   late final _$_isLoadingAtom =
       Atom(name: 'CatalogStoreBase._isLoading', context: context);
 
@@ -41,6 +49,22 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
     });
   }
 
+  late final _$searchAtom =
+      Atom(name: 'CatalogStoreBase.search', context: context);
+
+  @override
+  String? get search {
+    _$searchAtom.reportRead();
+    return super.search;
+  }
+
+  @override
+  set search(String? value) {
+    _$searchAtom.reportWrite(value, super.search, () {
+      super.search = value;
+    });
+  }
+
   late final _$loadCatalogAsyncAction =
       AsyncAction('CatalogStoreBase.loadCatalog', context: context);
 
@@ -49,10 +73,25 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
     return _$loadCatalogAsyncAction.run(() => super.loadCatalog());
   }
 
+  late final _$CatalogStoreBaseActionController =
+      ActionController(name: 'CatalogStoreBase', context: context);
+
+  @override
+  void setSearch(String? text) {
+    final _$actionInfo = _$CatalogStoreBaseActionController.startAction(
+        name: 'CatalogStoreBase.setSearch');
+    try {
+      return super.setSearch(text);
+    } finally {
+      _$CatalogStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
-
+search: ${search},
+filteredCatalogs: ${filteredCatalogs}
     ''';
   }
 }

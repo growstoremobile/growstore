@@ -3,9 +3,19 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:growstore/features/catalog/pages/products_page.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
 
-class CatalogPage extends StatelessWidget {
+class CatalogPage extends StatefulWidget {
+  const CatalogPage({super.key});
+
+  @override
+  State<CatalogPage> createState() => _CatalogPageState();
+}
+
+class _CatalogPageState extends State<CatalogPage> {
   final CatalogStore _store = CatalogStore();
-  CatalogPage({super.key}) {
+
+  @override
+  void initState() {
+    super.initState();
     _store.loadCatalog();
   }
 
@@ -15,22 +25,23 @@ class CatalogPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Categorias'),
         centerTitle: true,
-        bottom: const PreferredSize(
-          preferredSize: Size(double.infinity, 54),
+        bottom: PreferredSize(
+          preferredSize: const Size(double.infinity, 54),
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               spacing: 16,
               children: [
                 Expanded(
                   child: TextField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       icon: Icon(Icons.search),
                       hint: Text('Buscar produtos...'),
                     ),
+                    onChanged: _store.setSearch,
                   ),
                 ),
-                CircleAvatar(child: Icon(Icons.person)),
+                const CircleAvatar(child: Icon(Icons.person)),
               ],
             ),
           ),
@@ -40,11 +51,12 @@ class CatalogPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Observer(
-              builder: (context) {
-                return Expanded(
-                  child: GridView.builder(
-                    itemCount: _store.catalogs.length,
+            Expanded(
+              child: Observer(
+                builder: (context) {
+                  final filteredList = _store.filteredCatalogs;
+                  return GridView.builder(
+                    itemCount: filteredList.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
@@ -53,7 +65,7 @@ class CatalogPage extends StatelessWidget {
                           crossAxisSpacing: 19,
                         ),
                     itemBuilder: (BuildContext context, int index) {
-                      final catalog = _store.catalogs[index];
+                      final catalog = filteredList[index];
 
                       return InkWell(
                         onTap: () => Navigator.push(
@@ -88,9 +100,9 @@ class CatalogPage extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ],
         ),

@@ -24,6 +24,24 @@ abstract class CatalogStoreBase with Store {
   ObservableList<CatalogModel> _catalogs = <CatalogModel>[].asObservable();
   ObservableList<CatalogModel> get catalogs => _catalogs;
 
+  @observable
+  String? search;
+
+  @computed
+  List<CatalogModel> get filteredCatalogs {
+    if (search == null || search!.isEmpty) return _catalogs.toList();
+
+    return _catalogs
+        .where(
+          (catalog) =>
+              catalog.title.toLowerCase().contains(search!.toLowerCase()),
+        )
+        .toList();
+  }
+
+  @action
+  void setSearch(String? text) => search = text;
+
   @action
   Future<void> loadCatalog() async {
     _isLoading = true;
