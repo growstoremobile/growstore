@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/features/catalog/pages/products_page.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
 
 class CatalogPage extends StatelessWidget {
@@ -12,19 +13,33 @@ class CatalogPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const TextField(
-          decoration: InputDecoration(
-            icon: Icon(Icons.search),
-            hintText: 'Buscar produtos...',
+        title: const Text('Categorias'),
+        centerTitle: true,
+        bottom: const PreferredSize(
+          preferredSize: Size(double.infinity, 54),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              spacing: 16,
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.search),
+                      hint: Text('Buscar produtos...'),
+                    ),
+                  ),
+                ),
+                CircleAvatar(child: Icon(Icons.person)),
+              ],
+            ),
           ),
         ),
-        actions: const [CircleAvatar(child: Icon(Icons.person))],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text('Categorias', textAlign: TextAlign.center),
             Observer(
               builder: (context) {
                 return Expanded(
@@ -40,24 +55,35 @@ class CatalogPage extends StatelessWidget {
                     itemBuilder: (BuildContext context, int index) {
                       final catalog = _store.catalogs[index];
 
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Image(
-                                  image: NetworkImage(
-                                    catalog.products[index].imageUrl,
+                      return InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductsPage(catalog: catalog),
+                          ),
+                        ),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Image(
+                                    image: NetworkImage(
+                                      catalog.products[index].imageUrl,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Text(catalog.title, textAlign: TextAlign.center),
-                              Text(
-                                '${catalog.products.length} itens',
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                                Text(
+                                  catalog.title,
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  '${catalog.products.length} itens',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
