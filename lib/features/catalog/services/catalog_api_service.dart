@@ -2,8 +2,13 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:growstore/features/catalog/models/catalog_model.dart';
 
-class CatalogApiService {
-  Future<List<CatalogModel>> responseCatalog() async {
+abstract interface class CatalogService {
+  Future<List<CatalogModel>> getCatalogs();
+}
+
+class CatalogMockService implements CatalogService {
+  @override
+  Future<List<CatalogModel>> getCatalogs() async {
     final response = await rootBundle.loadString('assets/mocks/catalogs.json');
     final data = jsonDecode(response) as List;
 

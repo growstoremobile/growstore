@@ -46,53 +46,57 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Expanded(
-              child: Observer(
-                builder: (context) {
-                  final filteredList = _store.filteredCatalogs;
-                  return GridView.builder(
-                    itemCount: filteredList.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 1,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 19,
-                        ),
-                    itemBuilder: (BuildContext context, int index) {
-                      final catalog = filteredList[index];
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              Expanded(
+                child: Observer(
+                  builder: (context) {
+                    final filteredList = _store.filteredCatalogs;
+                    return _store.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : GridView.builder(
+                            itemCount: filteredList.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  childAspectRatio: 1,
+                                  mainAxisSpacing: 16,
+                                  crossAxisSpacing: 19,
+                                ),
+                            itemBuilder: (BuildContext context, int index) {
+                              final catalog = filteredList[index];
 
-                      return InkWell(
-                        onTap: () {},
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                const Icon(Icons.person),
-                                Text(
-                                  catalog.title,
-                                  textAlign: TextAlign.center,
+                              return InkWell(
+                                onTap: () {},
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: [
+                                        const Icon(Icons.person),
+                                        Text(
+                                          catalog.title,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        Text(
+                                          '${catalog.productQtn} itens',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                Text(
-                                  '${catalog.catalogQtn} itens',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                              );
+                            },
+                          );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: NavigationBar(

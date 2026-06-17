@@ -10,7 +10,7 @@ class CatalogStore = CatalogStoreBase with _$CatalogStore;
 
 // The store-class
 abstract class CatalogStoreBase with Store {
-  final CatalogApiService _serviceCatalog = CatalogApiService();
+  final CatalogService _serviceCatalog = CatalogMockService();
 
   @observable
   bool _isLoading = false;
@@ -43,7 +43,7 @@ abstract class CatalogStoreBase with Store {
   Future<void> loadCatalog() async {
     _isLoading = true;
 
-    final responseCatalogs = await _serviceCatalog.responseCatalog();
+    final responseCatalogs = await _serviceCatalog.getCatalogs();
 
     _catalogs.addAll(responseCatalogs);
 

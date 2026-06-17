@@ -2,21 +2,21 @@
   {
     "id": 1,
     "title": "men's clothing",
-    "catalogQtn": 1
+    "productQtn": 5
   },
   {
     "id": 2,
     "title": "jewelery",
-    "catalogQtn": 1
+    "productQtn": 10
   },
   {
     "id": 3,
     "title": "electronics",
-    "catalogQtn": 1
+    "productQtn": 17
   },
   {
     "id": 4,
     "title": "women's clothing",
-    "catalogQtn": 1
+    "productQtn": 8
   }
 ]
