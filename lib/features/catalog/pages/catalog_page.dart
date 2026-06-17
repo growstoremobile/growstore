@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:growstore/features/catalog/pages/products_page.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -68,30 +67,19 @@ class _CatalogPageState extends State<CatalogPage> {
                       final catalog = filteredList[index];
 
                       return InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductsPage(catalog: catalog),
-                          ),
-                        ),
+                        onTap: () {},
                         child: Card(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               children: [
-                                Expanded(
-                                  child: Image(
-                                    image: NetworkImage(
-                                      catalog.products[index].imageUrl,
-                                    ),
-                                  ),
-                                ),
+                                const Icon(Icons.person),
                                 Text(
                                   catalog.title,
                                   textAlign: TextAlign.center,
                                 ),
                                 Text(
-                                  '${catalog.products.length} itens',
+                                  '${catalog.catalogQtn} itens',
                                   textAlign: TextAlign.center,
                                 ),
                               ],
