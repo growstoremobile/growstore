@@ -1,10 +1,14 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:growstore/features/auth/dtos/auth_dto.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/services/auth_service.dart';
+import 'package:growstore/features/auth/services/google_auth_service.dart'
+    show GoogleAuthService;
 import 'package:growstore/shared/utils/constants.dart';
 
 class AuthRepository {
   final AuthService _service;
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
 
   AuthRepository([AuthService? service])
     : _service = service ?? AuthServiceMock();
@@ -28,5 +32,16 @@ class AuthRepository {
     await secureStorage.write(key: 'token_user', value: token);
 
     return token;
+  }
+
+  Future<UserModel> loginWithGoogle() async {
+    return await _googleAuthService.signInWithGoogle();
+  }
+
+  Future<void> logout() async {
+    await _googleAuthService.signOut();
+
+    const secureStorage = FlutterSecureStorage();
+    await secureStorage.delete(key: 'token_user');
   }
 }

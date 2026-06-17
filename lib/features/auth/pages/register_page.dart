@@ -88,6 +88,32 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<void> _handleGoogleLogin() async {
+    if (_registerStore.isGoogleLoading) return;
+
+    final success = await _registerStore.loginWithGoogle();
+
+    if (mounted) {
+      if (success) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) =>
+                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
+          ),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _registerStore.error ?? 'Erro ao fazer login com Google',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,7 +186,14 @@ class _RegisterPageState extends State<RegisterPage> {
                               const SizedBox(height: 32),
                               const RegisterDividerWidget(),
                               const SizedBox(height: 24),
-                              const LoginGoogleButtonWidget(),
+                              Observer(
+                                builder: (_) {
+                                  return LoginGoogleButtonWidget(
+                                    isLoading: _registerStore.isGoogleLoading,
+                                    onPressed: _handleGoogleLogin,
+                                  );
+                                },
+                              ),
                               const SizedBox(height: 32),
                               const RegisterFooterWidget(),
                             ],
