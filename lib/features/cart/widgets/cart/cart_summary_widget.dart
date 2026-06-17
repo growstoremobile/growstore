@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_checkout_button_widget.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_summary_line_widget.dart';
@@ -31,18 +32,18 @@ class CartSummaryWidget extends StatelessWidget {
         children: [
           CartSummaryLineWidget(
             label: 'Subtotal',
-            value: _formatPrice(subtotal),
+            value: cartCurrency(subtotal),
           ),
           const SizedBox(height: 12),
           CartSummaryLineWidget(
             label: 'Frete Express',
-            value: _formatPrice(shipping),
+            value: cartCurrency(shipping),
           ),
           if (discount > 0) ...[
             const SizedBox(height: 12),
             CartSummaryLineWidget(
               label: 'Desconto${couponCode != null ? ' ($couponCode)' : ''}',
-              value: '- ${_formatPrice(discount)}',
+              value: '- ${cartCurrency(discount)}',
               valueColor: Colors.red.shade600,
             ),
           ],
@@ -83,7 +84,7 @@ class CartSummaryWidget extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _formatNumber(total),
+                      cartCurrencyValue(total),
                       style: const TextStyle(
                         fontSize: 38,
                         fontWeight: FontWeight.w900,
@@ -101,14 +102,5 @@ class CartSummaryWidget extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatPrice(double value) {
-    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
-  }
-
-  // Apenas o número (sem "R$"), usado no total em destaque
-  String _formatNumber(double value) {
-    return value.toStringAsFixed(2).replaceAll('.', ',');
   }
 }

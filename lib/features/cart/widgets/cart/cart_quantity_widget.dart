@@ -15,6 +15,9 @@ class CartQuantityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // No mínimo (1), o decremento fica desabilitado para evitar toque morto
+    final canDecrement = quantity > 1;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.backgroundColor,
@@ -27,14 +30,16 @@ class CartQuantityWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
-            onTap: onDecrement,
+            onTap: canDecrement ? onDecrement : null,
             borderRadius: BorderRadius.circular(8),
-            child: const Padding(
-              padding: EdgeInsets.all(6),
+            child: Padding(
+              padding: const EdgeInsets.all(6),
               child: Icon(
                 Icons.remove,
                 size: 18,
-                color: AppColors.onSurfaceVariant,
+                color: canDecrement
+                    ? AppColors.onSurfaceVariant
+                    : AppColors.outlineVariant,
               ),
             ),
           ),

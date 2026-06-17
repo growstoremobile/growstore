@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
+import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_quantity_widget.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
 import 'package:growstore/shared/colors/colors.dart';
@@ -91,7 +92,7 @@ class CartItemWidget extends StatelessWidget {
           const SizedBox(width: 8),
           // Preço da linha (preço unitário x quantidade)
           Text(
-            _formatPrice(item.totalPrice),
+            cartCurrency(item.totalPrice),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
@@ -101,9 +102,5 @@ class CartItemWidget extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatPrice(double value) {
-    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
   }
 }

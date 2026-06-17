@@ -58,14 +58,19 @@ class CartCouponWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: onRemove,
+                TextButton(
+                  onPressed: onRemove,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    foregroundColor: AppColors.outline,
+                  ),
                   child: const Text(
                     'Remover',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.outline,
                       decoration: TextDecoration.underline,
                     ),
                   ),
