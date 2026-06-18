@@ -1,5 +1,6 @@
 import 'package:growstore/core/errors/custom_error.dart';
 import 'package:growstore/features/auth/dtos/auth_dto.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/repositories/auth_repository.dart';
 import 'package:mobx/mobx.dart';
 
@@ -14,8 +15,13 @@ abstract class RegisterStoreBase with Store {
   final AuthRepository _repository;
 
   @observable
+  UserModel? currentUser;
+
+  @readonly
+  bool _isGoogleLoading = false;
+
+  @readonly
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
 
   @observable
   String? error;
@@ -58,6 +64,27 @@ abstract class RegisterStoreBase with Store {
       return false;
     } finally {
       _isLoading = false;
+    }
+  }
+
+  @action
+  Future<bool> loginWithGoogle() async {
+    try {
+      error = null;
+      _isGoogleLoading = true;
+      await Future.delayed(const Duration(seconds: 2));
+
+      currentUser = await _repository.loginWithGoogle();
+
+      return currentUser != null;
+    } on CustomError catch (e) {
+      error = e.message;
+      return false;
+    } catch (e) {
+      error = 'Não foi possível realizar o login com Google. Tente novamente.';
+      return false;
+    } finally {
+      _isGoogleLoading = false;
     }
   }
 }

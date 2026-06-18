@@ -63,6 +63,32 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _handleGoogleLogin() async {
+    if (_loginStore.isGoogleLoading) return;
+
+    final success = await _loginStore.loginWithGoogle();
+
+    if (mounted) {
+      if (success) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) =>
+                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
+          ),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _loginStore.error ?? 'Erro ao fazer login com Google',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +141,14 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 32),
                       const LoginDividerWidget(),
                       const SizedBox(height: 24),
-                      const LoginGoogleButtonWidget(),
+                      Observer(
+                        builder: (_) {
+                          return LoginGoogleButtonWidget(
+                            isLoading: _loginStore.isGoogleLoading,
+                            onPressed: _handleGoogleLogin,
+                          );
+                        },
+                      ),
                       const SizedBox(height: 32),
                       const LoginFooterWidget(),
                     ],

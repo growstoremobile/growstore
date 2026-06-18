@@ -75,6 +75,81 @@ O projeto tem foco em uma interface fluida, responsiva e alinhada às boas prát
 - API REST
 - JWT
 
+## Configuração Firebase
+
+O login social com Google utiliza Firebase Authentication.
+
+### Arquivos necessários
+
+Os arquivos abaixo não são versionados no repositório e devem ser adicionados manualmente:
+
+**Android**
+
+```text
+android/app/google-services.json
+```
+
+**iOS**
+
+```text
+ios/Runner/GoogleService-Info.plist
+```
+
+### Configuração Android
+
+1. Criar um projeto no Firebase Console.
+2. Registrar o aplicativo Android.
+3. Baixar o arquivo `google-services.json`.
+4. Adicionar o arquivo em:
+
+```text
+android/app/google-services.json
+```
+
+5. Executar:
+
+```bash
+flutterfire configure
+```
+
+### Configuração iOS
+
+1. Registrar o aplicativo iOS no Firebase.
+2. Baixar o arquivo `GoogleService-Info.plist`.
+3. Adicionar o arquivo em:
+
+```text
+ios/Runner/GoogleService-Info.plist
+```
+
+4. Executar:
+
+```bash
+flutterfire configure
+```
+
+### Executando o projeto
+
+```bash
+flutter pub get
+flutter run
+```
+
+## Login com Google
+
+A autenticação social foi implementada utilizando:
+
+- Firebase Authentication
+- Google Sign-In
+
+Fluxos implementados:
+
+- Login com conta Google
+- Logout utilizando Firebase Authentication
+- Tratamento de sucesso na autenticação
+- Tratamento de cancelamento do login
+- Tratamento de erros de autenticação
+
 ## Plataformas Suportadas
 
 - Android
