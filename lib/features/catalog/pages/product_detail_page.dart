@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/product_detail_image_widget.dart';
 
 // Cores temporárias da GrowStore
 // ⚠️ Substitua por AppColors.xxx quando as cores oficiais estiverem prontas
@@ -69,10 +70,17 @@ class ProductDetailPage extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: Center(
-        child: Text(
-          "PDP do produto: $productId",
-          style: const TextStyle(color: productTextPrimary),
+      body: const SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 16),
+            ProductDetailImageWidget(
+              imageUrl: ["assets/images/T-ShirtDark.png"],
+            ),
+
+            SizedBox(height: 24),
+          ],
         ),
       ),
     );
