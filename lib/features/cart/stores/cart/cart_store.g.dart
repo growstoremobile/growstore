@@ -122,6 +122,22 @@ mixin _$CartStore on CartStoreBase, Store {
     });
   }
 
+  late final _$lastAddedItemAtom =
+      Atom(name: 'CartStoreBase.lastAddedItem', context: context);
+
+  @override
+  CartItemModel? get lastAddedItem {
+    _$lastAddedItemAtom.reportRead();
+    return super.lastAddedItem;
+  }
+
+  @override
+  set lastAddedItem(CartItemModel? value) {
+    _$lastAddedItemAtom.reportWrite(value, super.lastAddedItem, () {
+      super.lastAddedItem = value;
+    });
+  }
+
   late final _$loadCartAsyncAction =
       AsyncAction('CartStoreBase.loadCart', context: context);
 
@@ -132,6 +148,17 @@ mixin _$CartStore on CartStoreBase, Store {
 
   late final _$CartStoreBaseActionController =
       ActionController(name: 'CartStoreBase', context: context);
+
+  @override
+  void addItem(CartItemModel item) {
+    final _$actionInfo = _$CartStoreBaseActionController.startAction(
+        name: 'CartStoreBase.addItem');
+    try {
+      return super.addItem(item);
+    } finally {
+      _$CartStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void incrementQuantity(CartItemModel item) {
@@ -189,12 +216,24 @@ mixin _$CartStore on CartStoreBase, Store {
   }
 
   @override
+  void clearCart() {
+    final _$actionInfo = _$CartStoreBaseActionController.startAction(
+        name: 'CartStoreBase.clearCart');
+    try {
+      return super.clearCart();
+    } finally {
+      _$CartStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 items: ${items},
 error: ${error},
 appliedCoupon: ${appliedCoupon},
 couponError: ${couponError},
+lastAddedItem: ${lastAddedItem},
 subtotal: ${subtotal},
 totalItems: ${totalItems},
 shipping: ${shipping},
