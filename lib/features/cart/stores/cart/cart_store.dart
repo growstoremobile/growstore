@@ -37,6 +37,11 @@ abstract class CartStoreBase with Store {
   @observable
   String? couponError;
 
+  // Último item adicionado ao carrinho. A UI (ex: tela de produto/PDP) pode
+  // observar este campo para exibir o feedback visual ao adicionar o produto.
+  @observable
+  CartItemModel? lastAddedItem;
+
   // Subtotal atualizado automaticamente (soma de preço x quantidade)
   @computed
   double get subtotal =>
@@ -58,6 +63,10 @@ abstract class CartStoreBase with Store {
   @computed
   double get total => subtotal - discount + shipping;
 
+  // Índice de um item equivalente (mesmo produto e variação), ou -1 se não existir
+  int _equivalentIndex(CartItemModel item) =>
+      items.indexWhere((e) => e.id == item.id && e.variation == item.variation);
+
   @action
   Future<void> loadCart() async {
     try {
@@ -77,8 +86,26 @@ abstract class CartStoreBase with Store {
   }
 
   @action
+  void addItem(CartItemModel item) {
+    final index = _equivalentIndex(item);
+
+    if (index >= 0) {
+      // Já existe um item equivalente: soma a quantidade em vez de duplicar
+      final current = items[index];
+      items[index] = current.copyWith(
+        quantity: current.quantity + item.quantity,
+      );
+    } else {
+      items.add(item);
+    }
+
+    // Sinaliza o item adicionado para a UI exibir o feedback visual
+    lastAddedItem = item;
+  }
+
+  @action
   void incrementQuantity(CartItemModel item) {
-    final index = items.indexWhere((e) => e.id == item.id);
+    final index = _equivalentIndex(item);
     if (index == -1) return;
 
     final current = items[index];
@@ -87,7 +114,7 @@ abstract class CartStoreBase with Store {
 
   @action
   void decrementQuantity(CartItemModel item) {
-    final index = items.indexWhere((e) => e.id == item.id);
+    final index = _equivalentIndex(item);
     if (index == -1) return;
 
     final current = items[index];
@@ -98,7 +125,7 @@ abstract class CartStoreBase with Store {
 
   @action
   void removeItem(CartItemModel item) {
-    items.removeWhere((e) => e.id == item.id);
+    items.removeWhere((e) => e.id == item.id && e.variation == item.variation);
   }
 
   @action
@@ -123,5 +150,14 @@ abstract class CartStoreBase with Store {
   void removeCoupon() {
     appliedCoupon = null;
     couponError = null;
+  }
+
+  // Limpa o carrinho por completo (chamado após finalizar a compra/checkout)
+  @action
+  void clearCart() {
+    items.clear();
+    appliedCoupon = null;
+    couponError = null;
+    lastAddedItem = null;
   }
 }

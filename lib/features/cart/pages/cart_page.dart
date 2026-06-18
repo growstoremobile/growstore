@@ -48,6 +48,8 @@ class _CartPageState extends State<CartPage> {
   }
 
   void _handleCheckout() {
+    // Limpa o carrinho ao finalizar a compra
+    _cartStore.clearCart();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Compra finalizada com sucesso!')),
     );
