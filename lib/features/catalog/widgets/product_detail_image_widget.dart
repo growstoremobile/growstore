@@ -4,9 +4,9 @@ const productSurfaceColor = Color(0xFF1A1A1A); // Grafite mais claro (cards)
 const productTextSecondary = Color(0xFFFFFFFF); // Branco
 
 class ProductDetailImageWidget extends StatefulWidget {
-  final List<String> imageUrl;
+  final List<String> pathImages;
 
-  const ProductDetailImageWidget({super.key, required this.imageUrl});
+  const ProductDetailImageWidget({super.key, required this.pathImages});
 
   @override
   State<ProductDetailImageWidget> createState() =>
@@ -18,7 +18,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.imageUrl.isEmpty) {
+    if (widget.pathImages.isEmpty) {
       return _buildPlaceholder();
     }
 
@@ -35,26 +35,14 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
             child: SizedBox(
               height: 320,
               child: PageView.builder(
-                itemCount: widget.imageUrl.length,
+                itemCount: widget.pathImages.length,
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
                 },
                 itemBuilder: (context, index) {
-                  return Image.network(
-                    widget.imageUrl[index],
+                  return Image.asset(
+                    widget.pathImages[index],
                     fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF3DDC6B),
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
                     errorBuilder: (context, error, stackTrace) {
                       return _buildPlaceholder();
                     },
@@ -66,11 +54,11 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
         ),
         const SizedBox(height: 12),
 
-        if (widget.imageUrl.length > 1)
+        if (widget.pathImages.length > 1)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              widget.imageUrl.length,
+              widget.pathImages.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -91,10 +79,10 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
 
   Widget _buildPlaceholder() {
     return Container(
-      height:320,
+      height: 320,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color:productSurfaceColor,
+        color: productSurfaceColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Center(

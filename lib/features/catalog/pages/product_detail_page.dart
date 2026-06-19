@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/product_detail_image_widget.dart';
+import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 
 // Cores temporárias da GrowStore
 // ⚠️ Substitua por AppColors.xxx quando as cores oficiais estiverem prontas
@@ -76,7 +76,7 @@ class ProductDetailPage extends StatelessWidget {
           children: [
             SizedBox(height: 16),
             ProductDetailImageWidget(
-              imageUrl: ["assets/images/T-ShirtDark.png"],
+              pathImages: ["assets/images/tshirt_growdev.png"],
             ),
 
             SizedBox(height: 24),
