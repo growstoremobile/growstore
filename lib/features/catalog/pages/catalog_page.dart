@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/features/catalog/services/catalog_api_service.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -10,7 +11,9 @@ class CatalogPage extends StatefulWidget {
 }
 
 class _CatalogPageState extends State<CatalogPage> {
-  final CatalogStore _store = CatalogStore();
+  final CatalogStore _store = CatalogStore(
+    serviceCatalog: CatalogMockService(),
+  );
 
   @override
   void initState() {

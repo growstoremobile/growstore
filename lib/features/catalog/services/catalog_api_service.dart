@@ -9,9 +9,15 @@ abstract interface class CatalogService {
 class CatalogMockService implements CatalogService {
   @override
   Future<List<CatalogModel>> getCatalogs() async {
-    final response = await rootBundle.loadString('assets/mocks/catalogs.json');
-    final data = jsonDecode(response) as List;
+    try {
+      final response = await rootBundle.loadString(
+        'assets/mocks/catalogs.json',
+      );
+      final data = jsonDecode(response) as List;
 
-    return (data).map((item) => CatalogModel.fromMap(item)).toList();
+      return data.map((item) => CatalogModel.fromMap(item)).toList();
+    } catch (_) {
+      throw Exception('Erro ao carregar catálagos');
+    }
   }
 }

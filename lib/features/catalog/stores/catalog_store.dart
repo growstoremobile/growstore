@@ -10,7 +10,10 @@ class CatalogStore = CatalogStoreBase with _$CatalogStore;
 
 // The store-class
 abstract class CatalogStoreBase with Store {
-  final CatalogService _serviceCatalog = CatalogMockService();
+  final CatalogService _serviceCatalog;
+
+  CatalogStoreBase({required CatalogService serviceCatalog})
+    : _serviceCatalog = serviceCatalog;
 
   @observable
   bool _isLoading = false;
@@ -41,12 +44,16 @@ abstract class CatalogStoreBase with Store {
 
   @action
   Future<void> loadCatalog() async {
-    _isLoading = true;
+    try {
+      _isLoading = true;
 
-    final responseCatalogs = await _serviceCatalog.getCatalogs();
+      final responseCatalogs = await _serviceCatalog.getCatalogs();
 
-    _catalogs.addAll(responseCatalogs);
-
-    _isLoading = false;
+      _catalogs.addAll(responseCatalogs);
+    } catch (_) {
+      throw Exception('Erro ao mostrar cátalogos na tela.');
+    } finally {
+      _isLoading = false;
+    }
   }
 }

@@ -65,7 +65,7 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
     ),
 
     // Buttons
-    labelLarge: TextStyle(
+    labelLarge: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
       fontSize: GrowTypography.labelLarge,
@@ -75,7 +75,7 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
     ),
 
     // Etiquetas
-    labelSmall: TextStyle(
+    labelSmall: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
       fontSize: GrowTypography.labelSmall,
