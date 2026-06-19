@@ -64,7 +64,7 @@ class DefaultProductCard extends StatelessWidget {
 
             // Informações
             Container(
-              decoration: BoxDecoration(color: Colors.black),
+              decoration: const BoxDecoration(color: Colors.black),
               child: Padding(
                 padding: const EdgeInsets.all(.0),
                 child: Column(
@@ -95,7 +95,7 @@ class DefaultProductCard extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: onPressed,
                         icon: Icon(iconButton ?? iconButton),
-                        label: Text(textButton ?? 'Adicionar'),
+                        label: Text(textButton ?? ''),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadiusGeometry.circular(8),

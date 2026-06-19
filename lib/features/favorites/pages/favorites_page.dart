@@ -5,18 +5,18 @@ class FavoritePage extends StatelessWidget {
   FavoritePage({super.key});
   final List<Map<String, dynamic>> store = [
     {
-      'name': 'Notebook Gamer',
-      'price': 4999.90,
+      'name': 'Camiseta',
+      'price': 29.90,
       'image': 'assets/images/tshirt_growdev.png',
     },
     {
-      'name': 'Mouse Gamer',
-      'price': 199.90,
+      'name': 'Camiseta',
+      'price': 29.90,
       'image': 'assets/images/tshirt_growdev.png',
     },
     {
-      'name': 'Teclado Mecânico',
-      'price': 299.90,
+      'name': 'Camiseta',
+      'price': 29.99,
       'image': 'assets/images/tshirt_growdev.png',
     },
   ];
