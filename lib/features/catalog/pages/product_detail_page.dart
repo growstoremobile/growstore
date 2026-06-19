@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
-
-// Cores temporárias da GrowStore
-// ⚠️ Substitua por AppColors.xxx quando as cores oficiais estiverem prontas
-const productBackgroundColor = Color(0xFF0D0D0D); // Preto grafite fundo
-const productSurfaceColor = Color(0xFF1A1A1A); // Grafite mais claro (cards)
-const productPrimaryGreen = Color(0xFF3DDC6B); // Verde vibrante GrowStore
-const productTextPrimary = Color(0xFFFFFFFF); // Branco
-const productTextSecondary = Color(0xFF9E9E9E);
+import 'package:growstore/core/theme/growstore_theme.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final String productId;
@@ -17,18 +10,21 @@ class ProductDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: productBackgroundColor,
+      backgroundColor: GrowColors.darkSurface,
       appBar: AppBar(
-        backgroundColor: productBackgroundColor,
+        backgroundColor: GrowColors.darkBg,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: productTextPrimary),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: GrowColors.darkTextPrimary,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           "Detalhes",
           style: TextStyle(
-            color: productTextPrimary,
+            color: GrowColors.darkTextPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -40,7 +36,7 @@ class ProductDetailPage extends StatelessWidget {
               IconButton(
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
-                  color: productTextPrimary,
+                  color: GrowColors.darkTextPrimary,
                 ),
                 onPressed: () {
                   // Navegar para a página do carrinho
@@ -52,13 +48,13 @@ class ProductDetailPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(
-                    color: productPrimaryGreen,
+                    color: GrowColors.darkBorderHighlight,
                     shape: BoxShape.circle,
                   ),
                   child: const Text(
                     "1",
                     style: TextStyle(
-                      color: productTextPrimary,
+                      color: GrowColors.darkTextPrimary,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),

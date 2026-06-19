@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-const productSurfaceColor = Color(0xFF1A1A1A); // Grafite mais claro (cards)
-const productTextSecondary = Color(0xFFFFFFFF); // Branco
+import 'package:growstore/core/theme/growstore_theme.dart';
 
 class ProductDetailImageWidget extends StatefulWidget {
   final List<String> pathImages;
@@ -27,7 +25,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: productSurfaceColor,
+            color: GrowColors.darkSurface,
             borderRadius: BorderRadius.circular(16),
           ),
           child: ClipRRect(
@@ -67,7 +65,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
                 decoration: BoxDecoration(
                   color: _currentIndex == index
                       ? const Color(0xFF3DDC6B)
-                      : productTextSecondary,
+                      : GrowColors.darkTextSecondary,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -82,13 +80,13 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
       height: 320,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: productSurfaceColor,
+        color: GrowColors.darkSurface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Center(
         child: Icon(
           Icons.image_not_supported_outlined,
-          color: productTextSecondary,
+          color: GrowColors.darkTextSecondary,
           size: 48,
         ),
       ),
