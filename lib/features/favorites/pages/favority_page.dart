@@ -32,6 +32,25 @@ class _FavorityPageState extends State<FavorityPage> {
             );
           }
 
+          if (favorityStore.errorMessage != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    favorityStore.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: favorityStore.getFavorities,
+                    child: const Text("Tentar novamente"),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (favorityStore.favorities.isEmpty) {
             return const Center(
               child: Text(

@@ -17,15 +17,21 @@ abstract class FavorityProductsStoreBase with Store {
   @observable
   bool isLoading = false;
 
+  @observable
+  String? errorMessage;
+
   @action
   Future<void> getFavorities() async {
     isLoading = true;
+    errorMessage = null; // Limpa erros anteriores ao tentar novamente
+
     try {
       final listFromRepository = await _repository.getAllFavorities();
       favorities.clear();
       favorities.addAll(listFromRepository);
     } catch (e) {
-      print(e);
+      errorMessage =
+          "Não foi possível carregar seus favoritos. Verifique sua conexão.";
     } finally {
       isLoading = false;
     }

@@ -18,7 +18,7 @@ class FavoriteService {
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      throw Exception('Erro ao buscar favoritos no Supabase: $e');
+      rethrow;
     }
   }
 }
