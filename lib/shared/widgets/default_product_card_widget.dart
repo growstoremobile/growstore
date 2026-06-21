@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class DefaultProductCard extends StatelessWidget {
   final String titleProduct;
   final IconData? iconButton;
-  final IconData? iconFavorite;
+  final IconData? iconFavority;
   final String? textButton;
   final String? pathImage;
   final double price;
@@ -15,7 +15,7 @@ class DefaultProductCard extends StatelessWidget {
     required this.price,
     this.pathImage,
     this.iconButton,
-    this.iconFavorite,
+    this.iconFavority,
     this.textButton,
     this.onPressed,
   });
@@ -44,7 +44,15 @@ class DefaultProductCard extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: pathImage != null
-                          ? Image.asset(pathImage!, fit: BoxFit.contain)
+                          ? (pathImage!.startsWith('http')
+                                ? Image.network(
+                                    pathImage!,
+                                    fit: BoxFit.contain,
+                                  ) // Se for link do Supabase
+                                : Image.asset(
+                                    pathImage!,
+                                    fit: BoxFit.contain,
+                                  )) // Se for asset local mockado
                           : const Placeholder(),
                     ),
 
@@ -53,7 +61,7 @@ class DefaultProductCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Icon(
-                        iconFavorite ?? iconFavorite,
+                        iconFavority ?? iconFavority,
                         color: Colors.green,
                       ),
                     ),
