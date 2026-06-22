@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:growstore/core/theme/growstore_theme.dart';
 
 class DefaultProductCard extends StatelessWidget {
   final String titleProduct;
@@ -22,11 +23,14 @@ class DefaultProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Colors.green, width: 1),
-      ),
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(16),
+      //   side: const BorderSide(color: Colors.green, width: 1),
+      // ),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         width: 180,
@@ -61,8 +65,10 @@ class DefaultProductCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Icon(
-                        iconFavority ?? iconFavority,
-                        color: Colors.green,
+                        iconFavority ?? Icons.favorite_border,
+                        color: iconFavority == Icons.favorite
+                            ? colors.primary
+                            : theme.hintColor,
                       ),
                     ),
                   ],
@@ -72,9 +78,9 @@ class DefaultProductCard extends StatelessWidget {
 
             // Informações
             Container(
-              decoration: const BoxDecoration(color: Colors.black),
+              decoration: BoxDecoration(color: colors.surfaceContainerHighest),
               child: Padding(
-                padding: const EdgeInsets.all(.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -82,17 +88,15 @@ class DefaultProductCard extends StatelessWidget {
                       titleProduct,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white),
+                      style: theme.textTheme.titleLarge,
                     ),
 
                     const SizedBox(height: 4),
 
                     Text(
                       'R\$ ${price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                      style: theme.textTheme.priceStyle.copyWith(
+                        color: colors.primary,
                       ),
                     ),
 
@@ -106,10 +110,8 @@ class DefaultProductCard extends StatelessWidget {
                         label: Text(textButton ?? ''),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(8),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
                         ),
                       ),
                     ),
