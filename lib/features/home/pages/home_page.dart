@@ -69,7 +69,7 @@ class HomePage extends StatelessWidget {
           children: [
             HomeHeader(
               onMenu: () => scaffoldKey.currentState?.openDrawer(),
-              onSearch: () => _comingSoon(context, 'Busca'),
+              onSearch: () => Navigator.of(context).pushNamed('/search'),
             ),
             Expanded(
               child: SingleChildScrollView(

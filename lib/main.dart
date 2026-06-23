@@ -9,6 +9,7 @@ import 'package:growstore/features/favorites/repositories/favority_repository.da
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
+import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/firebase_options.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -64,6 +65,7 @@ class GrowStoreApp extends StatelessWidget {
       home: const HomePage(),
       routes: {
         '/home': (_) => const HomePage(),
+        '/search': (_) => const SearchPage(),
         '/cart': (_) => const CartPage(),
         '/favorites': (_) => const FavorityPage(),
       },
