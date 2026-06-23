@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
+import 'package:growstore/shared/widgets/theme_toggle_button.dart';
 
 class HomeSearchBar extends StatelessWidget {
   const HomeSearchBar({
@@ -72,13 +73,11 @@ class HomeSearchBar extends StatelessWidget {
             onTap: onProfile,
           ),
           const SizedBox(width: 8),
-          Tooltip(
-            message: isDark ? 'Usar tema claro' : 'Usar tema escuro',
-            child: _HomeHeaderIconButton(
-              icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-              colors: colors,
-              onTap: onThemeToggle,
-            ),
+          ThemeToggleButton(
+            isDark: isDark,
+            onPressed: onThemeToggle,
+            borderColor: colors.avatarBorder,
+            iconColor: colors.avatarIcon,
           ),
         ],
       ),

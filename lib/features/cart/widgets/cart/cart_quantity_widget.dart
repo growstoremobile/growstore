@@ -15,9 +15,6 @@ class CartQuantityWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // No mínimo (1), o decremento fica desabilitado para evitar toque morto
-    final canDecrement = quantity > 1;
-
     return Container(
       decoration: BoxDecoration(
         color: AppColors.backgroundColor,
@@ -29,40 +26,32 @@ class CartQuantityWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          InkWell(
-            onTap: canDecrement ? onDecrement : null,
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: Icon(
-                Icons.remove,
-                size: 18,
-                color: canDecrement
-                    ? AppColors.onSurfaceVariant
-                    : AppColors.outlineVariant,
-              ),
+          SizedBox.square(
+            dimension: 32,
+            child: IconButton(
+              onPressed: onDecrement,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.remove, size: 18),
+              color: AppColors.onSurfaceVariant,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+          SizedBox(
+            width: 32,
             child: Text(
               '$quantity',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
-          InkWell(
-            onTap: onIncrement,
-            borderRadius: BorderRadius.circular(8),
-            child: const Padding(
-              padding: EdgeInsets.all(6),
-              child: Icon(
-                Icons.add,
-                size: 18,
-                color: AppColors.onSurfaceVariant,
-              ),
+          SizedBox.square(
+            dimension: 32,
+            child: IconButton(
+              onPressed: onIncrement,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.add, size: 18),
+              color: AppColors.onSurfaceVariant,
             ),
           ),
         ],

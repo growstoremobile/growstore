@@ -5,6 +5,7 @@ import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
@@ -37,6 +38,7 @@ Future<void> initServiceLocator() async {
   );
 
   GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  GetIt.I.registerSingleton<CartStore>(CartStore());
 }
 
 Future<void> main() async {

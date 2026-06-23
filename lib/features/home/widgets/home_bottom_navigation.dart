@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeBottomNavigation extends StatelessWidget {
-  const HomeBottomNavigation({super.key, required this.onTap});
+  const HomeBottomNavigation({
+    super.key,
+    required this.onTap,
+    this.cartItemCount = 0,
+  });
 
   final ValueChanged<String> onTap;
+  final int cartItemCount;
 
   static const _items = [
     (Icons.home_filled, 'Início'),
@@ -39,16 +44,55 @@ class HomeBottomNavigation extends StatelessWidget {
       child: Row(
         children: _items.map((item) {
           final selected = item.$2 == 'Início';
+          final isCart = item.$2 == 'Carrinho';
+          final iconColor = selected ? primary : unselected;
+          final badgeLabel = cartItemCount > 99 ? '99+' : '$cartItemCount';
+
           return Expanded(
             child: InkWell(
               onTap: () => onTap(item.$2),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    item.$1,
-                    color: selected ? primary : unselected,
-                    size: 25,
+                  SizedBox(
+                    width: 36,
+                    height: 28,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(item.$1, color: iconColor, size: 25),
+                        if (isCart && cartItemCount > 0)
+                          Positioned(
+                            top: -2,
+                            right: 0,
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: primary,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: background),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                badgeLabel,
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 3),
                   Text(

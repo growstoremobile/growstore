@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/features/cart/models/cart_item_model.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_carousel_item_model.dart';
@@ -22,6 +25,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
+      ? GetIt.I<CartStore>()
+      : CartStore();
+
   final FavorityProductsStore? _favorityStore =
       GetIt.I.isRegistered<FavorityProductsStore>()
       ? GetIt.I<FavorityProductsStore>()
@@ -129,7 +136,10 @@ class _HomePageState extends State<HomePage> {
         Navigator.of(context).pushNamed('/cart');
         break;
       case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
+        Navigator.of(context).pushNamed('/favorites').then((_) {
+          if (!mounted) return;
+          setState(() {});
+        });
         break;
       case 'Categorias':
       case 'Pedidos':
@@ -162,6 +172,39 @@ class _HomePageState extends State<HomePage> {
 
   bool _isFavorite(int productId) {
     return _favorityStore?.isFavorite(productId) ?? false;
+  }
+
+  void _addToCart(HomeProductModel product) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    _cartStore.addItem(
+      CartItemModel(
+        id: product.id.toString(),
+        name: product.name,
+        variation: product.category,
+        price: product.priceValue,
+        imageUrl: product.asset,
+      ),
+    );
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: isDark
+            ? const Color(0xFF0F1B2A)
+            : const Color(0xFF191C1D),
+        content: Text('${product.name} adicionado ao carrinho'),
+        action: SnackBarAction(
+          label: 'Ver carrinho',
+          textColor: const Color(0xFF40A937),
+          onPressed: () => Navigator.of(context).pushNamed('/cart'),
+        ),
+      ),
+    );
   }
 
   @override
@@ -222,6 +265,7 @@ class _HomePageState extends State<HomePage> {
                         colors: colors,
                         isFavorite: _isFavorite,
                         onFavoriteToggle: _toggleFavorite,
+                        onAddToCart: _addToCart,
                         onTap: (product) => _comingSoon(context, product.name),
                       ),
                     ],
@@ -231,8 +275,11 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        bottomNavigationBar: HomeBottomNavigation(
-          onTap: (label) => _handleBottomNavigation(context, label),
+        bottomNavigationBar: Observer(
+          builder: (_) => HomeBottomNavigation(
+            cartItemCount: _cartStore.totalItems,
+            onTap: (label) => _handleBottomNavigation(context, label),
+          ),
         ),
       ),
     );

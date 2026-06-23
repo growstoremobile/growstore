@@ -10,6 +10,7 @@ class HomeProductGrid extends StatelessWidget {
     required this.colors,
     required this.isFavorite,
     required this.onFavoriteToggle,
+    required this.onAddToCart,
     required this.onTap,
   });
 
@@ -17,6 +18,7 @@ class HomeProductGrid extends StatelessWidget {
   final HomeLayoutColors colors;
   final bool Function(int productId) isFavorite;
   final ValueChanged<HomeProductModel> onFavoriteToggle;
+  final ValueChanged<HomeProductModel> onAddToCart;
   final ValueChanged<HomeProductModel> onTap;
 
   @override
@@ -51,7 +53,7 @@ class HomeProductGrid extends StatelessWidget {
           crossAxisCount: 2,
           mainAxisSpacing: 8,
           crossAxisSpacing: 12,
-          childAspectRatio: 177 / 250,
+          childAspectRatio: 177 / 272,
         ),
         itemBuilder: (context, index) {
           final product = products[index];
@@ -61,6 +63,7 @@ class HomeProductGrid extends StatelessWidget {
             colors: colors,
             isFavorite: isFavorite(product.id),
             onFavoriteToggle: () => onFavoriteToggle(product),
+            onAddToCart: () => onAddToCart(product),
             onTap: () => onTap(product),
           );
         },
@@ -75,6 +78,7 @@ class _HomeProductCard extends StatelessWidget {
     required this.colors,
     required this.isFavorite,
     required this.onFavoriteToggle,
+    required this.onAddToCart,
     required this.onTap,
   });
 
@@ -82,24 +86,33 @@ class _HomeProductCard extends StatelessWidget {
   final HomeLayoutColors colors;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
+  final VoidCallback onAddToCart;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final buttonSurface = isDark
+        ? const Color(0xDD0F1B2A)
+        : Colors.white.withValues(alpha: .94);
+    final mutedText = isDark
+        ? const Color(0xFFBACCB0)
+        : const Color(0xFF5A6658);
+
     return Material(
       color: colors.productCard,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
             color: colors.productCard,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: colors.productBorder),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -110,34 +123,54 @@ class _HomeProductCard extends StatelessWidget {
                     children: [
                       Image.asset(product.asset, fit: BoxFit.cover),
                       Positioned(
-                        top: 0,
-                        right: 0,
-                        child: SizedBox.square(
-                          dimension: 38,
-                          child: IconButton(
-                            onPressed: onFavoriteToggle,
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
-                              isFavorite
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border_rounded,
-                              color: colors.primary,
-                              size: 24,
-                            ),
-                          ),
+                        top: 8,
+                        right: 8,
+                        child: _ProductActionButton(
+                          tooltip: isFavorite
+                              ? 'Remover dos favoritos'
+                              : 'Adicionar aos favoritos',
+                          icon: isFavorite
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          iconColor: isFavorite ? colors.primary : mutedText,
+                          backgroundColor: buttonSurface,
+                          borderColor: colors.productBorder,
+                          onPressed: onFavoriteToggle,
+                        ),
+                      ),
+                      Positioned(
+                        right: 8,
+                        bottom: 8,
+                        child: _ProductActionButton(
+                          tooltip: 'Comprar',
+                          icon: Icons.add_shopping_cart_rounded,
+                          iconColor: Colors.white,
+                          backgroundColor: colors.primary,
+                          borderColor: colors.primary,
+                          onPressed: onAddToCart,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Text(
+                          product.category.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.jetBrainsMono(
+                            color: mutedText,
+                            fontSize: 10,
+                            height: 12 / 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
                         Text(
                           product.name,
                           maxLines: 1,
@@ -149,6 +182,7 @@ class _HomeProductCard extends StatelessWidget {
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                        const Spacer(),
                         Text(
                           product.price,
                           maxLines: 1,
@@ -166,6 +200,49 @@ class _HomeProductCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductActionButton extends StatelessWidget {
+  const _ProductActionButton({
+    required this.tooltip,
+    required this.icon,
+    required this.iconColor,
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final Color iconColor;
+  final Color backgroundColor;
+  final Color borderColor;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: iconColor, size: 20),
           ),
         ),
       ),
