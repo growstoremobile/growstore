@@ -20,6 +20,8 @@ class CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNetworkImage = item.imageUrl.startsWith('http');
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: cartCardDecoration(),
@@ -28,32 +30,42 @@ class CartItemWidget extends StatelessWidget {
           // Imagem do produto
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: CachedNetworkImage(
-              imageUrl: item.imageUrl,
+            child: SizedBox(
               width: 72,
               height: 72,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                width: 72,
-                height: 72,
-                color: AppColors.backgroundColor,
-                child: const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              ),
-              errorWidget: (context, url, error) => Container(
-                width: 72,
-                height: 72,
-                color: AppColors.backgroundColor,
-                child: const Icon(
-                  Icons.shopping_bag_outlined,
-                  color: AppColors.outline,
-                ),
-              ),
+              child: isNetworkImage
+                  ? CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: AppColors.backgroundColor,
+                        child: const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: AppColors.backgroundColor,
+                        child: const Icon(
+                          Icons.shopping_bag_outlined,
+                          color: AppColors.outline,
+                        ),
+                      ),
+                    )
+                  : Image.asset(
+                      item.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: AppColors.backgroundColor,
+                        child: const Icon(
+                          Icons.shopping_bag_outlined,
+                          color: AppColors.outline,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 12),
