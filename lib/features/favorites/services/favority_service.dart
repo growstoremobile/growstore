@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class FavoriteService {
+class FavorityService {
   final _supabase = Supabase.instance.client;
 
   // Busca os dados completos de produtos específicos baseado em uma lista de IDs

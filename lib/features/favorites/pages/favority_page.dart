@@ -73,12 +73,12 @@ class _FavorityPageState extends State<FavorityPage> {
               itemBuilder: (context, index) {
                 final produto = favorityStore.favorities[index];
                 return DefaultProductCard(
-                  titleProduct: produto['title'] ?? '',
-                  iconFavority: favorityStore.isFavorite(produto['id'])
+                  titleProduct: produto.titleProduct,
+                  iconFavority: favorityStore.isFavorite(produto.id)
                       ? Icons.favorite
                       : Icons.favorite_border,
-                  price: (produto['price'] as num).toDouble(),
-                  pathImage: produto['image'],
+                  price: (produto.priceProduct as num).toDouble(),
+                  pathImage: produto.pathImage,
                   iconButton: Icons.shopping_cart,
                   textButton: 'Adicionar',
                   onPressed: () {
