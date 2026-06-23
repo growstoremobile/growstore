@@ -13,13 +13,13 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
       Atom(name: 'FavorityProductsStoreBase.favorities', context: context);
 
   @override
-  ObservableList<Map<String, dynamic>> get favorities {
+  ObservableList<FavorityModel> get favorities {
     _$favoritiesAtom.reportRead();
     return super.favorities;
   }
 
   @override
-  set favorities(ObservableList<Map<String, dynamic>> value) {
+  set favorities(ObservableList<FavorityModel> value) {
     _$favoritiesAtom.reportWrite(value, super.favorities, () {
       super.favorities = value;
     });
@@ -41,6 +41,22 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
     });
   }
 
+  late final _$errorMessageAtom =
+      Atom(name: 'FavorityProductsStoreBase.errorMessage', context: context);
+
+  @override
+  String? get errorMessage {
+    _$errorMessageAtom.reportRead();
+    return super.errorMessage;
+  }
+
+  @override
+  set errorMessage(String? value) {
+    _$errorMessageAtom.reportWrite(value, super.errorMessage, () {
+      super.errorMessage = value;
+    });
+  }
+
   late final _$getFavoritiesAsyncAction =
       AsyncAction('FavorityProductsStoreBase.getFavorities', context: context);
 
@@ -53,7 +69,7 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
       AsyncAction('FavorityProductsStoreBase.toggleFavority', context: context);
 
   @override
-  Future<void> toggleFavority(Map<String, dynamic> product) {
+  Future<void> toggleFavority(FavorityModel product) {
     return _$toggleFavorityAsyncAction.run(() => super.toggleFavority(product));
   }
 
@@ -61,7 +77,8 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
   String toString() {
     return '''
 favorities: ${favorities},
-isLoading: ${isLoading}
+isLoading: ${isLoading},
+errorMessage: ${errorMessage}
     ''';
   }
 }
