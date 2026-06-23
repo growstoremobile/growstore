@@ -3,6 +3,7 @@ import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/home/widgets/home_category_card.dart';
 import 'package:growstore/features/home/widgets/home_header.dart';
 import 'package:growstore/features/home/widgets/home_hero.dart';
+import 'package:growstore/features/home/widgets/home_menu_drawer.dart';
 import 'package:growstore/features/home/widgets/home_newsletter.dart';
 import 'package:growstore/features/home/widgets/home_product_card.dart';
 import 'package:growstore/features/home/widgets/home_section_title.dart';
@@ -31,16 +32,43 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  void _handleMenuSelection(BuildContext context, String action) {
+    Navigator.of(context).pop();
+
+    switch (action) {
+      case 'home':
+        break;
+      case 'cart':
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      case 'favorites':
+        Navigator.of(context).pushNamed('/favorites');
+        break;
+      case 'shop':
+        _comingSoon(context, 'Loja');
+        break;
+      case 'profile':
+        _comingSoon(context, 'Perfil');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: _page,
+      drawer: HomeMenuDrawer(
+        onSelected: (action) => _handleMenuSelection(context, action),
+      ),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             HomeHeader(
-              onMenu: () => _comingSoon(context, 'Menu'),
+              onMenu: () => scaffoldKey.currentState?.openDrawer(),
               onSearch: () => _comingSoon(context, 'Busca'),
             ),
             Expanded(

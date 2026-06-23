@@ -15,16 +15,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(FavorityModelAdapter());
+
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(FavorityModelAdapter());
+  }
 }
 
 Future<void> initServiceLocator() async {
-  final favorityBox = await Hive.openBox("favorities");
+  final favorityBox = await Hive.openBox('favorities');
 
-  // 1. Registrar o Service
   GetIt.I.registerSingleton<FavorityService>(FavorityService());
 
-  // 2. Registrar o Repository (Injetando o Service)
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
       boxFavoritiesProducts: favorityBox,
@@ -38,17 +39,15 @@ Future<void> initServiceLocator() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initHive();
-  await initServiceLocator();
-
-  // Inicialização do Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Inicialização do Supabase
   await Supabase.initialize(
     url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
     publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
   );
+
+  await initHive();
+  await initServiceLocator();
 
   runApp(const GrowStoreApp());
 }
