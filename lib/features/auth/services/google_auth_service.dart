@@ -4,8 +4,13 @@ import 'package:growstore/core/errors/custom_error.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
 
 class GoogleAuthService {
+  // Mudança 1: Criamos UMA única instância do GoogleSignIn para usar na classe toda
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   Future<UserModel> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // Mudança 2: Usamos a variável '_googleSignIn' aqui em vez de tentar recriar do zero
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn
+        .standard();
 
     if (googleUser == null) {
       throw CustomError('Login cancelado pelo usuário.');
@@ -15,7 +20,8 @@ class GoogleAuthService {
         await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
+      accessToken:
+          googleAuth.accessToken, // Aqui já está com o 'T' maiúsculo perfeito!
       idToken: googleAuth.idToken,
     );
 
@@ -37,7 +43,8 @@ class GoogleAuthService {
   }
 
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    // Mudança 3: Usamos a mesma instância aqui para fazer o log out com segurança
+    await _googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
   }
 }

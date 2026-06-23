@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final String productId;
@@ -10,7 +11,6 @@ class ProductDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: GrowColors.darkSurface,
       appBar: AppBar(
         backgroundColor: GrowColors.darkBg,
         elevation: 0,
@@ -48,7 +48,7 @@ class ProductDetailPage extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(
-                    color: GrowColors.darkBorderHighlight,
+                    color: GrowColors.darkBg,
                     shape: BoxShape.circle,
                   ),
                   child: const Text(
@@ -71,8 +71,21 @@ class ProductDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 16),
+
             ProductDetailImageWidget(
               pathImages: ["assets/images/tshirt_growdev.png"],
+            ),
+
+            SizedBox(height: 24),
+
+            ProductDetailInfoWidget(
+              name: 'Nome do produto com múltiplas linhas',
+              price: 199.90,
+              description:
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, '
+                  'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+                  'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris '
+                  'nisi ut aliquip ex ea commodo consequat.',
             ),
 
             SizedBox(height: 24),
