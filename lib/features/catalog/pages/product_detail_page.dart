@@ -49,13 +49,6 @@ class ProductDetailPage extends StatelessWidget {
                   'nisi ut aliquip ex ea commodo consequat.',
             ),
             SizedBox(height: 24),
-
-            ProductDetailVariantsWidget(
-              sizes: ['P', 'M', 'G', 'GG'],
-              colors: ['#000000', '#FFFFFF', '#40A937'],
-            ),
-
-            SizedBox(height: 24),
           ],
         ),
       ),

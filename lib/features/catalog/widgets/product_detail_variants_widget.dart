@@ -1,3 +1,8 @@
+// TODO: Widget implementado e pronto para uso.
+// O design aprovado da PDP não exibe seletor de variantes de cor e tamanho nesta tela.
+// A seleção de tamanho/cor ocorre na tela do Carrinho (Quem for implementar utilizar esse widget aqui).
+// Remover este TODO quando o fluxo completo for definido pelo time.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
