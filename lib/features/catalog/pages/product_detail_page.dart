@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
+import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final String productId;
@@ -47,6 +48,13 @@ class ProductDetailPage extends StatelessWidget {
                   'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris '
                   'nisi ut aliquip ex ea commodo consequat.',
             ),
+            SizedBox(height: 24),
+
+            ProductDetailVariantsWidget(
+              sizes: ['P', 'M', 'G', 'GG'],
+              colors: ['#000000', '#FFFFFF', '#40A937'],
+            ),
+
             SizedBox(height: 24),
           ],
         ),

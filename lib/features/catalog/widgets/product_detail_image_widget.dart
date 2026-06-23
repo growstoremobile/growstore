@@ -38,9 +38,17 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
                   setState(() => _currentIndex = index);
                 },
                 itemBuilder: (context, index) {
-                  return Image.asset(
+                  return Image.network(
                     widget.pathImages[index],
                     fit: BoxFit.contain,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: GrowColors.primary,
+                        ),
+                      );
+                    },
                     errorBuilder: (context, error, stackTrace) {
                       return _buildPlaceholder();
                     },
@@ -64,7 +72,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
                 height: 8,
                 decoration: BoxDecoration(
                   color: _currentIndex == index
-                      ? const Color(0xFF3DDC6B)
+                      ? GrowColors.primary
                       : GrowColors.darkTextSecondary,
                   borderRadius: BorderRadius.circular(4),
                 ),

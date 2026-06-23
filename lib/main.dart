@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
+import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
@@ -32,6 +33,7 @@ Future<void> initServiceLocator() async {
   );
 
   GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  GetIt.I.registerFactory<ProductDetailStore>(() => ProductDetailStore());
 }
 
 void main() async {
