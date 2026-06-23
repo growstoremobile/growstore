@@ -195,6 +195,7 @@ class _SearchHeader extends StatelessWidget {
             child: TextField(
               controller: controller,
               autofocus: true,
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               cursorColor: colors.primary,
               style: GoogleFonts.inter(
                 color: colors.textPrimary,
