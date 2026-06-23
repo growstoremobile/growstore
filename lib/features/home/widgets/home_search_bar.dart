@@ -9,12 +9,14 @@ class HomeSearchBar extends StatelessWidget {
     required this.isDark,
     required this.onSearch,
     required this.onProfile,
+    required this.onThemeToggle,
   });
 
   final HomeLayoutColors colors;
   final bool isDark;
   final VoidCallback onSearch;
   final VoidCallback onProfile;
+  final VoidCallback onThemeToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -63,25 +65,58 @@ class HomeSearchBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          InkWell(
+          _HomeHeaderIconButton(
+            tooltip: 'Perfil',
+            icon: Icons.person_outline_rounded,
+            colors: colors,
             onTap: onProfile,
-            customBorder: const CircleBorder(),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: colors.avatarBorder),
-              ),
-              child: Icon(
-                Icons.person_outline_rounded,
-                color: colors.avatarIcon,
-                size: 22,
-              ),
+          ),
+          const SizedBox(width: 8),
+          Tooltip(
+            message: isDark ? 'Usar tema claro' : 'Usar tema escuro',
+            child: _HomeHeaderIconButton(
+              icon: isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+              colors: colors,
+              onTap: onThemeToggle,
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class _HomeHeaderIconButton extends StatelessWidget {
+  const _HomeHeaderIconButton({
+    this.tooltip,
+    required this.icon,
+    required this.colors,
+    required this.onTap,
+  });
+
+  final String? tooltip;
+  final IconData icon;
+  final HomeLayoutColors colors;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final button = InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: colors.avatarBorder),
+        ),
+        child: Icon(icon, color: colors.avatarIcon, size: 20),
+      ),
+    );
+
+    if (tooltip == null) return button;
+
+    return Tooltip(message: tooltip!, child: button);
   }
 }

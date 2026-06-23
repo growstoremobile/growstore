@@ -17,6 +17,25 @@ class HomeProductGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (products.isEmpty) {
+      return Container(
+        color: colors.productGrid,
+        constraints: const BoxConstraints(minHeight: 250),
+        padding: const EdgeInsets.fromLTRB(24, 48, 24, 64),
+        alignment: Alignment.center,
+        child: Text(
+          'Nenhum produto nesta categoria',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.syne(
+            color: colors.productName,
+            fontSize: 16,
+            height: 22 / 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: colors.productGrid,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

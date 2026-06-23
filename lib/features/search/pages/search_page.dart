@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:growstore/features/search/widgets/search_layout_colors.dart';
 import 'package:growstore/features/search/widgets/search_product_card.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 
@@ -11,9 +12,6 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  static const _green = Color(0xFF39FF14);
-  static const _page = Color(0xFF04090F);
-
   final _controller = TextEditingController();
   final _productService = ProductService();
 
@@ -90,30 +88,36 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = SearchLayoutColors.resolve(
+      Theme.of(context).brightness == Brightness.dark,
+    );
+
     return Scaffold(
-      backgroundColor: _page,
+      backgroundColor: colors.page,
       body: SafeArea(
         child: Column(
           children: [
             _SearchHeader(
               controller: _controller,
+              colors: colors,
               onBack: () => Navigator.of(context).pop(),
               onClear: _controller.clear,
             ),
-            Expanded(child: _buildContent()),
+            Expanded(child: _buildContent(colors)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(SearchLayoutColors colors) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: _green));
+      return Center(child: CircularProgressIndicator(color: colors.primary));
     }
 
     if (_errorMessage != null) {
       return _SearchStateMessage(
+        colors: colors,
         icon: Icons.wifi_off_rounded,
         title: 'Erro na busca',
         description: _errorMessage!,
@@ -129,7 +133,8 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     if (_filteredProducts.isEmpty) {
-      return const _SearchStateMessage(
+      return _SearchStateMessage(
+        colors: colors,
         icon: Icons.search_off_rounded,
         title: 'Nenhum produto encontrado',
         description:
@@ -151,6 +156,7 @@ class _SearchPageState extends State<SearchPage> {
 
         return SearchProductCard(
           product: product,
+          colors: colors,
           onTap: () => _showDetailsSoon(product),
         );
       },
@@ -161,49 +167,47 @@ class _SearchPageState extends State<SearchPage> {
 class _SearchHeader extends StatelessWidget {
   const _SearchHeader({
     required this.controller,
+    required this.colors,
     required this.onBack,
     required this.onClear,
   });
 
   final TextEditingController controller;
+  final SearchLayoutColors colors;
   final VoidCallback onBack;
   final VoidCallback onClear;
-
-  static const _green = Color(0xFF39FF14);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 20, 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF111412).withValues(alpha: .72),
-        border: Border(
-          bottom: BorderSide(color: Colors.white.withValues(alpha: .10)),
-        ),
+        color: colors.header,
+        border: Border(bottom: BorderSide(color: colors.headerBorder)),
       ),
       child: Row(
         children: [
           IconButton(
             onPressed: onBack,
-            icon: const Icon(Icons.arrow_back_rounded, color: _green),
+            icon: Icon(Icons.arrow_back_rounded, color: colors.primary),
           ),
           Expanded(
             child: TextField(
               controller: controller,
               autofocus: true,
-              cursorColor: _green,
+              cursorColor: colors.primary,
               style: GoogleFonts.inter(
-                color: const Color(0xFFE2E3DF),
+                color: colors.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: 'Buscar produtos',
                 hintStyle: GoogleFonts.inter(
-                  color: const Color(0xFFBACCB0),
+                  color: colors.textSecondary,
                   fontSize: 16,
                 ),
-                prefixIcon: const Icon(Icons.search_rounded, color: _green),
+                prefixIcon: Icon(Icons.search_rounded, color: colors.primary),
                 suffixIcon: ValueListenableBuilder<TextEditingValue>(
                   valueListenable: controller,
                   builder: (_, value, _) {
@@ -211,21 +215,19 @@ class _SearchHeader extends StatelessWidget {
 
                     return IconButton(
                       onPressed: onClear,
-                      icon: const Icon(Icons.close_rounded, color: _green),
+                      icon: Icon(Icons.close_rounded, color: colors.primary),
                     );
                   },
                 ),
                 filled: true,
-                fillColor: const Color(0xFF04090F),
+                fillColor: colors.field,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: .10),
-                  ),
+                  borderSide: BorderSide(color: colors.fieldBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: _green),
+                  borderSide: BorderSide(color: colors.primary),
                 ),
               ),
             ),
@@ -238,6 +240,7 @@ class _SearchHeader extends StatelessWidget {
 
 class _SearchStateMessage extends StatelessWidget {
   const _SearchStateMessage({
+    required this.colors,
     required this.icon,
     required this.title,
     required this.description,
@@ -245,6 +248,7 @@ class _SearchStateMessage extends StatelessWidget {
     this.onAction,
   });
 
+  final SearchLayoutColors colors;
   final IconData icon;
   final String title;
   final String description;
@@ -259,13 +263,13 @@ class _SearchStateMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: const Color(0xFF39FF14), size: 44),
+            Icon(icon, color: colors.primary, size: 44),
             const SizedBox(height: 18),
             Text(
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.syne(
-                color: const Color(0xFFE2E3DF),
+                color: colors.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 height: 32 / 24,
@@ -276,7 +280,7 @@ class _SearchStateMessage extends StatelessWidget {
               description,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: const Color(0xFFBACCB0),
+                color: colors.textSecondary,
                 fontSize: 15,
                 height: 22 / 15,
               ),
@@ -286,8 +290,8 @@ class _SearchStateMessage extends StatelessWidget {
               FilledButton(
                 onPressed: onAction,
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF39FF14),
-                  foregroundColor: const Color(0xFF04090F),
+                  backgroundColor: colors.primary,
+                  foregroundColor: colors.buttonForeground,
                 ),
                 child: Text(actionLabel!),
               ),

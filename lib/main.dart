@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
+import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
@@ -54,24 +55,43 @@ Future<void> main() async {
   runApp(const GrowStoreApp());
 }
 
-class GrowStoreApp extends StatelessWidget {
+class GrowStoreApp extends StatefulWidget {
   const GrowStoreApp({super.key});
 
   @override
+  State<GrowStoreApp> createState() => _GrowStoreAppState();
+}
+
+class _GrowStoreAppState extends State<GrowStoreApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme(Brightness currentBrightness) {
+    setState(() {
+      _themeMode = currentBrightness == Brightness.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Grow Store',
-      theme: growLightTheme,
-      darkTheme: growDarkTheme,
-      themeMode: ThemeMode.system,
-      home: const HomePage(),
-      routes: {
-        '/home': (_) => const HomePage(),
-        '/search': (_) => const SearchPage(),
-        '/cart': (_) => const CartPage(),
-        '/favorites': (_) => const FavorityPage(),
-      },
+    return ThemeModeController(
+      themeMode: _themeMode,
+      toggleTheme: _toggleTheme,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Grow Store',
+        theme: growLightTheme,
+        darkTheme: growDarkTheme,
+        themeMode: _themeMode,
+        home: const HomePage(),
+        routes: {
+          '/home': (_) => const HomePage(),
+          '/search': (_) => const SearchPage(),
+          '/cart': (_) => const CartPage(),
+          '/favorites': (_) => const FavorityPage(),
+        },
+      ),
     );
   }
 }
