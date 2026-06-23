@@ -139,13 +139,13 @@ class GrowProductCardSkeleton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor, width: 1),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Imagem
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
-            child: const GrowSkeletonBox(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
+            child: GrowSkeletonBox(
               width: double.infinity,
               height: 140,
               borderRadius: 0,
@@ -153,21 +153,21 @@ class GrowProductCardSkeleton extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Nome do produto — linha 1
-                const GrowSkeletonBox(width: double.infinity, height: 14),
-                const SizedBox(height: 6),
+                GrowSkeletonBox(width: double.infinity, height: 14),
+                SizedBox(height: 6),
                 // Nome do produto — linha 2
-                const GrowSkeletonBox(width: 100, height: 14),
-                const SizedBox(height: 12),
+                GrowSkeletonBox(width: 100, height: 14),
+                SizedBox(height: 12),
                 // Preço
-                const GrowSkeletonBox(width: 80, height: 20),
-                const SizedBox(height: 12),
+                GrowSkeletonBox(width: 80, height: 20),
+                SizedBox(height: 12),
                 // Botão Adicionar
-                const GrowSkeletonBox(
+                GrowSkeletonBox(
                   width: double.infinity,
                   height: 40,
                   borderRadius: 8,
@@ -199,29 +199,25 @@ class GrowCartItemSkeleton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: borderColor, width: 1),
       ),
-      child: Row(
+      child: const Row(
         children: [
           // Thumbnail
-          const GrowSkeletonBox(width: 64, height: 64, borderRadius: 8),
-          const SizedBox(width: 12),
+          GrowSkeletonBox(width: 64, height: 64, borderRadius: 8),
+          SizedBox(width: 12),
 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const GrowSkeletonBox(width: double.infinity, height: 14),
-                const SizedBox(height: 6),
-                const GrowSkeletonBox(width: 120, height: 12),
-                const SizedBox(height: 12),
+                GrowSkeletonBox(width: double.infinity, height: 14),
+                SizedBox(height: 6),
+                GrowSkeletonBox(width: 120, height: 12),
+                SizedBox(height: 12),
                 Row(
                   children: [
-                    const GrowSkeletonBox(
-                      width: 80,
-                      height: 32,
-                      borderRadius: 6,
-                    ),
-                    const Spacer(),
-                    const GrowSkeletonBox(width: 60, height: 20),
+                    GrowSkeletonBox(width: 80, height: 32, borderRadius: 6),
+                    Spacer(),
+                    GrowSkeletonBox(width: 60, height: 20),
                   ],
                 ),
               ],
