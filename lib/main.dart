@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
+import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
@@ -61,7 +62,9 @@ class GrowStoreApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Grow Store',
-      theme: growDarkTheme,
+      theme: growLightTheme,
+      darkTheme: growDarkTheme,
+      themeMode: ThemeMode.system,
       home: const HomePage(),
       routes: {
         '/home': (_) => const HomePage(),
