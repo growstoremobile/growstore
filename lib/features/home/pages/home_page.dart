@@ -19,6 +19,18 @@ class HomePage extends StatelessWidget {
     ).showSnackBar(SnackBar(content: Text('$destination em breve.')));
   }
 
+  void _handleBottomNavigation(BuildContext context, String label) {
+    switch (label) {
+      case 'Home':
+        break;
+      case 'Carrinho':
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      default:
+        _comingSoon(context, label);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,7 +167,7 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: HomeBottomNavigation(
-        onTap: (label) => _comingSoon(context, label),
+        onTap: (label) => _handleBottomNavigation(context, label),
       ),
     );
   }

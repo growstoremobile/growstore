@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
@@ -11,10 +12,10 @@ class ProductService {
           .from('produtos')
           .select(); // Sem filtros traz tudo
 
-      print(response);
+      debugPrint(response.toString());
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print("Erro ao buscar produtos: $e");
+      debugPrint('Erro ao buscar produtos: $e');
       rethrow;
     }
   }
