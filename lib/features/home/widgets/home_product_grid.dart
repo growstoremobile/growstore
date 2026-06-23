@@ -8,11 +8,15 @@ class HomeProductGrid extends StatelessWidget {
     super.key,
     required this.products,
     required this.colors,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
     required this.onTap,
   });
 
   final List<HomeProductModel> products;
   final HomeLayoutColors colors;
+  final bool Function(int productId) isFavorite;
+  final ValueChanged<HomeProductModel> onFavoriteToggle;
   final ValueChanged<HomeProductModel> onTap;
 
   @override
@@ -55,6 +59,8 @@ class HomeProductGrid extends StatelessWidget {
           return _HomeProductCard(
             product: product,
             colors: colors,
+            isFavorite: isFavorite(product.id),
+            onFavoriteToggle: () => onFavoriteToggle(product),
             onTap: () => onTap(product),
           );
         },
@@ -67,11 +73,15 @@ class _HomeProductCard extends StatelessWidget {
   const _HomeProductCard({
     required this.product,
     required this.colors,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
     required this.onTap,
   });
 
   final HomeProductModel product;
   final HomeLayoutColors colors;
+  final bool isFavorite;
+  final VoidCallback onFavoriteToggle;
   final VoidCallback onTap;
 
   @override
@@ -105,10 +115,12 @@ class _HomeProductCard extends StatelessWidget {
                         child: SizedBox.square(
                           dimension: 38,
                           child: IconButton(
-                            onPressed: () {},
+                            onPressed: onFavoriteToggle,
                             padding: EdgeInsets.zero,
                             icon: Icon(
-                              Icons.favorite_border_rounded,
+                              isFavorite
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
                               color: colors.primary,
                               size: 24,
                             ),

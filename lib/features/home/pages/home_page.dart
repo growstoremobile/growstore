@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/features/favorites/models/favority_model.dart';
+import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_carousel_item_model.dart';
 import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
@@ -19,6 +22,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FavorityProductsStore? _favorityStore =
+      GetIt.I.isRegistered<FavorityProductsStore>()
+      ? GetIt.I<FavorityProductsStore>()
+      : null;
+
   String _selectedCategory = 'Todas';
 
   static const _categories = [
@@ -50,39 +58,51 @@ class _HomePageState extends State<HomePage> {
 
   static const _products = [
     HomeProductModel(
+      id: 13,
       name: 'Camiseta preta',
       category: 'Camiseta',
       price: 'R\$ 79,90',
+      priceValue: 79.90,
       asset: 'assets/images/figma_home_product_tshirt.png',
     ),
     HomeProductModel(
+      id: 5,
       name: 'Kit Adesivos',
       category: 'Adesivos',
       price: 'R\$ 5,90',
+      priceValue: 5.90,
       asset: 'assets/images/figma_home_product_stickers.png',
     ),
     HomeProductModel(
+      id: 2,
       name: 'Caneca preta',
       category: 'Copos',
       price: 'R\$ 29,90',
+      priceValue: 29.90,
       asset: 'assets/images/figma_home_product_mug.png',
     ),
     HomeProductModel(
+      id: 4,
       name: 'Garrafa térmica',
       category: 'Garrafas',
       price: 'R\$ 39,90',
+      priceValue: 39.90,
       asset: 'assets/images/figma_home_product_bottle.png',
     ),
     HomeProductModel(
+      id: 9,
       name: 'Mochila Notebook',
       category: 'Mochila',
       price: 'R\$ 129,90',
+      priceValue: 129.90,
       asset: 'assets/images/figma_home_product_backpack.png',
     ),
     HomeProductModel(
+      id: 1,
       name: 'Mousepad',
       category: 'Mousepads',
       price: 'R\$ 19,90',
+      priceValue: 19.90,
       asset: 'assets/images/figma_home_product_mousepad.png',
     ),
   ];
@@ -120,6 +140,28 @@ class _HomePageState extends State<HomePage> {
 
   void _selectCategory(String category) {
     setState(() => _selectedCategory = category);
+  }
+
+  Future<void> _toggleFavorite(HomeProductModel product) async {
+    final favorityStore = _favorityStore;
+
+    if (favorityStore == null) return;
+
+    await favorityStore.toggleFavority(
+      FavorityModel(
+        id: product.id,
+        titleProduct: product.name,
+        priceProduct: product.priceValue,
+        pathImage: product.asset,
+      ),
+    );
+
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  bool _isFavorite(int productId) {
+    return _favorityStore?.isFavorite(productId) ?? false;
   }
 
   @override
@@ -178,6 +220,8 @@ class _HomePageState extends State<HomePage> {
                       HomeProductGrid(
                         products: _filteredProducts,
                         colors: colors,
+                        isFavorite: _isFavorite,
+                        onFavoriteToggle: _toggleFavorite,
                         onTap: (product) => _comingSoon(context, product.name),
                       ),
                     ],
