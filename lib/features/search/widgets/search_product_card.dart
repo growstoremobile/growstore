@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:growstore/features/search/widgets/search_layout_colors.dart';
 
 class SearchProductCard extends StatelessWidget {
   const SearchProductCard({
     super.key,
     required this.product,
+    required this.colors,
     required this.onTap,
   });
 
   final Map<String, dynamic> product;
+  final SearchLayoutColors colors;
   final VoidCallback onTap;
 
   String get _title => (product['title'] ?? '').toString();
@@ -23,8 +26,8 @@ class SearchProductCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF111412).withValues(alpha: .72),
-          border: Border.all(color: Colors.white.withValues(alpha: .10)),
+          color: colors.card,
+          border: Border.all(color: colors.cardBorder),
           borderRadius: BorderRadius.circular(14),
         ),
         clipBehavior: Clip.antiAlias,
@@ -41,8 +44,8 @@ class SearchProductCard extends StatelessWidget {
                         center: Alignment.topCenter,
                         radius: .9,
                         colors: [
-                          const Color(0xFF39FF14).withValues(alpha: .22),
-                          const Color(0xFF04090F),
+                          colors.primary.withValues(alpha: .22),
+                          colors.imageBackground,
                         ],
                       ),
                     ),
@@ -50,17 +53,17 @@ class SearchProductCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(14),
                     child: _image.isEmpty
-                        ? const Icon(
+                        ? Icon(
                             Icons.inventory_2_outlined,
-                            color: Color(0xFF39FF14),
+                            color: colors.primary,
                             size: 42,
                           )
                         : Image.network(
                             _image,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, _, _) => const Icon(
+                            errorBuilder: (_, _, _) => Icon(
                               Icons.broken_image_outlined,
-                              color: Color(0xFF39FF14),
+                              color: colors.primary,
                               size: 42,
                             ),
                           ),
@@ -78,7 +81,7 @@ class SearchProductCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.jetBrainsMono(
-                      color: const Color(0xFFBACCB0),
+                      color: colors.textSecondary,
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       height: 14 / 10,
@@ -91,7 +94,7 @@ class SearchProductCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
-                      color: const Color(0xFFE2E3DF),
+                      color: colors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       height: 19 / 14,
@@ -101,7 +104,7 @@ class SearchProductCard extends StatelessWidget {
                   Text(
                     'R\$ ${_price.toStringAsFixed(2).replaceAll('.', ',')}',
                     style: GoogleFonts.jetBrainsMono(
-                      color: const Color(0xFF39FF14),
+                      color: colors.primary,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       height: 18 / 13,

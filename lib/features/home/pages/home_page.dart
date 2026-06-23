@@ -1,18 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/features/home/models/home_carousel_item_model.dart';
+import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
-import 'package:growstore/features/home/widgets/home_category_card.dart';
-import 'package:growstore/features/home/widgets/home_header.dart';
-import 'package:growstore/features/home/widgets/home_hero.dart';
-import 'package:growstore/features/home/widgets/home_menu_drawer.dart';
-import 'package:growstore/features/home/widgets/home_newsletter.dart';
-import 'package:growstore/features/home/widgets/home_product_card.dart';
-import 'package:growstore/features/home/widgets/home_section_title.dart';
+import 'package:growstore/features/home/widgets/home_category_carousel.dart';
+import 'package:growstore/features/home/widgets/home_featured_title.dart';
+import 'package:growstore/features/home/widgets/home_layout_colors.dart';
+import 'package:growstore/features/home/widgets/home_product_grid.dart';
+import 'package:growstore/features/home/widgets/home_promo_carousel.dart';
+import 'package:growstore/features/home/widgets/home_search_bar.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  static const _page = Color(0xFF04090F);
-  static const _green = Color(0xFF39FF14);
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String _selectedCategory = 'Todas';
+
+  static const _categories = [
+    'Todas',
+    'Camiseta',
+    'Mochila',
+    'Garrafas',
+    'Copos',
+    'Cadernos',
+    'Canetas',
+    'Adesivos',
+    'Mousepads',
+  ];
+
+  static const _carousel = [
+    HomeCarouselItemModel(
+      asset: 'assets/images/figma_home_carousel_tshirt.png',
+      width: 120,
+    ),
+    HomeCarouselItemModel(
+      asset: 'assets/images/figma_home_carousel_kit.png',
+      width: 213,
+    ),
+    HomeCarouselItemModel(
+      asset: 'assets/images/figma_home_carousel_devices.png',
+      width: 120,
+    ),
+  ];
+
+  static const _products = [
+    HomeProductModel(
+      name: 'Camiseta preta',
+      category: 'Camiseta',
+      price: 'R\$ 79,90',
+      asset: 'assets/images/figma_home_product_tshirt.png',
+    ),
+    HomeProductModel(
+      name: 'Kit Adesivos',
+      category: 'Adesivos',
+      price: 'R\$ 5,90',
+      asset: 'assets/images/figma_home_product_stickers.png',
+    ),
+    HomeProductModel(
+      name: 'Caneca preta',
+      category: 'Copos',
+      price: 'R\$ 29,90',
+      asset: 'assets/images/figma_home_product_mug.png',
+    ),
+    HomeProductModel(
+      name: 'Garrafa térmica',
+      category: 'Garrafas',
+      price: 'R\$ 39,90',
+      asset: 'assets/images/figma_home_product_bottle.png',
+    ),
+    HomeProductModel(
+      name: 'Mochila Notebook',
+      category: 'Mochila',
+      price: 'R\$ 129,90',
+      asset: 'assets/images/figma_home_product_backpack.png',
+    ),
+    HomeProductModel(
+      name: 'Mousepad',
+      category: 'Mousepads',
+      price: 'R\$ 19,90',
+      asset: 'assets/images/figma_home_product_mousepad.png',
+    ),
+  ];
+
+  List<HomeProductModel> get _filteredProducts {
+    if (_selectedCategory == 'Todas') return _products;
+
+    return _products
+        .where((product) => product.category == _selectedCategory)
+        .toList();
+  }
 
   void _comingSoon(BuildContext context, String destination) {
     ScaffoldMessenger.of(
@@ -22,180 +103,93 @@ class HomePage extends StatelessWidget {
 
   void _handleBottomNavigation(BuildContext context, String label) {
     switch (label) {
-      case 'Home':
+      case 'Início':
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
         break;
-      default:
+      case 'Favoritos':
+        Navigator.of(context).pushNamed('/favorites');
+        break;
+      case 'Categorias':
+      case 'Pedidos':
         _comingSoon(context, label);
+        break;
     }
   }
 
-  void _handleMenuSelection(BuildContext context, String action) {
-    Navigator.of(context).pop();
-
-    switch (action) {
-      case 'home':
-        break;
-      case 'cart':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'favorites':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'shop':
-        _comingSoon(context, 'Loja');
-        break;
-      case 'profile':
-        _comingSoon(context, 'Perfil');
-        break;
-    }
+  void _selectCategory(String category) {
+    setState(() => _selectedCategory = category);
   }
 
   @override
   Widget build(BuildContext context) {
-    final scaffoldKey = GlobalKey<ScaffoldState>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = HomeLayoutColors.resolve(isDark);
 
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: _page,
-      drawer: HomeMenuDrawer(
-        onSelected: (action) => _handleMenuSelection(context, action),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: colors.statusBar,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: colors.bottomBar,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            HomeHeader(
-              onMenu: () => scaffoldKey.currentState?.openDrawer(),
-              onSearch: () => Navigator.of(context).pushNamed('/search'),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HomeHero(
-                      onShop: () => _comingSoon(context, 'Coleção de treino'),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(20, 64, 20, 0),
-                      child: HomeSectionTitle('SHOP BY CATEGORY'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
-                      child: HomeCategoryCard(
-                        title: 'APPAREL',
-                        subtitle: 'COLLECTION 2024',
-                        asset: 'assets/images/figma_category_apparel.png',
-                        alignment: Alignment.topCenter,
-                        onTap: () => _comingSoon(context, 'Roupas'),
+      child: Scaffold(
+        backgroundColor: colors.page,
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              HomeSearchBar(
+                colors: colors,
+                isDark: isDark,
+                onSearch: () => Navigator.of(context).pushNamed('/search'),
+                onProfile: () => _comingSoon(context, 'Perfil'),
+                onThemeToggle: () => ThemeModeController.of(
+                  context,
+                ).toggleTheme(Theme.of(context).brightness),
+              ),
+              Divider(height: 1, thickness: 1, color: colors.divider),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      HomeCategoryCarousel(
+                        categories: _categories,
+                        selectedCategory: _selectedCategory,
+                        colors: colors,
+                        onSelected: _selectCategory,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                      child: HomeCategoryCard(
-                        title: 'ACCESSORIES',
-                        subtitle: 'ESSENTIALS',
-                        asset: 'assets/images/figma_category_accessories.png',
-                        alignment: Alignment.bottomRight,
-                        onTap: () => _comingSoon(context, 'Acessórios'),
+                      HomePromoCarousel(
+                        items: _carousel,
+                        colors: colors,
+                        isDark: isDark,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 64, 20, 0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const HomeSectionTitle('FEATURED\nPRODUCTS'),
-                          TextButton(
-                            onPressed: () =>
-                                _comingSoon(context, 'Todos os produtos'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: _green,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                            ),
-                            child: const Row(
-                              children: [
-                                Text(
-                                  'VIEW\nALL',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    height: 16 / 12,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(Icons.chevron_right, size: 14),
-                              ],
-                            ),
-                          ),
-                        ],
+                      if (isDark)
+                        HomeFeaturedTitle(
+                          colors: colors,
+                          onViewAll: () =>
+                              _comingSoon(context, 'Todos os produtos'),
+                        ),
+                      HomeProductGrid(
+                        products: _filteredProducts,
+                        colors: colors,
+                        onTap: (product) => _comingSoon(context, product.name),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        childAspectRatio: 167 / 335,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        children: [
-                          HomeProductCard(
-                            category: 'APPAREL',
-                            title: 'CORE LOGO TEE',
-                            price: 'R\$ 129,90',
-                            asset: 'assets/images/figma_product_apparel.png',
-                            onTap: () => _comingSoon(context, 'Core Logo Tee'),
-                          ),
-                          HomeProductCard(
-                            category: 'GEAR',
-                            title: 'COMMUTER\nBACKPACK',
-                            price: 'R\$ 499,90',
-                            asset: 'assets/images/figma_product_backpack.png',
-                            onTap: () => _comingSoon(context, 'Backpack'),
-                          ),
-                          HomeProductCard(
-                            category: 'DRINKWARE',
-                            title: 'DEVELOPER MUG',
-                            price: 'R\$ 59,90',
-                            asset: 'assets/images/figma_product_bottle.png',
-                            onTap: () => _comingSoon(context, 'Developer Mug'),
-                          ),
-                          HomeProductCard(
-                            category: 'ACCESSORIES',
-                            title: 'SLEEVE 14" PRO',
-                            price: 'R\$ 189,90',
-                            asset: 'assets/images/figma_product_sleeve.png',
-                            onTap: () => _comingSoon(context, 'Sleeve 14 Pro'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 64, 20, 160),
-                      child: HomeNewsletter(
-                        onSubscribe: () =>
-                            _comingSoon(context, 'Inscrição confirmada'),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: HomeBottomNavigation(
-        onTap: (label) => _handleBottomNavigation(context, label),
+        bottomNavigationBar: HomeBottomNavigation(
+          onTap: (label) => _handleBottomNavigation(context, label),
+        ),
       ),
     );
   }

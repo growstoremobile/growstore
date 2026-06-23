@@ -7,67 +7,59 @@ class HomeBottomNavigation extends StatelessWidget {
   final ValueChanged<String> onTap;
 
   static const _items = [
-    (Icons.home_filled, 'Home'),
-    (Icons.storefront_outlined, 'Loja'),
-    (Icons.shopping_cart_outlined, 'Carrinho'),
-    (Icons.person_outline_rounded, 'Perfil'),
+    (Icons.home_filled, 'Início'),
+    (Icons.grid_view_rounded, 'Categorias'),
+    (Icons.shopping_cart_rounded, 'Carrinho'),
+    (Icons.favorite_rounded, 'Favoritos'),
+    (Icons.shopping_bag_rounded, 'Pedidos'),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const primary = Color(0xFF40A937);
+    final background = isDark
+        ? const Color(0xFF0F1B2A)
+        : const Color(0xFFE7E8E9);
+    final unselected = isDark
+        ? const Color(0xFFE2E3DF)
+        : const Color(0xFF191C1D);
+
     return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 83,
+      padding: const EdgeInsets.fromLTRB(8, 7, 8, 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF111412).withValues(alpha: .80),
+        color: background,
         border: Border(
-          top: BorderSide(color: Colors.white.withValues(alpha: .10)),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x1A39FF14),
-            offset: Offset(0, -4),
-            blurRadius: 20,
+          top: BorderSide(
+            color: isDark ? Colors.transparent : const Color(0xFFC6C8C9),
           ),
-        ],
+        ),
       ),
       child: Row(
         children: _items.map((item) {
-          final selected = item.$2 == 'Home';
+          final selected = item.$2 == 'Início';
           return Expanded(
             child: InkWell(
               onTap: () => onTap(item.$2),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: 2,
-                    color: selected
-                        ? const Color(0xFF39FF14)
-                        : Colors.transparent,
-                  ),
-                  const Spacer(),
                   Icon(
                     item.$1,
-                    color: selected
-                        ? const Color(0xFF39FF14)
-                        : const Color(0xFFBACCB0),
-                    size: 20,
+                    color: selected ? primary : unselected,
+                    size: 25,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
                     item.$2,
                     style: GoogleFonts.jetBrainsMono(
-                      color: selected
-                          ? const Color(0xFF39FF14)
-                          : const Color(0xFFBACCB0),
-                      fontSize: 12,
+                      color: selected ? primary : unselected,
+                      fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      height: 16 / 12,
-                      letterSpacing: 1.2,
+                      height: 12 / 10,
                     ),
                   ),
-                  const Spacer(),
                 ],
               ),
             ),
