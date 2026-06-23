@@ -11,10 +11,8 @@ class ProductService {
           .from('produtos')
           .select(); // Sem filtros traz tudo
 
-      print(response);
       return List<Map<String, dynamic>>.from(response);
-    } catch (e) {
-      print("Erro ao buscar produtos: $e");
+    } catch (_) {
       rethrow;
     }
   }
