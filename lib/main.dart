@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/firebase_options.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginPage(),
+      home: const ProfilePage(),
     );
   }
 }
