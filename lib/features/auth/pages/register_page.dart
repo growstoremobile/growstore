@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/shared/colors/colors.dart';
 import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_app_bar_widget.dart';
@@ -27,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
 
   final _registerStore = RegisterStore();
+  final _authStore = GetIt.I.get<AuthStore>();
 
   @override
   void dispose() {
@@ -65,13 +70,22 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (mounted) {
         if (success) {
+          // Cria o modelo do usuário com os dados do formulário
+          final user = UserModel(
+            id: 'new_user_id', // Idealmente, este ID viria da resposta da API
+            name: _nameController.text,
+            email: _emailController.text,
+          );
+          // Salva o usuário no store global de autenticação
+          _authStore.setUser(user);
+
           // Redireciona para a tela inicial e limpa a pilha de navegação
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => const Scaffold(
                 body: Center(
-                  child: Text('Sua Home Page Aqui'),
-                ), // TODO: Substitua pela Home
+                  child: Text("Aqui seria sua home"),
+                ), // TODO: Colocar aqui a Home
               ),
             ),
             (route) =>

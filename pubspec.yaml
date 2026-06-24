@@ -83,8 +83,17 @@ flutter:
   # example:
   # fonts:
   #   - family: Schyler
-  # The original font files are not part of this repository. The system font
-  # keeps the application buildable on every supported platform.
+  # fonts:
+  #     - family: Inter
+  #       fonts:
+  #         - asset: assets/fonts/Inter-Regular.ttf
+  #         - asset: assets/fonts/Inter-Bold.ttf
+  #           weight: 700
+  #     - family: Syne
+  #       fonts:
+  #         - asset: assets/fonts/Syne-Regular.ttf
+  #         - asset: assets/fonts/Syne-Bold.ttf
+  #           weight: 700
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

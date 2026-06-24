@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
@@ -11,6 +12,7 @@ import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/firebase_options.dart';
@@ -29,6 +31,7 @@ Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
 
   GetIt.I.registerSingleton<FavorityService>(FavorityService());
+  GetIt.I.registerSingleton<AuthStore>(AuthStore());
 
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
@@ -94,6 +97,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/favorites': (_) => const FavorityPage(),
         },
       ),
+      home: ProfilePage(),
     );
   }
 }
