@@ -1,64 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/profile/widgets/main_menu_widget.dart';
 import 'package:growstore/features/profile/widgets/profile_header_widget.dart';
 import 'package:growstore/features/profile/widgets/secondary_menu_widget.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  ProfilePage({super.key});
+
+  final _authStore = GetIt.I.get<AuthStore>();
+  // TODO: Implementar injeção de dependencia com o GetIt para o CartStore
+  // final _cartStore = GetIt.I.get<CartStore>();
+
+  void _handleLogout(BuildContext context) {
+    // Limpa o estado global
+    _authStore.logout();
+    //TODO: Após fazer a injeção de dependecia, limpar o estado global do carrinho
+    // _cartStore.clearCart();
+
+    // Navega para a tela de login e remove todas as outras da pilha
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GrowColors.lightBg,
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(child: ProfileHeaderWidget()),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                const MainMenuWidget(),
-                const SizedBox(height: 40),
-                const SecondaryMenuWidget(),
-              ]),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: GrowColors.lightSurface,
-        selectedItemColor: GrowColors.lightTextPrimary,
-        unselectedItemColor: GrowColors.lightTextSecondary,
-        selectedLabelStyle: const TextStyle(
-          fontSize: 10,
-          color: GrowColors.lightTextPrimary,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 10,
-          color: GrowColors.lightTextSecondary,
-        ),
-        currentIndex: 0, // Exemplo, 'Início' está selecionado
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            label: 'Categorias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            label: 'Carrinho',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Favoritos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag_outlined),
-            label: 'Pedidos',
-          ),
-        ],
+      body: Observer(
+        builder: (_) {
+          final userName = _authStore.user?.name ?? 'Visitante';
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: ProfileHeaderWidget(userName: userName),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    const MainMenuWidget(),
+                    const SizedBox(height: 50),
+                    SecondaryMenuWidget(onLogout: () => _handleLogout(context)),
+                  ]),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

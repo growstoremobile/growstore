@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
 
+/// Cabeçalho da tela de perfil, exibindo o avatar e nome do usuário.
 class ProfileHeaderWidget extends StatelessWidget {
-  const ProfileHeaderWidget({super.key});
+  /// Nome do usuário a ser exibido.
+  final String userName;
+
+  const ProfileHeaderWidget({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
+    final userInitial = userName.isNotEmpty ? userName[0].toUpperCase() : '?';
+
     return Container(
       color: GrowColors.primary,
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
@@ -18,22 +24,25 @@ class ProfileHeaderWidget extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: GrowColors.lightSurface.withAlpha(
-                    61,
-                  ), // white24
-                  child: Icon(
-                    Icons.person,
-                    size: 50,
-                    color: GrowColors.lightSurface.withAlpha(178),
-                  ), // white70
+                  backgroundColor: GrowColors.lightSurface.withAlpha(61),
+                  child: Text(
+                    userInitial,
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w500,
+                      color: GrowColors.lightSurface.withAlpha(178),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 16),
-                const Text(
-                  'Olá Fulano',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: GrowColors.lightSurface,
+                Expanded(
+                  child: Text(
+                    'Olá, $userName',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: GrowColors.lightSurface,
+                    ),
                   ),
                 ),
               ],
@@ -60,17 +69,9 @@ class ProfileHeaderWidget extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: GrowColors.primary,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      'G',
-                      style: TextStyle(
-                        color: GrowColors.lightSurface,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12,
-                      ),
-                    ),
+                    child: Image.asset('assets/images/g-logo.png'),
                   ),
                   const SizedBox(width: 12),
                   const Text(

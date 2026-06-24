@@ -8,15 +8,12 @@ class MainMenuWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Column(
       children: [
-        MenuItemWidget(icon: Icons.home_outlined, title: 'Início'),
+        MenuItemWidget(icon: Icons.home, title: 'Início'),
         MenuItemWidget(icon: Icons.search, title: 'Buscar'),
-        MenuItemWidget(icon: Icons.grid_view_outlined, title: 'Categorias'),
-        MenuItemWidget(icon: Icons.favorite_border, title: 'Favoritos'),
-        MenuItemWidget(
-          icon: Icons.shopping_bag_outlined,
-          title: 'Minhas Compras',
-        ),
-        MenuItemWidget(icon: Icons.shopping_cart_outlined, title: 'Carrinho'),
+        MenuItemWidget(icon: Icons.grid_view_rounded, title: 'Categorias'),
+        MenuItemWidget(icon: Icons.favorite, title: 'Favoritos'),
+        MenuItemWidget(icon: Icons.shopping_bag, title: 'Minhas Compras'),
+        MenuItemWidget(icon: Icons.shopping_cart, title: 'Carrinho'),
       ],
     );
   }

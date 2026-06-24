@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
@@ -20,6 +21,7 @@ Future<void> initServiceLocator() async {
 
   // 1. Registrar o Service
   GetIt.I.registerSingleton<FavorityService>(FavorityService());
+  GetIt.I.registerSingleton<AuthStore>(AuthStore());
 
   // 2. Registrar o Repository (Injetando o Service)
   GetIt.I.registerSingleton<FavorityRepository>(
@@ -60,7 +62,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const ProfilePage(),
+      home: ProfilePage(),
     );
   }
 }
