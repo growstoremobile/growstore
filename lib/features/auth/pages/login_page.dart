@@ -58,7 +58,11 @@ class _LoginPageState extends State<LoginPage> {
 
           // Redireciona para a tela inicial e limpa a pilha de navegação
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => ProfilePage()),
+            MaterialPageRoute(
+              builder: (context) => const Scaffold(
+                body: Center(child: Text("Aqui seria sua home")), // TODO: Colocar aqui a Home
+              ),
+            ),
             (route) =>
                 false, // O (route) => false é o que remove as telas de login/cadastro do histórico
           );
