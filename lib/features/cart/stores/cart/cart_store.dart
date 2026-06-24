@@ -12,6 +12,7 @@ abstract class CartStoreBase with Store {
     : _repository = repository ?? CartRepository();
 
   final CartRepository _repository;
+  bool _hasLoadedCart = false;
 
   // Cupom válido (mock) e o desconto que ele concede
   static const String _validCoupon = 'GROW10';
@@ -69,6 +70,13 @@ abstract class CartStoreBase with Store {
 
   @action
   Future<void> loadCart() async {
+    if (_hasLoadedCart) return;
+
+    if (items.isNotEmpty) {
+      _hasLoadedCart = true;
+      return;
+    }
+
     try {
       error = null;
       _isLoading = true;
@@ -78,6 +86,7 @@ abstract class CartStoreBase with Store {
 
       final result = await _repository.getCartItems();
       items = ObservableList<CartItemModel>.of(result);
+      _hasLoadedCart = true;
     } on CustomError catch (e) {
       error = e.message;
     } finally {
@@ -118,8 +127,11 @@ abstract class CartStoreBase with Store {
     if (index == -1) return;
 
     final current = items[index];
-    // A quantidade mínima é 1; remover é feito pelo gesto de arrastar
-    if (current.quantity <= 1) return;
+    // Removing the last unit also removes the product from the cart.
+    if (current.quantity <= 1) {
+      items.removeAt(index);
+      return;
+    }
     items[index] = current.copyWith(quantity: current.quantity - 1);
   }
 

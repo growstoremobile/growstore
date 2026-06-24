@@ -9,7 +9,7 @@ final ThemeData growLightTheme = ThemeData(
   brightness: Brightness.light,
 
   colorScheme: const ColorScheme.light(
-    primary: GrowColors.primaryDark,
+    primary: GrowColors.primary,
     onPrimary: Colors.white,
     primaryContainer: Color(0xFFC8E6C5),
     onPrimaryContainer: Color(0xFF1A3D18),
@@ -46,7 +46,7 @@ final ThemeData growLightTheme = ThemeData(
 
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
     backgroundColor: GrowColors.lightSurface,
-    selectedItemColor: GrowColors.primaryDark,
+    selectedItemColor: GrowColors.primary,
     unselectedItemColor: GrowColors.lightTextSecondary,
     type: BottomNavigationBarType.fixed,
     elevation: 4,
@@ -78,7 +78,7 @@ final ThemeData growLightTheme = ThemeData(
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: GrowColors.primaryDark,
+      backgroundColor: GrowColors.primary,
       foregroundColor: Colors.white,
       disabledBackgroundColor: GrowColors.lightBorder,
       disabledForegroundColor: GrowColors.lightTextDisabled,
@@ -98,8 +98,8 @@ final ThemeData growLightTheme = ThemeData(
 
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
-      foregroundColor: GrowColors.primaryDark,
-      side: const BorderSide(color: GrowColors.primaryDark, width: 1.5),
+      foregroundColor: GrowColors.primary,
+      side: const BorderSide(color: GrowColors.primary, width: 1.5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       textStyle: const TextStyle(
@@ -114,7 +114,7 @@ final ThemeData growLightTheme = ThemeData(
 
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: GrowColors.primaryDark,
+      foregroundColor: GrowColors.primary,
       textStyle: const TextStyle(
         fontFamily: GrowTypography.fontFamily,
         fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -145,7 +145,7 @@ final ThemeData growLightTheme = ThemeData(
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: GrowColors.primaryDark, width: 1.5),
+      borderSide: const BorderSide(color: GrowColors.primary, width: 1.5),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -160,7 +160,7 @@ final ThemeData growLightTheme = ThemeData(
 
   chipTheme: ChipThemeData(
     backgroundColor: Colors.transparent,
-    selectedColor: GrowColors.primaryDark,
+    selectedColor: GrowColors.primary,
     disabledColor: GrowColors.lightBorder,
     labelStyle: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
@@ -196,7 +196,7 @@ final ThemeData growLightTheme = ThemeData(
   ),
 
   badgeTheme: const BadgeThemeData(
-    backgroundColor: GrowColors.primaryDark,
+    backgroundColor: GrowColors.primary,
     textColor: Colors.white,
     smallSize: 8,
     largeSize: 16,

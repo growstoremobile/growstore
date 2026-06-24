@@ -9,6 +9,7 @@ class DefaultProductCard extends StatelessWidget {
   final String? pathImage;
   final double price;
   final VoidCallback? onPressed;
+  final VoidCallback? onFavoritePressed;
 
   const DefaultProductCard({
     super.key,
@@ -19,6 +20,7 @@ class DefaultProductCard extends StatelessWidget {
     this.iconFavority,
     this.textButton,
     this.onPressed,
+    this.onFavoritePressed,
   });
 
   @override
@@ -64,11 +66,15 @@ class DefaultProductCard extends StatelessWidget {
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: Icon(
-                        iconFavority ?? Icons.favorite_border,
-                        color: iconFavority == Icons.favorite
-                            ? colors.primary
-                            : theme.hintColor,
+                      child: IconButton(
+                        onPressed: onFavoritePressed,
+                        tooltip: 'Remover dos favoritos',
+                        icon: Icon(
+                          iconFavority ?? Icons.favorite_border,
+                          color: iconFavority == Icons.favorite
+                              ? colors.primary
+                              : theme.hintColor,
+                        ),
                       ),
                     ),
                   ],

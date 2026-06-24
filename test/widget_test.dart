@@ -1,30 +1,33 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:growstore/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('home renders its main storefront sections', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const GrowStoreApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Buscar produtos...'), findsOneWidget);
+    expect(find.text('Todas'), findsOneWidget);
+    expect(find.text('Camiseta'), findsOneWidget);
+    expect(find.text('Camiseta preta'), findsOneWidget);
+    expect(find.text('Kit Adesivos'), findsOneWidget);
+    expect(find.text('Início'), findsOneWidget);
+    expect(find.text('Pedidos'), findsOneWidget);
+    expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.dark_mode_rounded), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.tap(find.text('Mochila'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Mochila Notebook'), findsOneWidget);
+    expect(find.text('Camiseta preta'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.dark_mode_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.light_mode_rounded), findsOneWidget);
   });
 }
