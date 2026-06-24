@@ -19,7 +19,6 @@ void main() {
 
     final supabase = Supabase.instance.client;
     final response = await supabase.from('produtos').select();
-    print(response);
 
     expect(response, isNotNull);
     expect(response, isNotEmpty);

@@ -3,7 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
-import 'package:growstore/features/profile/pages/profile_page.dart';
+import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/shared/colors/colors.dart';
 import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_app_bar_widget.dart';
@@ -81,13 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
           // Redireciona para a tela inicial e limpa a pilha de navegação
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const Scaffold(
-                body: Center(
-                  child: Text("Aqui seria sua home"),
-                ), // TODO: Colocar aqui a Home
-              ),
-            ),
+            MaterialPageRoute(builder: (context) => const HomePage()),
             (route) =>
                 false, // O (route) => false é o que remove as telas de login/cadastro do histórico
           );

@@ -12,7 +12,6 @@ import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/firebase_options.dart';
@@ -97,7 +96,6 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/favorites': (_) => const FavorityPage(),
         },
       ),
-      home: ProfilePage(),
     );
   }
 }
