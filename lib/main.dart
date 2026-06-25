@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/core/di/injection.dart';
 import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
@@ -10,6 +11,7 @@ import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/catalog/pages/product_detail_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
@@ -28,7 +30,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
-
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(FavorityModelAdapter());
   }
@@ -68,30 +69,31 @@ Future<void> initServiceLocator() async {
     HomeStore(GetIt.I.get<HomeRepository>()),
   );
 
+  GetIt.I.registerSingleton<AuthStore>(authStore);
+  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
+  GetIt.I.registerSingleton<HomeStore>(
+    HomeStore(GetIt.I.get<HomeRepository>()),
+  );
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
       boxFavoritiesProducts: favorityBox,
       favoriteService: GetIt.I.get<FavorityService>(),
     ),
   );
-
   GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
   GetIt.I.registerSingleton<CartStore>(CartStore());
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   await Supabase.initialize(
     url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
     publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
   );
-
   await initHive();
   await initServiceLocator();
-
+  await setupDependencies(); // ← única linha adicionada
   runApp(const GrowStoreApp());
 }
 
@@ -124,7 +126,6 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         theme: growLightTheme,
         darkTheme: growDarkTheme,
         themeMode: _themeMode,
-        home: const SplashPage(),
         routes: {
           '/splash': (_) => const SplashPage(),
           '/home': (_) => const HomePage(),
@@ -134,6 +135,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/profile': (_) => ProfilePage(),
+          '/productDetail': (_) => ProductDetailPage()
         },
       ),
     );
