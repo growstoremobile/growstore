@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/core/di/injection.dart';
 import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
@@ -10,6 +11,7 @@ import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/catalog/pages/product_detail_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
@@ -91,6 +93,7 @@ Future<void> main() async {
 
   await initHive();
   await initServiceLocator();
+  await setupDependencies();
 
   runApp(const GrowStoreApp());
 }
@@ -134,6 +137,26 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/profile': (_) => ProfilePage(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/productDetail') {
+            final productId = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (productId == null || productId.isEmpty) {
+                  return const Scaffold(
+                    body: Center(child: Text('Produto nao encontrado.')),
+                  );
+                }
+
+                return ProductDetailPage(productId: productId);
+              },
+            );
+          }
+
+          return null;
         },
       ),
     );

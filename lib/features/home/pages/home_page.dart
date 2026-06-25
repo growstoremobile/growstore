@@ -257,7 +257,9 @@ class _HomePageState extends State<HomePage> {
       isFavorite: _isFavorite,
       onFavoriteToggle: _toggleFavorite,
       onAddToCart: _addToCart,
-      onTap: (product) => _comingSoon(context, product.name),
+      onTap: (product) => Navigator.of(
+        context,
+      ).pushNamed('/productDetail', arguments: product.id.toString()),
     );
   }
 }
