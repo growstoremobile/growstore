@@ -130,8 +130,8 @@ mixin _$RegisterStore on RegisterStoreBase, Store {
       AsyncAction('RegisterStoreBase.register', context: context);
 
   @override
-  Future<bool> register(String email, String pass) {
-    return _$registerAsyncAction.run(() => super.register(email, pass));
+  Future<bool> register(String name, String email, String pass) {
+    return _$registerAsyncAction.run(() => super.register(name, email, pass));
   }
 
   late final _$loginWithGoogleAsyncAction =

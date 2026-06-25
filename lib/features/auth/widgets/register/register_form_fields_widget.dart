@@ -21,69 +21,81 @@ class RegisterFormFieldsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        RegisterTextFieldWidget(
-          controller: nameController,
-          label: 'Nome Completo',
-          hint: 'Como deseja ser chamado?',
-          prefixIcon: Icons.person_outline,
-        ),
-        const SizedBox(height: 16),
-        RegisterTextFieldWidget(
-          controller: emailController,
-          label: 'E-mail Corporativo',
-          hint: 'exemplo@growstore.com',
-          prefixIcon: Icons.mail_outline,
-          keyboardType: TextInputType.emailAddress,
-        ),
-        const SizedBox(height: 16),
-        Observer(
-          builder: (_) {
-            return RegisterTextFieldWidget(
-              controller: passwordController,
-              label: 'Senha',
-              hint: 'Mínimo 8 caracteres',
-              prefixIcon: Icons.lock_outline,
-              isPassword: true,
-              obscureText: store.obscurePassword,
-              onToggleVisibility: store.togglePasswordVisibility,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Campo obrigatório';
-                }
-                if (value.length < 8) {
-                  return 'A senha deve ter no mínimo 8 caracteres';
-                }
-                return null;
-              },
-            );
-          },
-        ),
-        const SizedBox(height: 16),
-        Observer(
-          builder: (_) {
-            return RegisterTextFieldWidget(
-              controller: confirmPasswordController,
-              label: 'Confirmar Senha',
-              hint: 'Repita sua senha',
-              prefixIcon: Icons.shield_outlined,
-              isPassword: true,
-              obscureText: store.obscureConfirmPassword,
-              onToggleVisibility: store.toggleConfirmPasswordVisibility,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Campo obrigatório';
-                }
-                if (value.length < 8) {
-                  return 'A senha deve ter no mínimo 8 caracteres';
-                }
-                return null;
-              },
-            );
-          },
-        ),
-      ],
+    return AutofillGroup(
+      child: Column(
+        children: [
+          RegisterTextFieldWidget(
+            controller: nameController,
+            label: 'Nome completo',
+            hint: 'Como deseja ser chamado?',
+            prefixIcon: Icons.person_outline_rounded,
+            keyboardType: TextInputType.name,
+            textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.words,
+            autofillHints: const [AutofillHints.name],
+          ),
+          const SizedBox(height: 10),
+          RegisterTextFieldWidget(
+            controller: emailController,
+            label: 'E-mail',
+            hint: 'seu@email.com',
+            prefixIcon: Icons.mail_outline_rounded,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
+          ),
+          const SizedBox(height: 10),
+          Observer(
+            builder: (_) {
+              return RegisterTextFieldWidget(
+                controller: passwordController,
+                label: 'Senha',
+                hint: 'Mínimo de 8 caracteres',
+                prefixIcon: Icons.lock_outline_rounded,
+                isPassword: true,
+                obscureText: store.obscurePassword,
+                onToggleVisibility: store.togglePasswordVisibility,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.newPassword],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Campo obrigatório';
+                  }
+                  if (value.length < 8) {
+                    return 'A senha deve ter no mínimo 8 caracteres';
+                  }
+                  return null;
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          Observer(
+            builder: (_) {
+              return RegisterTextFieldWidget(
+                controller: confirmPasswordController,
+                label: 'Confirmar senha',
+                hint: 'Repita sua senha',
+                prefixIcon: Icons.shield_outlined,
+                isPassword: true,
+                obscureText: store.obscureConfirmPassword,
+                onToggleVisibility: store.toggleConfirmPasswordVisibility,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.newPassword],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Campo obrigatório';
+                  }
+                  if (value.length < 8) {
+                    return 'A senha deve ter no mínimo 8 caracteres';
+                  }
+                  return null;
+                },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

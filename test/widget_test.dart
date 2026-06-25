@@ -1,30 +1,86 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
+import 'package:growstore/features/home/repositories/home_repository.dart';
+import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/main.dart';
+import 'package:growstore/shared/products/services/product_service.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() async {
+    await GetIt.I.reset();
+    final authStore = AuthStore()
+      ..setUser(
+        UserModel(id: '1', name: 'Teste', email: 'teste@growstore.com'),
+      );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    GetIt.I.registerSingleton<AuthStore>(authStore);
+    GetIt.I.registerSingleton<HomeStore>(
+      HomeStore(HomeRepository(productService: _FakeProductService())),
+    );
   });
+
+  tearDown(() async {
+    await GetIt.I.reset();
+  });
+
+  testWidgets('home renders its main storefront sections', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const GrowStoreApp());
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Buscar produtos...'), findsOneWidget);
+    expect(find.text('Todas'), findsOneWidget);
+    expect(find.text('Camiseta'), findsOneWidget);
+    expect(find.text('Camiseta preta'), findsOneWidget);
+    expect(find.text('Kit Adesivos'), findsOneWidget);
+    expect(find.text('Inicio'), findsOneWidget);
+    expect(find.text('Pedidos'), findsOneWidget);
+    expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.dark_mode_rounded), findsOneWidget);
+
+    await tester.tap(find.text('Mochila'));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Mochila Notebook'), findsOneWidget);
+    expect(find.text('Camiseta preta'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.dark_mode_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.light_mode_rounded), findsOneWidget);
+  });
+}
+
+class _FakeProductService implements ProductService {
+  @override
+  Future<List<Map<String, dynamic>>> fetchAllProducts() async {
+    return [
+      {
+        'id': 13,
+        'title': 'Camiseta preta',
+        'category': 'Camiseta',
+        'price': 79.90,
+        'image': 'assets/images/figma_home_product_tshirt.png',
+      },
+      {
+        'id': 5,
+        'title': 'Kit Adesivos',
+        'category': 'Adesivos',
+        'price': 5.90,
+        'image': 'assets/images/figma_home_product_stickers.png',
+      },
+      {
+        'id': 9,
+        'title': 'Mochila Notebook',
+        'category': 'Mochila',
+        'price': 129.90,
+        'image': 'assets/images/figma_home_product_backpack.png',
+      },
+    ];
+  }
 }

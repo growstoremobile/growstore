@@ -1,26 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors.dart';
 
 class RegisterHeaderWidget extends StatelessWidget {
   const RegisterHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
       children: [
-        Text(
-          'Crie sua conta',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: AppColors.deepNavy,
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: colorScheme.primaryContainer.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.18),
+            ),
+          ),
+          child: Icon(
+            Icons.person_add_alt_1_rounded,
+            color: colorScheme.onPrimaryContainer,
+            size: 26,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 10),
         Text(
-          'Inicie sua jornada no ecossistema técnico da Grow Store.',
+          'Crie sua conta',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16, color: AppColors.onSurfaceVariant),
+          style: theme.textTheme.displayMedium?.copyWith(
+            color: colorScheme.onSurface,
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Preencha seus dados para acessar os produtos exclusivos da Grow Store.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            height: 1.32,
+            letterSpacing: 0,
+          ),
         ),
       ],
     );

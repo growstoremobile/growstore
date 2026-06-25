@@ -8,18 +8,18 @@ class GrowColors {
   static const primaryLight = Color(0xFF6DC265);
 
   // Backgrounds Dark
-  static const darkBg = Color(0xFF0A0A0A);
-  static const darkSurface = Color(0xFF141414); // cards / nav bar
-  static const darkSurfaceElevated = Color(0xFF1C1C1C); // cards / modals
+  static const darkBg = Color(0xFF04090F);
+  static const darkSurface = Color(0xFF0F1B2A); // cards / nav bar
+  static const darkSurfaceElevated = Color(0xFF27323F); // cards / modals
 
   //Backgrounds Light
-  static const lightBg = Color(0xFF40A937);
+  static const lightBg = Color(0xFFF8F9FA);
   static const lightSurface = Color(0xFFFFFFFF);
-  static const lightSurfaceElevated = Color(0xFFEEEEEE);
+  static const lightSurfaceElevated = Color(0xFFE7E8E9);
 
   // Text – Dark Mode
-  static const darkTextPrimary = Color(0xFFFFFFFF);
-  static const darkTextSecondary = Color(0xFFB0B0B0);
+  static const darkTextPrimary = Color(0xFFE2E3DF);
+  static const darkTextSecondary = Color(0xFF7D848C);
   static const darkTextDisabled = Color(0xFF555555);
 
   // Text – Light mode
