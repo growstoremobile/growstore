@@ -8,6 +8,7 @@ import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/core/theme/widgets/loading_widget.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_carousel_item_model.dart';
@@ -114,8 +115,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addToCart(HomeProductModel product) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     _cartStore.addItem(
       CartItemModel(
         id: product.id.toString(),
@@ -126,23 +125,11 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        backgroundColor: isDark
-            ? const Color(0xFF0F1B2A)
-            : const Color(0xFF191C1D),
-        content: Text('${product.name} adicionado ao carrinho'),
-        action: SnackBarAction(
-          label: 'Ver carrinho',
-          textColor: const Color(0xFF40A937),
-          onPressed: () => Navigator.of(context).pushNamed('/cart'),
-        ),
-      ),
+    showCartFeedbackSnackBar(
+      context,
+      title: 'Adicionado ao carrinho',
+      subtitle: product.name,
+      onViewCart: () => Navigator.of(context).pushNamed('/cart'),
     );
   }
 
@@ -182,30 +169,34 @@ class _HomePageState extends State<HomePage> {
                   builder: (_) => RefreshIndicator(
                     color: colors.primary,
                     onRefresh: _homeStore.loadProducts,
-                    child: SingleChildScrollView(
+                    child: CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          HomeCategoryCarousel(
+                      cacheExtent: 360,
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: HomeCategoryCarousel(
                             categories: _homeStore.categories,
                             selectedCategory: _homeStore.selectedCategory,
                             colors: colors,
                             onSelected: _homeStore.selectCategory,
                           ),
-                          HomePromoCarousel(
+                        ),
+                        SliverToBoxAdapter(
+                          child: HomePromoCarousel(
                             items: _carousel,
                             colors: colors,
                             isDark: isDark,
                           ),
-                          HomeFeaturedTitle(
+                        ),
+                        SliverToBoxAdapter(
+                          child: HomeFeaturedTitle(
                             colors: colors,
                             onViewAll: () =>
                                 Navigator.of(context).pushNamed('/search'),
                           ),
-                          _buildProductsContent(colors),
-                        ],
-                      ),
+                        ),
+                        _buildProductsContent(colors),
+                      ],
                     ),
                   ),
                 ),
@@ -225,33 +216,37 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildProductsContent(HomeLayoutColors colors) {
     if (_homeStore.isLoading) {
-      return _HomeProductsLoading(colors: colors);
+      return SliverToBoxAdapter(child: _HomeProductsLoading(colors: colors));
     }
 
     if (_homeStore.errorMessage != null) {
-      return _HomeStateContainer(
-        colors: colors,
-        child: GrowErrorState(
-          type: GrowErrorType.custom,
-          title: 'Erro ao carregar produtos',
-          description: _homeStore.errorMessage,
-          onRetry: _homeStore.loadProducts,
+      return SliverToBoxAdapter(
+        child: _HomeStateContainer(
+          colors: colors,
+          child: GrowErrorState(
+            type: GrowErrorType.custom,
+            title: 'Erro ao carregar produtos',
+            description: _homeStore.errorMessage,
+            onRetry: _homeStore.loadProducts,
+          ),
         ),
       );
     }
 
     if (_homeStore.filteredProducts.isEmpty) {
-      return _HomeStateContainer(
-        colors: colors,
-        child: const GrowEmptyState(
-          icon: Icons.inventory_2_outlined,
-          title: 'Nenhum produto encontrado',
-          description: 'Tente escolher outra categoria.',
+      return SliverToBoxAdapter(
+        child: _HomeStateContainer(
+          colors: colors,
+          child: const GrowEmptyState(
+            icon: Icons.inventory_2_outlined,
+            title: 'Nenhum produto encontrado',
+            description: 'Tente escolher outra categoria.',
+          ),
         ),
       );
     }
 
-    return HomeProductGrid(
+    return HomeProductSliverGrid(
       products: _homeStore.filteredProducts,
       colors: colors,
       isFavorite: _isFavorite,

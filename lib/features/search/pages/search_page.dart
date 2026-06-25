@@ -144,6 +144,7 @@ class _SearchPageState extends State<SearchPage> {
 
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      cacheExtent: 360,
       itemCount: _filteredProducts.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

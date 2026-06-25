@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/search/widgets/search_layout_colors.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class SearchProductCard extends StatelessWidget {
   const SearchProductCard({
@@ -52,21 +53,14 @@ class SearchProductCard extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(14),
-                    child: _image.isEmpty
-                        ? Icon(
-                            Icons.inventory_2_outlined,
-                            color: colors.primary,
-                            size: 42,
-                          )
-                        : Image.network(
-                            _image,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, _, _) => Icon(
-                              Icons.broken_image_outlined,
-                              color: colors.primary,
-                              size: 42,
-                            ),
-                          ),
+                    child: GrowCachedProductImage(
+                      imageUrl: _image,
+                      backgroundColor: Colors.transparent,
+                      iconColor: colors.primary,
+                      fit: BoxFit.contain,
+                      cacheWidth: 420,
+                      cacheHeight: 420,
+                    ),
                   ),
                 ],
               ),

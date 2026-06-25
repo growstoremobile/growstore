@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
@@ -30,28 +31,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   void _handleAddToCart() {
-    final messenger = ScaffoldMessenger.of(context);
     final added = _store.addToCart();
+    final productName = _store.product?.name;
 
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          added
-              ? 'Produto adicionado ao carrinho!'
-              : 'Selecione tamanho e cor antes de adicionar.',
-        ),
-        backgroundColor: added ? GrowColors.primary : GrowColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        action: added
-            ? SnackBarAction(
-                label: 'Ver carrinho',
-                textColor: GrowColors.darkBg,
-                onPressed: () => Navigator.pushNamed(context, '/cart'),
-              )
-            : null,
-      ),
+    showCartFeedbackSnackBar(
+      context,
+      title: added ? 'Adicionado ao carrinho' : 'Selecione tamanho e cor',
+      subtitle: added ? productName : null,
+      isError: !added,
+      onViewCart: added ? () => Navigator.pushNamed(context, '/cart') : null,
     );
   }
 

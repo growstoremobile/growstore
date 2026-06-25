@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class ProductDetailImageWidget extends StatefulWidget {
   final List<String> pathImages;
@@ -44,7 +44,14 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
                   setState(() => _currentIndex = index);
                 },
                 itemBuilder: (context, index) {
-                  return _ProductImage(path: images[index]);
+                  return GrowCachedProductImage(
+                    imageUrl: images[index],
+                    backgroundColor: GrowColors.darkSurface,
+                    iconColor: GrowColors.darkTextSecondary,
+                    fit: BoxFit.contain,
+                    cacheWidth: 900,
+                    cacheHeight: 900,
+                  );
                 },
               ),
             ),
@@ -88,40 +95,6 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
           color: GrowColors.darkTextSecondary,
           size: 48,
         ),
-      ),
-    );
-  }
-}
-
-class _ProductImage extends StatelessWidget {
-  const _ProductImage({required this.path});
-
-  final String path;
-
-  @override
-  Widget build(BuildContext context) {
-    if (path.startsWith('http')) {
-      return CachedNetworkImage(
-        imageUrl: path,
-        fit: BoxFit.contain,
-        placeholder: (_, _) => const Center(
-          child: CircularProgressIndicator(color: GrowColors.primary),
-        ),
-        errorWidget: (_, _, _) => const Icon(
-          Icons.image_not_supported_outlined,
-          color: GrowColors.darkTextSecondary,
-          size: 48,
-        ),
-      );
-    }
-
-    return Image.asset(
-      path,
-      fit: BoxFit.contain,
-      errorBuilder: (_, _, _) => const Icon(
-        Icons.image_not_supported_outlined,
-        color: GrowColors.darkTextSecondary,
-        size: 48,
       ),
     );
   }
