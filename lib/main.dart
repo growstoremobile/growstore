@@ -69,11 +69,6 @@ Future<void> initServiceLocator() async {
     HomeStore(GetIt.I.get<HomeRepository>()),
   );
 
-  GetIt.I.registerSingleton<AuthStore>(authStore);
-  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
-  GetIt.I.registerSingleton<HomeStore>(
-    HomeStore(GetIt.I.get<HomeRepository>()),
-  );
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
       boxFavoritiesProducts: favorityBox,
@@ -127,7 +122,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         darkTheme: growDarkTheme,
         themeMode: _themeMode,
         routes: {
-          '/': (_) => const HomePage(),
+          '/': (_) => const SplashPage(),
           '/splash': (_) => const SplashPage(),
           '/home': (_) => const HomePage(),
           '/login': (_) => const LoginPage(),
