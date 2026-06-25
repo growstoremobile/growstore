@@ -34,16 +34,18 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    await _service.logout();
-    await _googleAuthService.signOut();
-
-    Constants.userToken = '';
-    final authBox = await Hive.openBox('auth');
-    await authBox.delete('token_user');
-    await authBox.delete('user_id');
-    await authBox.delete('user_name');
-    await authBox.delete('user_email');
-    await authBox.delete('user_photo_url');
+    try {
+      await _service.logout();
+      await _googleAuthService.signOut();
+    } finally {
+      Constants.userToken = '';
+      final authBox = await Hive.openBox('auth');
+      await authBox.delete('token_user');
+      await authBox.delete('user_id');
+      await authBox.delete('user_name');
+      await authBox.delete('user_email');
+      await authBox.delete('user_photo_url');
+    }
   }
 
   Future<void> _persistSession(UserModel user, String token) async {

@@ -99,17 +99,13 @@ class _SplashLogo extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(
-        'assets/images/g-logo.png',
-        width: 54,
-        height: 54,
-        errorBuilder: (_, _, _) => const Text(
-          'G',
-          style: TextStyle(
-            color: GrowColors.primary,
-            fontSize: 52,
-            fontWeight: FontWeight.w800,
-          ),
+      child: const Text(
+        'G',
+        style: TextStyle(
+          color: GrowColors.primary,
+          fontSize: 56,
+          fontWeight: FontWeight.w900,
+          height: 1,
         ),
       ),
     );
