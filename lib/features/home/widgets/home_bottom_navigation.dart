@@ -12,7 +12,7 @@ class HomeBottomNavigation extends StatelessWidget {
   final int cartItemCount;
 
   static const _items = [
-    (Icons.home_filled, 'Início'),
+    (Icons.home_filled, 'Inicio'),
     (Icons.grid_view_rounded, 'Categorias'),
     (Icons.shopping_cart_rounded, 'Carrinho'),
     (Icons.favorite_rounded, 'Favoritos'),
@@ -43,7 +43,7 @@ class HomeBottomNavigation extends StatelessWidget {
       ),
       child: Row(
         children: _items.map((item) {
-          final selected = item.$2 == 'Início';
+          final selected = item.$2 == 'Inicio';
           final isCart = item.$2 == 'Carrinho';
           final iconColor = selected ? primary : unselected;
           final badgeLabel = cartItemCount > 99 ? '99+' : '$cartItemCount';

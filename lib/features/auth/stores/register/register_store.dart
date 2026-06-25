@@ -49,16 +49,16 @@ abstract class RegisterStoreBase with Store {
   void setAcceptedTerms(bool value) => _acceptedTerms = value;
 
   @action
-  Future<bool> register(String email, String pass) async {
+  Future<bool> register(String name, String email, String pass) async {
     try {
       error = null;
       _isLoading = true;
 
-      // Simula o tempo de resposta da API
-      await Future.delayed(const Duration(seconds: 2));
+      currentUser = await _repository.createAccount(
+        AuthDto(name: name.trim(), email: email.trim(), pass: pass),
+      );
 
-      // O Repository fará a criação e o login automático em seguida
-      return await _repository.createAccount(AuthDto(email: email, pass: pass));
+      return currentUser != null;
     } on CustomError catch (e) {
       error = e.message;
       return false;
@@ -72,7 +72,6 @@ abstract class RegisterStoreBase with Store {
     try {
       error = null;
       _isGoogleLoading = true;
-      await Future.delayed(const Duration(seconds: 2));
 
       currentUser = await _repository.loginWithGoogle();
 
@@ -80,8 +79,8 @@ abstract class RegisterStoreBase with Store {
     } on CustomError catch (e) {
       error = e.message;
       return false;
-    } catch (e) {
-      error = 'Não foi possível realizar o login com Google. Tente novamente.';
+    } catch (_) {
+      error = 'Nao foi possivel realizar o login com Google. Tente novamente.';
       return false;
     } finally {
       _isGoogleLoading = false;

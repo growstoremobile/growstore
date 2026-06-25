@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
-import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
-import 'package:growstore/features/profile/pages/profile_page.dart';
-import 'package:growstore/shared/colors/colors.dart';
+import 'package:growstore/features/auth/stores/register/register_store.dart';
 import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_app_bar_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_background_painter_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_button_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_divider_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_footer_widget.dart';
+import 'package:growstore/features/auth/widgets/register/register_form_fields_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_header_widget.dart';
 import 'package:growstore/features/auth/widgets/register/register_terms_checkbox_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_form_fields_widget.dart';
-import 'package:growstore/features/auth/stores/register/register_store.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -49,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (!_registerStore.acceptedTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Você precisa aceitar os Termos de Uso.'),
+            content: Text('Voce precisa aceitar os Termos de Uso.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -58,39 +56,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('As senhas não coincidem.')),
+          const SnackBar(content: Text('As senhas nao coincidem.')),
         );
         return;
       }
 
       final success = await _registerStore.register(
+        _nameController.text,
         _emailController.text,
         _passwordController.text,
       );
 
       if (mounted) {
         if (success) {
-          // Cria o modelo do usuário com os dados do formulário
-          final user = UserModel(
-            id: 'new_user_id', // Idealmente, este ID viria da resposta da API
-            name: _nameController.text,
-            email: _emailController.text,
-          );
-          // Salva o usuário no store global de autenticação
-          _authStore.setUser(user);
+          final user = _registerStore.currentUser;
+          if (user != null) {
+            _authStore.setUser(user);
+          }
 
-          // Redireciona para a tela inicial e limpa a pilha de navegação
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const Scaffold(
-                body: Center(
-                  child: Text("Aqui seria sua home"),
-                ), // TODO: Colocar aqui a Home
-              ),
-            ),
-            (route) =>
-                false, // O (route) => false é o que remove as telas de login/cadastro do histórico
-          );
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/home', (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -109,13 +95,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (mounted) {
       if (success) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) =>
-                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
-          ),
-          (route) => false,
-        );
+        final user = _registerStore.currentUser;
+        if (user != null) {
+          _authStore.setUser(user);
+        }
+
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/home', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -134,11 +121,9 @@ class _RegisterPageState extends State<RegisterPage> {
       backgroundColor: const Color(0xFFF9F9F9),
       body: Stack(
         children: [
-          // Background Hero Pattern (Bolinhas pontilhadas)
           Positioned.fill(
             child: CustomPaint(painter: RegisterBackgroundPainterWidget()),
           ),
-          // Visual Accent Element (Ícone da planta no canto inferior)
           const Positioned(
             bottom: -20,
             right: -20,
@@ -147,7 +132,6 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Icon(Icons.eco, size: 160, color: AppColors.growthGreen),
             ),
           ),
-          // Conteúdo Principal
           SafeArea(
             child: Column(
               children: [
@@ -191,9 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 builder: (_) {
                                   return RegisterButtonWidget(
                                     isLoading: _registerStore.isLoading,
-                                    onPressed: () {
-                                      _handleRegister();
-                                    },
+                                    onPressed: _handleRegister,
                                   );
                                 },
                               ),
