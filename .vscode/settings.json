@@ -1,7 +1,0 @@
-{
-  "[snippets]": {
-    "editor.suggest.snippetsPreventQuickSuggestions": true,
-    "editor.snippetSuggestions": "none",
-    "editor.suggest.showSnippets": false
-  }
-}
