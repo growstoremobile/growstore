@@ -6,10 +6,14 @@ class HomeBottomNavigation extends StatelessWidget {
     super.key,
     required this.onTap,
     this.cartItemCount = 0,
+    this.selectedLabel = 'Inicio',
+    this.showCartBadge = true,
   });
 
   final ValueChanged<String> onTap;
   final int cartItemCount;
+  final String selectedLabel;
+  final bool showCartBadge;
 
   static const _items = [
     (Icons.home_filled, 'Inicio'),
@@ -43,7 +47,7 @@ class HomeBottomNavigation extends StatelessWidget {
       ),
       child: Row(
         children: _items.map((item) {
-          final selected = item.$2 == 'Inicio';
+          final selected = item.$2 == selectedLabel;
           final isCart = item.$2 == 'Carrinho';
           final iconColor = selected ? primary : unselected;
           final badgeLabel = cartItemCount > 99 ? '99+' : '$cartItemCount';
@@ -62,7 +66,7 @@ class HomeBottomNavigation extends StatelessWidget {
                       alignment: Alignment.center,
                       children: [
                         Icon(item.$1, color: iconColor, size: 25),
-                        if (isCart && cartItemCount > 0)
+                        if (showCartBadge && isCart && cartItemCount > 0)
                           Positioned(
                             top: -2,
                             right: 0,
