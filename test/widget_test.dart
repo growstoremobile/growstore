@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/main.dart';
@@ -9,6 +11,12 @@ import 'package:growstore/shared/products/services/product_service.dart';
 void main() {
   setUp(() async {
     await GetIt.I.reset();
+    final authStore = AuthStore()
+      ..setUser(
+        UserModel(id: '1', name: 'Teste', email: 'teste@growstore.com'),
+      );
+
+    GetIt.I.registerSingleton<AuthStore>(authStore);
     GetIt.I.registerSingleton<HomeStore>(
       HomeStore(HomeRepository(productService: _FakeProductService())),
     );
@@ -22,6 +30,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const GrowStoreApp());
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('Buscar produtos...'), findsOneWidget);
