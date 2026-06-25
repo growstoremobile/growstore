@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors.dart';
 
 class LoginGoogleButtonWidget extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
+
   const LoginGoogleButtonWidget({
     super.key,
     required this.onPressed,
@@ -12,44 +12,57 @@ class LoginGoogleButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: 46,
       child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.onSurface,
+          disabledForegroundColor: colorScheme.onSurfaceVariant,
+          side: BorderSide(
+            color: colorScheme.outline.withValues(alpha: isDark ? 0.52 : 0.32),
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
         onPressed: isLoading ? null : onPressed,
-
         child: isLoading
-            ? Container(
-                alignment: AlignmentGeometry.center,
+            ? SizedBox(
                 height: 22,
                 width: 22,
-                child: const CircularProgressIndicator(
-                  color: AppColors.primaryColor,
+                child: CircularProgressIndicator(
+                  color: colorScheme.primary,
                   strokeWidth: 2.5,
                 ),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: Image.asset(
-                        "assets/images/google.png",
-                        width: 20,
-                        height: 20,
-                      ),
-                    ),
+                  Image.asset(
+                    'assets/images/google.png',
+                    width: 20,
+                    height: 20,
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
                   ),
-                  const SizedBox(width: 15),
-
-                  const Text(
-                    "Continuar com o Google",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: AppColors.onSurfaceVariant,
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(
+                      'Continuar com o Google',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0,
+                      ),
                     ),
                   ),
                 ],

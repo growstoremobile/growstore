@@ -68,6 +68,12 @@ Future<void> initServiceLocator() async {
   GetIt.I.registerSingleton<HomeStore>(
     HomeStore(GetIt.I.get<HomeRepository>()),
   );
+
+  GetIt.I.registerSingleton<AuthStore>(authStore);
+  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
+  GetIt.I.registerSingleton<HomeStore>(
+    HomeStore(GetIt.I.get<HomeRepository>()),
+  );
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
       boxFavoritiesProducts: favorityBox,
@@ -120,7 +126,6 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         theme: growLightTheme,
         darkTheme: growDarkTheme,
         themeMode: _themeMode,
-        home: const ProductDetailPage(productId: '13'),
         routes: {
           '/splash': (_) => const SplashPage(),
           '/home': (_) => const HomePage(),
@@ -130,6 +135,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/profile': (_) => ProfilePage(),
+          '/productDetail': (_) => ProductDetailPage()
         },
       ),
     );

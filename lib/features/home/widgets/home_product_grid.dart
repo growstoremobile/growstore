@@ -53,7 +53,7 @@ class HomeProductGrid extends StatelessWidget {
           crossAxisCount: 2,
           mainAxisSpacing: 8,
           crossAxisSpacing: 12,
-          childAspectRatio: 177 / 272,
+          childAspectRatio: 0.58,
         ),
         itemBuilder: (context, index) {
           final product = products[index];
@@ -121,7 +121,7 @@ class _HomeProductCard extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(product.asset, fit: BoxFit.cover),
+                      _ProductImage(product: product, colors: colors),
                       Positioned(
                         top: 8,
                         right: 8,
@@ -204,6 +204,45 @@ class _HomeProductCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  const _ProductImage({required this.product, required this.colors});
+
+  final HomeProductModel product;
+  final HomeLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    if (product.asset.isEmpty) {
+      return ColoredBox(
+        color: colors.productGrid,
+        child: Icon(
+          Icons.inventory_2_outlined,
+          color: colors.primary,
+          size: 42,
+        ),
+      );
+    }
+
+    if (product.hasRemoteImage) {
+      return Container(
+        color: colors.productGrid,
+        padding: const EdgeInsets.all(12),
+        child: Image.network(
+          product.asset,
+          fit: BoxFit.contain,
+          errorBuilder: (_, _, _) => Icon(
+            Icons.broken_image_outlined,
+            color: colors.primary,
+            size: 42,
+          ),
+        ),
+      );
+    }
+
+    return Image.asset(product.asset, fit: BoxFit.cover);
   }
 }
 

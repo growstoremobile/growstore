@@ -71,7 +71,15 @@ class ProfileHeaderWidget extends StatelessWidget {
                       color: GrowColors.primary,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Image.asset('assets/images/g-logo.png'),
+                    child: const Text(
+                      'G',
+                      style: TextStyle(
+                        color: GrowColors.lightSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Text(

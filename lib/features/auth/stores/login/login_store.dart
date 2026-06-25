@@ -19,11 +19,9 @@ abstract class LoginStoreBase with Store {
 
   @readonly
   bool _isGoogleLoading = false;
- 
 
   @readonly
   bool _isLoading = false;
-
 
   @observable
   String? error;
@@ -41,10 +39,9 @@ abstract class LoginStoreBase with Store {
       error = null;
       _isLoading = true;
 
-      // Simula o tempo de resposta da API
-      await Future.delayed(const Duration(seconds: 1));
-
-      await _repository.login(AuthDto(email: email, pass: pass));
+      currentUser = await _repository.login(
+        AuthDto(email: email.trim(), pass: pass),
+      );
 
       return true;
     } on CustomError catch (e) {
@@ -60,7 +57,6 @@ abstract class LoginStoreBase with Store {
     try {
       error = null;
       _isGoogleLoading = true;
-      await Future.delayed(const Duration(seconds: 2));
 
       currentUser = await _repository.loginWithGoogle();
 
@@ -68,11 +64,10 @@ abstract class LoginStoreBase with Store {
     } on CustomError catch (e) {
       error = e.message;
       return false;
-    } catch (e) {
-      error = 'Não foi possível realizar o login com Google. Tente novamente.';
+    } catch (_) {
+      error = 'Nao foi possivel realizar o login com Google. Tente novamente.';
       return false;
-    }
-    finally {
+    } finally {
       _isGoogleLoading = false;
     }
   }
