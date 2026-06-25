@@ -4,13 +4,11 @@ import 'package:growstore/core/theme/growstore_theme.dart';
 class ProductDetailInfoWidget extends StatelessWidget {
   final String name;
   final double price;
-  final String description;
 
   const ProductDetailInfoWidget({
     super.key,
     required this.name,
     required this.price,
-    required this.description,
   });
 
   @override
@@ -22,7 +20,12 @@ class ProductDetailInfoWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(name, style: textTheme.titleLarge),
+          Text(
+            name,
+            style: textTheme.titleLarge,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
 
           const SizedBox(height: 8),
 
@@ -30,20 +33,6 @@ class ProductDetailInfoWidget extends StatelessWidget {
             'R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
             style: textTheme.priceStyle,
           ),
-
-          const SizedBox(height: 16),
-
-          Text(
-            'Descrição do produto:',
-            style: textTheme.bodyMedium?.copyWith(
-              color: GrowColors.darkTextPrimary,
-              fontWeight: GrowTypography.bold,
-            ),
-          ),
-
-          const SizedBox(height: 4),
-
-          Text(description, style: textTheme.bodyLarge),
         ],
       ),
     );

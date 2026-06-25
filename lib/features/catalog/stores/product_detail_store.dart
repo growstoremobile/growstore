@@ -21,7 +21,6 @@ abstract class _ProductDetailStore with Store {
     selectedColor = color;
   }
 
-  // Vamos usar isso no Item 6
   bool get hasValidSelection {
     return selectedSize != null && selectedColor != null;
   }

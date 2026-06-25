@@ -35,7 +35,5 @@ Future<void> setupDependencies() async {
     ProductDetailRepository(service: getIt.get<ProductDetailService>()),
   );
 
-  getIt.registerFactory<ProductDetailStore>(
-    () => ProductDetailStore(repository: getIt.get<ProductDetailRepository>()),
-  );
+  getIt.registerFactory<ProductDetailStore>(() => ProductDetailStore());
 }

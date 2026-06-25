@@ -31,7 +31,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: SizedBox(
-              height: 320,
+              height: 345,
               child: PageView.builder(
                 itemCount: widget.pathImages.length,
                 onPageChanged: (index) {
@@ -40,7 +40,7 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
                 itemBuilder: (context, index) {
                   return Image.network(
                     widget.pathImages[index],
-                    fit: BoxFit.contain,
+                    fit: BoxFit.fitWidth,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return const Center(
