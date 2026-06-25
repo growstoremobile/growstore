@@ -10,7 +10,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(FavorityModelAdapter());
+
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(FavorityModelAdapter());
+  }
 }
 
 void main() async {
@@ -19,14 +22,30 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Supabase.initialize(
     url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
+    url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
     publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
   );
   await setupDependencies();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GrowStoreApp extends StatefulWidget {
+  const GrowStoreApp({super.key});
+
+  @override
+  State<GrowStoreApp> createState() => _GrowStoreAppState();
+}
+
+class _GrowStoreAppState extends State<GrowStoreApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme(Brightness currentBrightness) {
+    setState(() {
+      _themeMode = currentBrightness == Brightness.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

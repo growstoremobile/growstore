@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_coupon_widget.dart';
@@ -16,7 +17,9 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  final _cartStore = CartStore();
+  final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
+      ? GetIt.I<CartStore>()
+      : CartStore();
   final _couponController = TextEditingController();
 
   @override
@@ -98,7 +101,7 @@ class _CartPageState extends State<CartPage> {
                   const SizedBox(height: 24),
                   for (final item in _cartStore.items) ...[
                     Dismissible(
-                      key: ValueKey(item.id),
+                      key: ValueKey('${item.id}-${item.variation}'),
                       direction: DismissDirection.endToStart,
                       onDismissed: (_) => _handleRemove(item),
                       background: Container(

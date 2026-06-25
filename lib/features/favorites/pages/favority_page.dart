@@ -79,10 +79,13 @@ class _FavorityPageState extends State<FavorityPage> {
                       : Icons.favorite_border,
                   price: (produto.priceProduct as num).toDouble(),
                   pathImage: produto.pathImage,
-                  iconButton: Icons.shopping_cart,
-                  textButton: 'Adicionar',
-                  onPressed: () {
-                    favorityStore.toggleFavority(produto);
+                  iconButton: Icons.delete_outline,
+                  textButton: 'Remover',
+                  onFavoritePressed: () async {
+                    await favorityStore.toggleFavority(produto);
+                  },
+                  onPressed: () async {
+                    await favorityStore.toggleFavority(produto);
                   },
                 );
               },

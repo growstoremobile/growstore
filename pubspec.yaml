@@ -48,6 +48,7 @@ flutter:
   assets:
     - assets/images/
 
+<<<<<<< HEAD
   fonts:
       - family: Inter
         fonts:
@@ -59,3 +60,32 @@ flutter:
           - asset: assets/fonts/Syne-Regular.ttf
           - asset: assets/fonts/Syne-Bold.ttf
             weight: 700
+=======
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  # fonts:
+  #     - family: Inter
+  #       fonts:
+  #         - asset: assets/fonts/Inter-Regular.ttf
+  #         - asset: assets/fonts/Inter-Bold.ttf
+  #           weight: 700
+  #     - family: Syne
+  #       fonts:
+  #         - asset: assets/fonts/Syne-Regular.ttf
+  #         - asset: assets/fonts/Syne-Bold.ttf
+  #           weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
+>>>>>>> origin/developer
