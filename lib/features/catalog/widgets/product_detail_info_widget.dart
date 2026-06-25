@@ -26,9 +26,7 @@ class ProductDetailInfoWidget extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-
           const SizedBox(height: 8),
-
           Text(
             'R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
             style: textTheme.priceStyle,

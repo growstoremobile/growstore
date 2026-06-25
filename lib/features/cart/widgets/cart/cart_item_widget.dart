@@ -118,7 +118,9 @@ class CartItemWidget extends StatelessWidget {
   }
 
   String _selectedSize(String variation) {
-    final normalized = variation.trim().toUpperCase();
+    final normalized = variation.contains('/')
+        ? variation.split('/').last.trim().toUpperCase()
+        : variation.trim().toUpperCase();
 
     if (normalized == 'P' || normalized == 'M' || normalized == 'G') {
       return normalized;

@@ -2,13 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/di/injection.dart';
-import 'package:growstore/features/auth/pages/login_page.dart';
-import 'package:growstore/features/auth/pages/register_page.dart';
-import 'package:growstore/features/auth/models/user_model.dart';
-import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
+import 'package:growstore/features/auth/pages/register_page.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
@@ -17,10 +17,10 @@ import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/features/splash/pages/splash_page.dart';
 import 'package:growstore/firebase_options.dart';
@@ -88,7 +88,8 @@ Future<void> main() async {
   );
   await initHive();
   await initServiceLocator();
-  await setupDependencies(); // ← única linha adicionada
+  await setupDependencies();
+
   runApp(const GrowStoreApp());
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class DefaultProductCard extends StatelessWidget {
   final String titleProduct;
@@ -49,17 +50,14 @@ class DefaultProductCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: pathImage != null
-                          ? (pathImage!.startsWith('http')
-                                ? Image.network(
-                                    pathImage!,
-                                    fit: BoxFit.contain,
-                                  ) // Se for link do Supabase
-                                : Image.asset(
-                                    pathImage!,
-                                    fit: BoxFit.contain,
-                                  )) // Se for asset local mockado
-                          : const Placeholder(),
+                      child: GrowCachedProductImage(
+                        imageUrl: pathImage,
+                        backgroundColor: Colors.transparent,
+                        iconColor: colors.primary,
+                        fit: BoxFit.contain,
+                        cacheWidth: 420,
+                        cacheHeight: 420,
+                      ),
                     ),
 
                     // Favorito

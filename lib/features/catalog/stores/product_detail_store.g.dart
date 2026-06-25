@@ -8,9 +8,9 @@ part of 'product_detail_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$ProductDetailStore on _ProductDetailStore, Store {
+mixin _$ProductDetailStore on ProductDetailStoreBase, Store {
   late final _$productAtom =
-      Atom(name: '_ProductDetailStore.product', context: context);
+      Atom(name: 'ProductDetailStoreBase.product', context: context);
 
   @override
   ProductDetailsModel? get product {
@@ -26,7 +26,7 @@ mixin _$ProductDetailStore on _ProductDetailStore, Store {
   }
 
   late final _$isLoadingAtom =
-      Atom(name: '_ProductDetailStore.isLoading', context: context);
+      Atom(name: 'ProductDetailStoreBase.isLoading', context: context);
 
   @override
   bool get isLoading {
@@ -42,7 +42,7 @@ mixin _$ProductDetailStore on _ProductDetailStore, Store {
   }
 
   late final _$errorAtom =
-      Atom(name: '_ProductDetailStore.error', context: context);
+      Atom(name: 'ProductDetailStoreBase.error', context: context);
 
   @override
   String? get error {
@@ -58,7 +58,7 @@ mixin _$ProductDetailStore on _ProductDetailStore, Store {
   }
 
   late final _$selectedSizeAtom =
-      Atom(name: '_ProductDetailStore.selectedSize', context: context);
+      Atom(name: 'ProductDetailStoreBase.selectedSize', context: context);
 
   @override
   String? get selectedSize {
@@ -74,7 +74,7 @@ mixin _$ProductDetailStore on _ProductDetailStore, Store {
   }
 
   late final _$selectedColorAtom =
-      Atom(name: '_ProductDetailStore.selectedColor', context: context);
+      Atom(name: 'ProductDetailStoreBase.selectedColor', context: context);
 
   @override
   String? get selectedColor {
@@ -90,46 +90,46 @@ mixin _$ProductDetailStore on _ProductDetailStore, Store {
   }
 
   late final _$loadProductAsyncAction =
-      AsyncAction('_ProductDetailStore.loadProduct', context: context);
+      AsyncAction('ProductDetailStoreBase.loadProduct', context: context);
 
   @override
   Future<void> loadProduct(String id) {
     return _$loadProductAsyncAction.run(() => super.loadProduct(id));
   }
 
-  late final _$_ProductDetailStoreActionController =
-      ActionController(name: '_ProductDetailStore', context: context);
+  late final _$ProductDetailStoreBaseActionController =
+      ActionController(name: 'ProductDetailStoreBase', context: context);
 
   @override
   void selectSize(String size) {
-    final _$actionInfo = _$_ProductDetailStoreActionController.startAction(
-        name: '_ProductDetailStore.selectSize');
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.selectSize');
     try {
       return super.selectSize(size);
     } finally {
-      _$_ProductDetailStoreActionController.endAction(_$actionInfo);
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void selectColor(String color) {
-    final _$actionInfo = _$_ProductDetailStoreActionController.startAction(
-        name: '_ProductDetailStore.selectColor');
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.selectColor');
     try {
       return super.selectColor(color);
     } finally {
-      _$_ProductDetailStoreActionController.endAction(_$actionInfo);
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   bool addToCart() {
-    final _$actionInfo = _$_ProductDetailStoreActionController.startAction(
-        name: '_ProductDetailStore.addToCart');
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.addToCart');
     try {
       return super.addToCart();
     } finally {
-      _$_ProductDetailStoreActionController.endAction(_$actionInfo);
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 

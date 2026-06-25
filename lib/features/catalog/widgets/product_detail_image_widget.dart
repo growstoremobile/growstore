@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class ProductDetailImageWidget extends StatefulWidget {
   final List<String> pathImages;
@@ -16,7 +17,12 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.pathImages.isEmpty) {
+    final images = widget.pathImages
+        .map((image) => image.trim())
+        .where((image) => image.isNotEmpty)
+        .toList();
+
+    if (images.isEmpty) {
       return _buildPlaceholder();
     }
 
@@ -33,25 +39,18 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
             child: SizedBox(
               height: 345,
               child: PageView.builder(
-                itemCount: widget.pathImages.length,
+                itemCount: images.length,
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
                 },
                 itemBuilder: (context, index) {
-                  return Image.network(
-                    widget.pathImages[index],
-                    fit: BoxFit.fitWidth,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: GrowColors.primary,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildPlaceholder();
-                    },
+                  return GrowCachedProductImage(
+                    imageUrl: images[index],
+                    backgroundColor: GrowColors.darkSurface,
+                    iconColor: GrowColors.darkTextSecondary,
+                    fit: BoxFit.contain,
+                    cacheWidth: 900,
+                    cacheHeight: 900,
                   );
                 },
               ),
@@ -59,12 +58,11 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
           ),
         ),
         const SizedBox(height: 12),
-
-        if (widget.pathImages.length > 1)
+        if (images.length > 1)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              widget.pathImages.length,
+              images.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 4),

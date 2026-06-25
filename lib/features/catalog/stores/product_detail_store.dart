@@ -1,4 +1,3 @@
-import 'package:get_it/get_it.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/catalog/models/product_detail_model.dart';
@@ -7,13 +6,17 @@ import 'package:mobx/mobx.dart';
 
 part 'product_detail_store.g.dart';
 
-class ProductDetailStore = _ProductDetailStore with _$ProductDetailStore;
+class ProductDetailStore = ProductDetailStoreBase with _$ProductDetailStore;
 
-abstract class _ProductDetailStore with Store {
+abstract class ProductDetailStoreBase with Store {
   final ProductDetailRepository _repository;
+  final CartStore _cartStore;
 
-  _ProductDetailStore({required ProductDetailRepository repository})
-    : _repository = repository;
+  ProductDetailStoreBase({
+    required ProductDetailRepository repository,
+    required CartStore cartStore,
+  }) : _repository = repository,
+       _cartStore = cartStore;
 
   @observable
   ProductDetailsModel? product;
@@ -36,7 +39,11 @@ abstract class _ProductDetailStore with Store {
   @action
   void selectColor(String color) => selectedColor = color;
 
-  bool get hasValidSelection => selectedSize != null && selectedColor != null;
+  bool get hasValidSelection {
+    return product != null &&
+        selectedSize?.trim().isNotEmpty == true &&
+        selectedColor?.trim().isNotEmpty == true;
+  }
 
   @action
   Future<void> loadProduct(String id) async {
@@ -44,7 +51,7 @@ abstract class _ProductDetailStore with Store {
       isLoading = true;
       error = null;
       product = await _repository.getProductById(id);
-    } catch (e) {
+    } catch (_) {
       error = 'Erro ao carregar produto.';
     } finally {
       isLoading = false;
@@ -53,18 +60,28 @@ abstract class _ProductDetailStore with Store {
 
   @action
   bool addToCart() {
-    if (!hasValidSelection || product == null) return false;
+    final currentProduct = product;
+    final size = selectedSize?.trim();
+    final color = selectedColor?.trim();
 
-    final cartStore = GetIt.I.get<CartStore>();
-    cartStore.addItem(
+    if (currentProduct == null ||
+        size == null ||
+        size.isEmpty ||
+        color == null ||
+        color.isEmpty) {
+      return false;
+    }
+
+    _cartStore.addItem(
       CartItemModel(
-        id: product!.uid,
-        name: product!.name,
-        variation: '$selectedColor / $selectedSize',
-        price: product!.price,
-        imageUrl: product!.mainImageUrl,
+        id: currentProduct.uid,
+        name: currentProduct.name,
+        variation: '$color / $size',
+        price: currentProduct.price,
+        imageUrl: currentProduct.mainImageUrl,
       ),
     );
+
     return true;
   }
 }

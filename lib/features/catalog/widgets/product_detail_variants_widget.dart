@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
 import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 
 class ProductDetailVariantsWidget extends StatelessWidget {
   final List<String> sizes;
   final List<Map<String, String>> colors;
-
   final ProductDetailStore store;
 
   const ProductDetailVariantsWidget({
     super.key,
-    required this.store, // ← recebe a store de fora
+    required this.store,
     this.sizes = const ['P', 'M', 'G', 'GG', 'XG'],
     this.colors = const [
       {'hex': '#0A0A0A', 'name': 'Preto'},
@@ -39,17 +37,19 @@ class ProductDetailVariantsWidget extends StatelessWidget {
             const SizedBox(height: 12),
             Wrap(
               spacing: 16,
+              runSpacing: 12,
               children: colors.map((colorMap) {
                 final colorHex = colorMap['hex']!;
                 final colorName = colorMap['name']!;
                 final color = Color(
                   int.parse(colorHex.replaceFirst('#', '0xFF')),
                 );
-                final isSelected = store.selectedColor == colorHex;
+                final isSelected = store.selectedColor == colorName;
 
                 return GestureDetector(
-                  onTap: () => store.selectColor(colorHex),
+                  onTap: () => store.selectColor(colorName),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         width: 40,
@@ -96,7 +96,6 @@ class ProductDetailVariantsWidget extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ],
-
           if (sizes.isNotEmpty) ...[
             Text(
               'Tamanho',
@@ -109,6 +108,7 @@ class ProductDetailVariantsWidget extends StatelessWidget {
             Row(
               children: sizes.map((size) {
                 final isSelected = store.selectedSize == size;
+
                 return Expanded(
                   child: GestureDetector(
                     onTap: () => store.selectSize(size),

@@ -7,7 +7,7 @@ class ProductDetailRepository {
   ProductDetailRepository({required ProductDetailService service})
     : _service = service;
 
-  Future<ProductDetailsModel> getProductById(String id) async {
-    return await _service.getProductById(id);
+  Future<ProductDetailsModel> getProductById(String id) {
+    return _service.getProductById(id);
   }
 }

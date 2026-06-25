@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
@@ -10,6 +11,7 @@ import 'package:growstore/features/catalog/widgets/product_detail_variants_widge
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
+
   const ProductDetailPage({super.key, required this.productId});
 
   @override
@@ -18,40 +20,27 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late final ProductDetailStore _store;
+  late final CartStore _cartStore;
 
   @override
   void initState() {
     super.initState();
-    _store = GetIt.I.get<ProductDetailStore>();
+    _store = GetIt.I<ProductDetailStore>();
+    _cartStore = GetIt.I<CartStore>();
     _store.loadProduct(widget.productId);
   }
 
   void _handleAddToCart() {
     final added = _store.addToCart();
-    if (added) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Produto adicionado ao carrinho!'),
-          backgroundColor: GrowColors.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          action: SnackBarAction(
-            label: 'Ver carrinho',
-            textColor: GrowColors.darkBg,
-            onPressed: () => Navigator.pushNamed(context, '/cart'),
-          ),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Selecione tamanho e cor antes de adicionar!'),
-          backgroundColor: GrowColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-      );
-    }
+    final productName = _store.product?.name;
+
+    showCartFeedbackSnackBar(
+      context,
+      title: added ? 'Adicionado ao carrinho' : 'Selecione tamanho e cor',
+      subtitle: added ? productName : null,
+      isError: !added,
+      onViewCart: added ? () => Navigator.pushNamed(context, '/cart') : null,
+    );
   }
 
   @override
@@ -66,16 +55,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         centerTitle: true,
         actions: [
           Observer(
-            builder: (_) {
-              final cartStore = GetIt.I.get<CartStore>();
-              return Badge(
-                label: Text('${cartStore.totalItems}'),
-                child: IconButton(
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  onPressed: () => Navigator.pushNamed(context, '/cart'),
-                ),
-              );
-            },
+            builder: (_) => Badge(
+              isLabelVisible: _cartStore.totalItems > 0,
+              label: Text('${_cartStore.totalItems}'),
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                onPressed: () => Navigator.pushNamed(context, '/cart'),
+              ),
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -105,22 +92,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-
                 ProductDetailImageWidget(pathImages: product.galleryUrls),
                 const SizedBox(height: 24),
-
                 ProductDetailInfoWidget(
                   name: product.name,
                   price: product.price,
                 ),
                 const SizedBox(height: 24),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: ProductDetailVariantsWidget(store: _store),
                 ),
                 const SizedBox(height: 24),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: ExpandableDescriptionWidget(
@@ -136,22 +119,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: _handleAddToCart,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: GrowColors.primary,
-              minimumSize: const Size.fromHeight(50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          child: Observer(
+            builder: (_) => ElevatedButton(
+              onPressed: _store.isLoading || _store.product == null
+                  ? null
+                  : _handleAddToCart,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: GrowColors.primary,
+                minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            child: const Text(
-              'ADICIONAR AO CARRINHO',
-              style: TextStyle(
-                color: GrowColors.darkTextPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
+              child: const Text(
+                'ADICIONAR AO CARRINHO',
+                style: TextStyle(
+                  color: GrowColors.darkTextPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
               ),
             ),
           ),
@@ -163,6 +150,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
 class ExpandableDescriptionWidget extends StatefulWidget {
   final String description;
+
   const ExpandableDescriptionWidget({super.key, required this.description});
 
   @override
@@ -182,7 +170,7 @@ class _ExpandableDescriptionWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descrição do produto',
+          'Descricao do produto',
           style: textTheme.bodyMedium?.copyWith(
             color: GrowColors.darkTextPrimary,
             fontWeight: GrowTypography.bold,
@@ -200,17 +188,12 @@ class _ExpandableDescriptionWidgetState
         const SizedBox(height: 6),
         GestureDetector(
           onTap: () => setState(() => isExpanded = !isExpanded),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                isExpanded ? 'Ver menos ˄' : 'Ver mais ˅',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: GrowColors.primary,
-                  fontWeight: GrowTypography.bold,
-                ),
-              ),
-            ],
+          child: Text(
+            isExpanded ? 'Ver menos' : 'Ver mais',
+            style: textTheme.bodyMedium?.copyWith(
+              color: GrowColors.primary,
+              fontWeight: GrowTypography.bold,
+            ),
           ),
         ),
       ],

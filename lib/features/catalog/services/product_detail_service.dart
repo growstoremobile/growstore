@@ -1,5 +1,5 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:growstore/features/catalog/models/product_detail_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductDetailService {
   final _supabase = Supabase.instance.client;
