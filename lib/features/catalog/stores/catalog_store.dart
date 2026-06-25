@@ -56,8 +56,8 @@ abstract class CatalogStoreBase with Store {
       final responseCatalogs = await _serviceCatalog.getCatalogs();
 
       _catalogs.addAll(responseCatalogs);
-    } catch (_) {
-      errorMessage = 'Erro ao mostrar cátalogos na tela.';
+    } catch (error) {
+      errorMessage = error.toString();
     } finally {
       _isLoading = false;
     }
