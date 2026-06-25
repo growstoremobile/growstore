@@ -8,8 +8,11 @@ class ProductDetailVariantsWidget extends StatelessWidget {
   final List<String> sizes;
   final List<Map<String, String>> colors;
 
+  final ProductDetailStore store;
+
   const ProductDetailVariantsWidget({
     super.key,
+    required this.store, // ← recebe a store de fora
     this.sizes = const ['P', 'M', 'G', 'GG', 'XG'],
     this.colors = const [
       {'hex': '#0A0A0A', 'name': 'Preto'},
@@ -19,7 +22,6 @@ class ProductDetailVariantsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final store = GetIt.I.get<ProductDetailStore>();
     final textTheme = Theme.of(context).textTheme;
 
     return Observer(

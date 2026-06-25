@@ -1,17 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
 
-class ProductDetailPage extends StatelessWidget {
+class ProductDetailPage extends StatefulWidget {
   final String productId;
   const ProductDetailPage({super.key, required this.productId});
 
   @override
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
+  late final ProductDetailStore _store;
+
+  @override
+  void initState() {
+    super.initState();
+    _store = GetIt.I.get<ProductDetailStore>();
+    _store.loadProduct(widget.productId);
+  }
+
+  void _handleAddToCart() {
+    final added = _store.addToCart();
+    if (added) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Produto adicionado ao carrinho!'),
+          backgroundColor: GrowColors.primary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          action: SnackBarAction(
+            label: 'Ver carrinho',
+            textColor: GrowColors.darkBg,
+            onPressed: () => Navigator.pushNamed(context, '/cart'),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Selecione tamanho e cor antes de adicionar!'),
+          backgroundColor: GrowColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: GrowColors.darkBg, // Fundo ultra dark oficial
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
@@ -20,74 +65,82 @@ class ProductDetailPage extends StatelessWidget {
         title: const Text('Detalhes'),
         centerTitle: true,
         actions: [
-          Badge(
-            label: const Text('1'),
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {},
-            ),
+          Observer(
+            builder: (_) {
+              final cartStore = GetIt.I.get<CartStore>();
+              return Badge(
+                label: Text('${cartStore.totalItems}'),
+                child: IconButton(
+                  icon: const Icon(Icons.shopping_cart_outlined),
+                  onPressed: () => Navigator.pushNamed(context, '/cart'),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
+      body: Observer(
+        builder: (_) {
+          if (_store.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: GrowColors.primary),
+            );
+          }
 
-            // 1. Imagem do Produto
-            const ProductDetailImageWidget(
-              pathImages: [
-                'https://ucdecpenkxmuuwpmmbgt.supabase.co/storage/v1/object/public/produto-growstore/tshirt_growdev.png',
+          if (_store.error != null) {
+            return Center(
+              child: Text(
+                _store.error!,
+                style: const TextStyle(color: GrowColors.error),
+              ),
+            );
+          }
+
+          final product = _store.product;
+          if (product == null) return const SizedBox();
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+
+                ProductDetailImageWidget(pathImages: product.galleryUrls),
+                const SizedBox(height: 24),
+
+                ProductDetailInfoWidget(
+                  name: product.name,
+                  price: product.price,
+                ),
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ProductDetailVariantsWidget(store: _store),
+                ),
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ExpandableDescriptionWidget(
+                    description: product.description,
+                  ),
+                ),
+                const SizedBox(height: 100),
               ],
             ),
-            const SizedBox(height: 24),
-
-            // 2. Informações Principais (Nome e Preço - já com o limitador interno)
-            const ProductDetailInfoWidget(
-              name: 'Nome do produto com múltiplas linhas',
-              price: 199.90,
-            ),
-            const SizedBox(height: 24),
-
-            // 3. Variantes (Cores com texto abaixo e Tamanhos P, M, G, GG centralizados)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: ProductDetailVariantsWidget(),
-            ),
-            const SizedBox(height: 24),
-
-            // 4. Descrição do Produto com o efeito "Ver mais"
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: ExpandableDescriptionWidget(
-                description:
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, '
-                    'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
-                    'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris '
-                    'nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in '
-                    'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-              ),
-            ),
-            const SizedBox(height: 32), // Espaço de segurança para o scroll
-          ],
-        ),
+          );
+        },
       ),
-
-      // 5. Botão "Adicionar ao Carrinho" Fixo no Rodapé (Não rola com o scroll)
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: ElevatedButton(
-            onPressed: () {
-              // Ação de adicionar ao carrinho
-            },
+            onPressed: _handleAddToCart,
             style: ElevatedButton.styleFrom(
-              backgroundColor: GrowColors.primary, // Verde oficial da paleta
-              minimumSize: const Size.fromHeight(
-                50,
-              ), // Botão alto igual ao protótipo
+              backgroundColor: GrowColors.primary,
+              minimumSize: const Size.fromHeight(50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -110,7 +163,6 @@ class ProductDetailPage extends StatelessWidget {
 
 class ExpandableDescriptionWidget extends StatefulWidget {
   final String description;
-
   const ExpandableDescriptionWidget({super.key, required this.description});
 
   @override
@@ -137,7 +189,6 @@ class _ExpandableDescriptionWidgetState
           ),
         ),
         const SizedBox(height: 8),
-
         Text(
           widget.description,
           style: textTheme.bodyLarge?.copyWith(
@@ -147,18 +198,13 @@ class _ExpandableDescriptionWidgetState
           overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
         ),
         const SizedBox(height: 6),
-
         GestureDetector(
-          onTap: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
+          onTap: () => setState(() => isExpanded = !isExpanded),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isExpanded ? 'Ver menos ̂' : 'Ver mais ˅',
+                isExpanded ? 'Ver menos ˄' : 'Ver mais ˅',
                 style: textTheme.bodyMedium?.copyWith(
                   color: GrowColors.primary,
                   fontWeight: GrowTypography.bold,
