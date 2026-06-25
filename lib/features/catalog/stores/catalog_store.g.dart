@@ -65,6 +65,22 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
     });
   }
 
+  late final _$errorMessageAtom =
+      Atom(name: 'CatalogStoreBase.errorMessage', context: context);
+
+  @override
+  String? get errorMessage {
+    _$errorMessageAtom.reportRead();
+    return super.errorMessage;
+  }
+
+  @override
+  set errorMessage(String? value) {
+    _$errorMessageAtom.reportWrite(value, super.errorMessage, () {
+      super.errorMessage = value;
+    });
+  }
+
   late final _$loadCatalogAsyncAction =
       AsyncAction('CatalogStoreBase.loadCatalog', context: context);
 
@@ -88,9 +104,21 @@ mixin _$CatalogStore on CatalogStoreBase, Store {
   }
 
   @override
+  void clearError() {
+    final _$actionInfo = _$CatalogStoreBaseActionController.startAction(
+        name: 'CatalogStoreBase.clearError');
+    try {
+      return super.clearError();
+    } finally {
+      _$CatalogStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 search: ${search},
+errorMessage: ${errorMessage},
 filteredCatalogs: ${filteredCatalogs}
     ''';
   }

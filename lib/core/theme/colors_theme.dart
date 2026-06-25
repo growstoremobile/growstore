@@ -13,7 +13,7 @@ class GrowColors {
   static const darkSurfaceElevated = Color(0xFF1C1C1C); // cards / modals
 
   //Backgrounds Light
-  static const lightBg = Color(0xFFF5F5F5);
+  static const lightBg = Color(0xFF40A937);
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightSurfaceElevated = Color(0xFFEEEEEE);
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:growstore/features/catalog/services/catalog_api_service.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
+import 'package:growstore/shared/widgets/app_error_dialog.dart';
+import 'package:mobx/mobx.dart';
 
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key});
@@ -15,18 +17,41 @@ class _CatalogPageState extends State<CatalogPage> {
     serviceCatalog: CatalogMockService(),
   );
 
+  late ReactionDisposer _errorDisposer;
+
   @override
   void initState() {
     super.initState();
+
+    _errorDisposer = reaction<String?>((_) => _store.errorMessage, (message) {
+      if (message != null) {
+        showAppErrorDialog(context: context, message: message);
+        _store.clearError();
+      }
+    });
     _store.loadCatalog();
+  }
+
+  @override
+  void dispose() {
+    _errorDisposer();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Categorias'),
+        title: Text('Categorias', style: TextTheme.of(context).displayMedium),
         centerTitle: true,
+        shape: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 1,
+          ),
+        ),
+
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, 54),
           child: Padding(
@@ -37,8 +62,11 @@ class _CatalogPageState extends State<CatalogPage> {
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
-                      icon: Icon(Icons.search),
-                      hint: Text('Buscar produtos...'),
+                      prefixIcon: Icon(Icons.search),
+                      hint: Text(
+                        'Buscar produtos...',
+                        style: TextStyle(fontSize: 17),
+                      ),
                     ),
                     onChanged: _store.setSearch,
                   ),
@@ -51,7 +79,12 @@ class _CatalogPageState extends State<CatalogPage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(
+            left: 32,
+            top: 24,
+            right: 32,
+            bottom: 0,
+          ),
           child: Column(
             children: [
               Expanded(
@@ -78,15 +111,24 @@ class _CatalogPageState extends State<CatalogPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.person),
+                                        const Icon(size: 35, Icons.person),
                                         Text(
                                           catalog.title,
-                                          textAlign: TextAlign.center,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge,
                                         ),
                                         Text(
                                           '${catalog.productQtn} itens',
-                                          textAlign: TextAlign.center,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
                                         ),
                                       ],
                                     ),
@@ -102,23 +144,31 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        destinations: const <Widget>[
-          NavigationDestination(icon: Icon(Icons.home), label: 'Início'),
-          NavigationDestination(
-            icon: Icon(Icons.view_comfy_alt),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, size: 35),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.view_comfy_alt, size: 35),
             label: 'Categorias',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.shopping_cart),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart, size: 35),
             label: 'Carrinho',
           ),
-          NavigationDestination(icon: Icon(Icons.favorite), label: 'Favoritos'),
-          NavigationDestination(
-            icon: Icon(Icons.shopping_bag),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite, size: 35),
+            label: 'Favoritos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag, size: 35),
             label: 'Pedidos',
           ),
         ],
+        currentIndex: 1,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
     );
   }

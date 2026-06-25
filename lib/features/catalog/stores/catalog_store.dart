@@ -27,6 +27,15 @@ abstract class CatalogStoreBase with Store {
   @observable
   String? search;
 
+  @observable
+  String? errorMessage;
+
+  @action
+  void setSearch(String? text) => search = text;
+
+  @action
+  void clearError() => errorMessage = null;
+
   @computed
   List<CatalogModel> get filteredCatalogs {
     if (search == null || search!.isEmpty) return _catalogs.toList();
@@ -40,9 +49,6 @@ abstract class CatalogStoreBase with Store {
   }
 
   @action
-  void setSearch(String? text) => search = text;
-
-  @action
   Future<void> loadCatalog() async {
     try {
       _isLoading = true;
@@ -51,7 +57,7 @@ abstract class CatalogStoreBase with Store {
 
       _catalogs.addAll(responseCatalogs);
     } catch (_) {
-      throw Exception('Erro ao mostrar cátalogos na tela.');
+      errorMessage = 'Erro ao mostrar cátalogos na tela.';
     } finally {
       _isLoading = false;
     }
