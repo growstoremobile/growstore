@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors.dart';
 
 class RegisterTextFieldWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -10,6 +9,9 @@ class RegisterTextFieldWidget extends StatelessWidget {
   final bool? obscureText;
   final VoidCallback? onToggleVisibility;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
+  final TextCapitalization textCapitalization;
   final FormFieldValidator<String>? validator;
 
   const RegisterTextFieldWidget({
@@ -22,79 +24,106 @@ class RegisterTextFieldWidget extends StatelessWidget {
     this.obscureText,
     this.onToggleVisibility,
     this.keyboardType,
+    this.textInputAction,
+    this.autofillHints,
+    this.textCapitalization = TextCapitalization.none,
     this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.deepNavy,
-            ),
-          ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final borderRadius = BorderRadius.circular(8);
+    final enabledBorderColor = colorScheme.outline.withValues(
+      alpha: isDark ? 0.42 : 0.28,
+    );
+    final fillColor =
+        theme.inputDecorationTheme.fillColor ??
+        colorScheme.surfaceContainerHighest;
+
+    OutlineInputBorder border(Color color, {double width = 1}) {
+      return OutlineInputBorder(
+        borderRadius: borderRadius,
+        borderSide: BorderSide(color: color, width: width),
+      );
+    }
+
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText ?? false,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      autofillHints: autofillHints,
+      textCapitalization: textCapitalization,
+      cursorColor: colorScheme.primary,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: colorScheme.onSurface,
+        fontWeight: FontWeight.w500,
+        height: 1.18,
+        letterSpacing: 0,
+      ),
+      validator:
+          validator ??
+          ((value) =>
+              (value == null || value.isEmpty) ? 'Campo obrigatório' : null),
+      decoration: InputDecoration(
+        isDense: true,
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        labelStyle: theme.textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+          height: 1.18,
+          letterSpacing: 0,
         ),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText ?? false,
-          keyboardType: keyboardType,
-          validator:
-              validator ??
-              ((value) => (value == null || value.isEmpty)
-                  ? 'Campo obrigatório'
-                  : null),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: AppColors.outline.withValues(alpha: 0.6),
-            ),
-            prefixIcon: Icon(prefixIcon, color: AppColors.outline, size: 20),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(
-                      (obscureText ?? true)
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: AppColors.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    onPressed: onToggleVisibility,
-                  )
-                : null,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.outline),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: AppColors.outline.withValues(alpha: 0.4),
-                width: 1,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
-                color: AppColors.growthGreen,
-                width: 2,
-              ),
-            ),
-          ),
+        hintText: hint,
+        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.58),
+          height: 1.18,
+          letterSpacing: 0,
         ),
-      ],
+        prefixIcon: Icon(
+          prefixIcon,
+          color: colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
+        prefixIconConstraints: const BoxConstraints.tightFor(
+          width: 44,
+          height: 46,
+        ),
+        suffixIcon: isPassword
+            ? IconButton(
+                tooltip: (obscureText ?? true)
+                    ? 'Mostrar senha'
+                    : 'Ocultar senha',
+                icon: Icon(
+                  (obscureText ?? true)
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+                onPressed: onToggleVisibility,
+              )
+            : null,
+        suffixIconConstraints: const BoxConstraints.tightFor(
+          width: 46,
+          height: 46,
+        ),
+        filled: true,
+        fillColor: fillColor,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 13,
+          horizontal: 12,
+        ),
+        border: border(enabledBorderColor),
+        enabledBorder: border(enabledBorderColor),
+        focusedBorder: border(colorScheme.primary, width: 1.6),
+        errorBorder: border(colorScheme.error),
+        focusedErrorBorder: border(colorScheme.error, width: 1.6),
+        errorMaxLines: 1,
+      ),
     );
   }
 }

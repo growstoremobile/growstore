@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors.dart';
 
-/// Custom painter para desenhar o background pontilhado (hero-pattern)
 class RegisterBackgroundPainterWidget extends CustomPainter {
+  const RegisterBackgroundPainterWidget({required this.color});
+
+  final Color color;
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.growthGreen.withValues(alpha: 0.05)
+      ..color = color
       ..style = PaintingStyle.fill;
 
     const spacing = 24.0;
@@ -20,5 +22,7 @@ class RegisterBackgroundPainterWidget extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant RegisterBackgroundPainterWidget oldDelegate) {
+    return oldDelegate.color != color;
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:growstore/shared/colors/colors.dart';
 
 class RegisterTermsCheckboxWidget extends StatelessWidget {
   final bool value;
@@ -13,6 +12,18 @@ class RegisterTermsCheckboxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final baseStyle = theme.textTheme.bodyMedium?.copyWith(
+      color: colorScheme.onSurfaceVariant,
+      height: 1.45,
+      letterSpacing: 0,
+    );
+    final linkStyle = baseStyle?.copyWith(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.w700,
+    );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -22,7 +33,9 @@ class RegisterTermsCheckboxWidget extends StatelessWidget {
           child: Checkbox(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.growthGreen,
+            activeColor: colorScheme.primary,
+            checkColor: colorScheme.onPrimary,
+            side: BorderSide(color: colorScheme.outlineVariant),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
             ),
@@ -31,30 +44,14 @@ class RegisterTermsCheckboxWidget extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: RichText(
-            text: const TextSpan(
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant,
-                fontSize: 14,
-                fontFamily: 'Inter',
-              ),
+            text: TextSpan(
+              style: baseStyle,
               children: [
-                TextSpan(text: 'Li e concordo com os '),
-                TextSpan(
-                  text: 'Termos de Uso',
-                  style: TextStyle(
-                    color: AppColors.primaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                TextSpan(text: ' e a '),
-                TextSpan(
-                  text: 'Política de Privacidade',
-                  style: TextStyle(
-                    color: AppColors.primaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                TextSpan(text: '.'),
+                const TextSpan(text: 'Li e concordo com os '),
+                TextSpan(text: 'Termos de Uso', style: linkStyle),
+                const TextSpan(text: ' e a '),
+                TextSpan(text: 'Política de Privacidade', style: linkStyle),
+                const TextSpan(text: '.'),
               ],
             ),
           ),
