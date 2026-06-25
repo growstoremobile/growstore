@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
+import 'package:growstore/features/auth/pages/register_page.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
@@ -14,8 +17,11 @@ import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
+import 'package:growstore/features/home/repositories/home_repository.dart';
+import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/firebase_options.dart';
+import 'package:growstore/shared/utils/constants.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -29,9 +35,37 @@ Future<void> initHive() async {
 
 Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
+  final authBox = await Hive.openBox('auth');
 
   GetIt.I.registerSingleton<FavorityService>(FavorityService());
-  GetIt.I.registerSingleton<AuthStore>(AuthStore());
+  final authStore = AuthStore();
+  final savedToken = authBox.get('token_user') as String?;
+  final savedUserId = authBox.get('user_id') as String?;
+  final savedUserName = authBox.get('user_name') as String?;
+  final savedUserEmail = authBox.get('user_email') as String?;
+  final savedUserPhotoUrl = authBox.get('user_photo_url') as String?;
+
+  if (savedToken != null &&
+      savedToken.isNotEmpty &&
+      savedUserId != null &&
+      savedUserName != null &&
+      savedUserEmail != null) {
+    Constants.userToken = savedToken;
+    authStore.setUser(
+      UserModel(
+        id: savedUserId,
+        name: savedUserName,
+        email: savedUserEmail,
+        photoUrl: savedUserPhotoUrl,
+      ),
+    );
+  }
+
+  GetIt.I.registerSingleton<AuthStore>(authStore);
+  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
+  GetIt.I.registerSingleton<HomeStore>(
+    HomeStore(GetIt.I.get<HomeRepository>()),
+  );
 
   GetIt.I.registerSingleton<FavorityRepository>(
     FavorityRepository(
@@ -92,12 +126,14 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         home: const HomePage(),
         routes: {
           '/home': (_) => const HomePage(),
+          '/login': (_) => const LoginPage(),
+          '/register': (_) => const RegisterPage(),
           '/search': (_) => const SearchPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
+          '/profile': (_) => ProfilePage(),
         },
       ),
-      home: ProfilePage(),
     );
   }
 }

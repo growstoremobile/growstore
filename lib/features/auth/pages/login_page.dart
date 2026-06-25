@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
-import 'package:growstore/features/profile/pages/profile_page.dart';
-import 'package:growstore/shared/colors/colors.dart';
-import 'package:growstore/features/auth/widgets/login/login_header_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_email_field_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_password_field_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_button_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_divider_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
-import 'package:growstore/features/auth/widgets/login/login_footer_widget.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/auth/stores/login/login_store.dart';
+import 'package:growstore/features/auth/widgets/login/login_button_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_divider_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_email_field_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_footer_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_header_widget.dart';
+import 'package:growstore/features/auth/widgets/login/login_password_field_widget.dart';
+import 'package:growstore/shared/colors/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -44,10 +43,8 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.text,
       );
 
-      // Garante que o widget ainda está na tela antes de mostrar a mensagem
       if (mounted) {
         if (success) {
-          // Mock de dados do usuário
           final user = UserModel(
             id: '123',
             name: 'Fulano de Tal',
@@ -56,16 +53,9 @@ class _LoginPageState extends State<LoginPage> {
           );
           _authStore.setUser(user);
 
-          // Redireciona para a tela inicial e limpa a pilha de navegação
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const Scaffold(
-                body: Center(child: Text("Aqui seria sua home")), // TODO: Colocar aqui a Home
-              ),
-            ),
-            (route) =>
-                false, // O (route) => false é o que remove as telas de login/cadastro do histórico
-          );
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/home', (route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(_loginStore.error ?? 'Erro ao fazer login')),
@@ -82,13 +72,14 @@ class _LoginPageState extends State<LoginPage> {
 
     if (mounted) {
       if (success) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) =>
-                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
-          ),
-          (route) => false,
-        );
+        final user = _loginStore.currentUser;
+        if (user != null) {
+          _authStore.setUser(user);
+        }
+
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/home', (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
