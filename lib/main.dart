@@ -20,6 +20,7 @@ import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
+import 'package:growstore/features/splash/pages/splash_page.dart';
 import 'package:growstore/firebase_options.dart';
 import 'package:growstore/shared/utils/constants.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -123,8 +124,9 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         theme: growLightTheme,
         darkTheme: growDarkTheme,
         themeMode: _themeMode,
-        home: const HomePage(),
+        home: const SplashPage(),
         routes: {
+          '/splash': (_) => const SplashPage(),
           '/home': (_) => const HomePage(),
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
