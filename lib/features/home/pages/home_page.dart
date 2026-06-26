@@ -3,12 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/core/theme/widgets/empty_state_widget.dart';
+import 'package:growstore/core/theme/widgets/error_state_widget.dart';
+import 'package:growstore/core/theme/widgets/loading_widget.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_carousel_item_model.dart';
 import 'package:growstore/features/home/models/home_product_model.dart';
+import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/home/widgets/home_category_carousel.dart';
 import 'package:growstore/features/home/widgets/home_featured_title.dart';
@@ -34,19 +39,9 @@ class _HomePageState extends State<HomePage> {
       ? GetIt.I<FavorityProductsStore>()
       : null;
 
-  String _selectedCategory = 'Todas';
-
-  static const _categories = [
-    'Todas',
-    'Camiseta',
-    'Mochila',
-    'Garrafas',
-    'Copos',
-    'Cadernos',
-    'Canetas',
-    'Adesivos',
-    'Mousepads',
-  ];
+  final HomeStore _homeStore = GetIt.I.isRegistered<HomeStore>()
+      ? GetIt.I<HomeStore>()
+      : HomeStore();
 
   static const _carousel = [
     HomeCarouselItemModel(
@@ -63,63 +58,10 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  static const _products = [
-    HomeProductModel(
-      id: 13,
-      name: 'Camiseta preta',
-      category: 'Camiseta',
-      price: 'R\$ 79,90',
-      priceValue: 79.90,
-      asset: 'assets/images/figma_home_product_tshirt.png',
-    ),
-    HomeProductModel(
-      id: 5,
-      name: 'Kit Adesivos',
-      category: 'Adesivos',
-      price: 'R\$ 5,90',
-      priceValue: 5.90,
-      asset: 'assets/images/figma_home_product_stickers.png',
-    ),
-    HomeProductModel(
-      id: 2,
-      name: 'Caneca preta',
-      category: 'Copos',
-      price: 'R\$ 29,90',
-      priceValue: 29.90,
-      asset: 'assets/images/figma_home_product_mug.png',
-    ),
-    HomeProductModel(
-      id: 4,
-      name: 'Garrafa térmica',
-      category: 'Garrafas',
-      price: 'R\$ 39,90',
-      priceValue: 39.90,
-      asset: 'assets/images/figma_home_product_bottle.png',
-    ),
-    HomeProductModel(
-      id: 9,
-      name: 'Mochila Notebook',
-      category: 'Mochila',
-      price: 'R\$ 129,90',
-      priceValue: 129.90,
-      asset: 'assets/images/figma_home_product_backpack.png',
-    ),
-    HomeProductModel(
-      id: 1,
-      name: 'Mousepad',
-      category: 'Mousepads',
-      price: 'R\$ 19,90',
-      priceValue: 19.90,
-      asset: 'assets/images/figma_home_product_mousepad.png',
-    ),
-  ];
-
-  List<HomeProductModel> get _filteredProducts {
-    if (_selectedCategory == 'Todas') return _products;
-
-    return _products
-        .where((product) => product.category == _selectedCategory)
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    _homeStore.loadProducts();
   }
 
   void _comingSoon(BuildContext context, String destination) {
@@ -130,7 +72,10 @@ class _HomePageState extends State<HomePage> {
 
   void _handleBottomNavigation(BuildContext context, String label) {
     switch (label) {
-      case 'Início':
+      case 'Inicio':
+        break;
+      case 'Categorias':
+        Navigator.of(context).pushNamed('/search');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
@@ -141,15 +86,10 @@ class _HomePageState extends State<HomePage> {
           setState(() {});
         });
         break;
-      case 'Categorias':
       case 'Pedidos':
         _comingSoon(context, label);
         break;
     }
-  }
-
-  void _selectCategory(String category) {
-    setState(() => _selectedCategory = category);
   }
 
   Future<void> _toggleFavorite(HomeProductModel product) async {
@@ -175,8 +115,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addToCart(HomeProductModel product) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     _cartStore.addItem(
       CartItemModel(
         id: product.id.toString(),
@@ -187,23 +125,11 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        backgroundColor: isDark
-            ? const Color(0xFF0F1B2A)
-            : const Color(0xFF191C1D),
-        content: Text('${product.name} adicionado ao carrinho'),
-        action: SnackBarAction(
-          label: 'Ver carrinho',
-          textColor: const Color(0xFF40A937),
-          onPressed: () => Navigator.of(context).pushNamed('/cart'),
-        ),
-      ),
+    showCartFeedbackSnackBar(
+      context,
+      title: 'Adicionado ao carrinho',
+      subtitle: product.name,
+      onViewCart: () => Navigator.of(context).pushNamed('/cart'),
     );
   }
 
@@ -232,43 +158,46 @@ class _HomePageState extends State<HomePage> {
                 colors: colors,
                 isDark: isDark,
                 onSearch: () => Navigator.of(context).pushNamed('/search'),
-                onProfile: () => _comingSoon(context, 'Perfil'),
+                onProfile: () => Navigator.of(context).pushNamed('/profile'),
                 onThemeToggle: () => ThemeModeController.of(
                   context,
                 ).toggleTheme(Theme.of(context).brightness),
               ),
               Divider(height: 1, thickness: 1, color: colors.divider),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      HomeCategoryCarousel(
-                        categories: _categories,
-                        selectedCategory: _selectedCategory,
-                        colors: colors,
-                        onSelected: _selectCategory,
-                      ),
-                      HomePromoCarousel(
-                        items: _carousel,
-                        colors: colors,
-                        isDark: isDark,
-                      ),
-                      if (isDark)
-                        HomeFeaturedTitle(
-                          colors: colors,
-                          onViewAll: () =>
-                              _comingSoon(context, 'Todos os produtos'),
+                child: Observer(
+                  builder: (_) => RefreshIndicator(
+                    color: colors.primary,
+                    onRefresh: _homeStore.loadProducts,
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      cacheExtent: 360,
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: HomeCategoryCarousel(
+                            categories: _homeStore.categories,
+                            selectedCategory: _homeStore.selectedCategory,
+                            colors: colors,
+                            onSelected: _homeStore.selectCategory,
+                          ),
                         ),
-                      HomeProductGrid(
-                        products: _filteredProducts,
-                        colors: colors,
-                        isFavorite: _isFavorite,
-                        onFavoriteToggle: _toggleFavorite,
-                        onAddToCart: _addToCart,
-                        onTap: (product) => _comingSoon(context, product.name),
-                      ),
-                    ],
+                        SliverToBoxAdapter(
+                          child: HomePromoCarousel(
+                            items: _carousel,
+                            colors: colors,
+                            isDark: isDark,
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: HomeFeaturedTitle(
+                            colors: colors,
+                            onViewAll: () =>
+                                Navigator.of(context).pushNamed('/search'),
+                          ),
+                        ),
+                        _buildProductsContent(colors),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -281,6 +210,139 @@ class _HomePageState extends State<HomePage> {
             onTap: (label) => _handleBottomNavigation(context, label),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProductsContent(HomeLayoutColors colors) {
+    if (_homeStore.isLoading) {
+      return SliverToBoxAdapter(child: _HomeProductsLoading(colors: colors));
+    }
+
+    if (_homeStore.errorMessage != null) {
+      return SliverToBoxAdapter(
+        child: _HomeStateContainer(
+          colors: colors,
+          child: GrowErrorState(
+            type: GrowErrorType.custom,
+            title: 'Erro ao carregar produtos',
+            description: _homeStore.errorMessage,
+            onRetry: _homeStore.loadProducts,
+          ),
+        ),
+      );
+    }
+
+    if (_homeStore.filteredProducts.isEmpty) {
+      return SliverToBoxAdapter(
+        child: _HomeStateContainer(
+          colors: colors,
+          child: const GrowEmptyState(
+            icon: Icons.inventory_2_outlined,
+            title: 'Nenhum produto encontrado',
+            description: 'Tente escolher outra categoria.',
+          ),
+        ),
+      );
+    }
+
+    return HomeProductSliverGrid(
+      products: _homeStore.filteredProducts,
+      colors: colors,
+      isFavorite: _isFavorite,
+      onFavoriteToggle: _toggleFavorite,
+      onAddToCart: _addToCart,
+      onTap: (product) => Navigator.of(
+        context,
+      ).pushNamed('/productDetail', arguments: product.id.toString()),
+    );
+  }
+}
+
+class _HomeStateContainer extends StatelessWidget {
+  const _HomeStateContainer({required this.colors, required this.child});
+
+  final HomeLayoutColors colors;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: colors.productGrid,
+      constraints: const BoxConstraints(minHeight: 320),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+      child: child,
+    );
+  }
+}
+
+class _HomeProductsLoading extends StatelessWidget {
+  const _HomeProductsLoading({required this.colors});
+
+  final HomeLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: colors.productGrid,
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: GridView.builder(
+        itemCount: 4,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.58,
+        ),
+        itemBuilder: (_, _) => _HomeProductCardSkeleton(colors: colors),
+      ),
+    );
+  }
+}
+
+class _HomeProductCardSkeleton extends StatelessWidget {
+  const _HomeProductCardSkeleton({required this.colors});
+
+  final HomeLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.productCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.productBorder),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 161 / 160,
+            child: GrowSkeletonBox(
+              width: double.infinity,
+              height: double.infinity,
+              borderRadius: 0,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GrowSkeletonBox(width: 72, height: 12),
+                  SizedBox(height: 4),
+                  GrowSkeletonBox(width: double.infinity, height: 18),
+                  Spacer(),
+                  GrowSkeletonBox(width: 88, height: 22),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

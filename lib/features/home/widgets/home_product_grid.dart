@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
-class HomeProductGrid extends StatelessWidget {
-  const HomeProductGrid({
+class HomeProductSliverGrid extends StatelessWidget {
+  const HomeProductSliverGrid({
     super.key,
     required this.products,
     required this.colors,
@@ -24,49 +25,52 @@ class HomeProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) {
-      return Container(
-        color: colors.productGrid,
-        constraints: const BoxConstraints(minHeight: 250),
-        padding: const EdgeInsets.fromLTRB(24, 48, 24, 64),
-        alignment: Alignment.center,
-        child: Text(
-          'Nenhum produto nesta categoria',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.syne(
-            color: colors.productName,
-            fontSize: 16,
-            height: 22 / 16,
-            fontWeight: FontWeight.w600,
+      return DecoratedSliver(
+        decoration: BoxDecoration(color: colors.productGrid),
+        sliver: SliverToBoxAdapter(
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 250),
+            padding: const EdgeInsets.fromLTRB(24, 48, 24, 64),
+            alignment: Alignment.center,
+            child: Text(
+              'Nenhum produto nesta categoria',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.syne(
+                color: colors.productName,
+                fontSize: 16,
+                height: 22 / 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
       );
     }
 
-    return Container(
-      color: colors.productGrid,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: GridView.builder(
-        itemCount: products.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 12,
-          childAspectRatio: 177 / 272,
-        ),
-        itemBuilder: (context, index) {
-          final product = products[index];
+    return DecoratedSliver(
+      decoration: BoxDecoration(color: colors.productGrid),
+      sliver: SliverPadding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        sliver: SliverGrid(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.58,
+          ),
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final product = products[index];
 
-          return _HomeProductCard(
-            product: product,
-            colors: colors,
-            isFavorite: isFavorite(product.id),
-            onFavoriteToggle: () => onFavoriteToggle(product),
-            onAddToCart: () => onAddToCart(product),
-            onTap: () => onTap(product),
-          );
-        },
+            return _HomeProductCard(
+              product: product,
+              colors: colors,
+              isFavorite: isFavorite(product.id),
+              onFavoriteToggle: () => onFavoriteToggle(product),
+              onAddToCart: () => onAddToCart(product),
+              onTap: () => onTap(product),
+            );
+          }, childCount: products.length),
+        ),
       ),
     );
   }
@@ -121,7 +125,7 @@ class _HomeProductCard extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(product.asset, fit: BoxFit.cover),
+                      _ProductImage(product: product, colors: colors),
                       Positioned(
                         top: 8,
                         right: 8,
@@ -203,6 +207,28 @@ class _HomeProductCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  const _ProductImage({required this.product, required this.colors});
+
+  final HomeProductModel product;
+  final HomeLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return GrowCachedProductImage(
+      imageUrl: product.asset,
+      backgroundColor: colors.productGrid,
+      iconColor: colors.primary,
+      fit: product.hasRemoteImage ? BoxFit.contain : BoxFit.cover,
+      padding: product.hasRemoteImage
+          ? const EdgeInsets.all(12)
+          : EdgeInsets.zero,
+      cacheWidth: 420,
+      cacheHeight: 420,
     );
   }
 }

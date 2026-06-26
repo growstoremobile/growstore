@@ -22,6 +22,7 @@ void main() {
 
     expect(response, isNotNull);
     expect(response, isNotEmpty);
+    expect(response.length, greaterThan(0));
   });
 }
 
