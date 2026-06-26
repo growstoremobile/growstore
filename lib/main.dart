@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/core/theme/dark_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
@@ -88,7 +89,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         theme: growLightTheme,
         darkTheme: growDarkTheme,
         themeMode: _themeMode,
-        home: const HomePage(),
+        home: const LoginPage(),
         routes: {
           '/home': (_) => const HomePage(),
           '/search': (_) => const SearchPage(),
