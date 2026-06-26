@@ -96,7 +96,7 @@ mixin _$LoginStore on LoginStoreBase, Store {
       AsyncAction('LoginStoreBase.login', context: context);
 
   @override
-  Future<bool> login(String email, String pass) {
+  Future<UserModel?> login(String email, String pass) {
     return _$loginAsyncAction.run(() => super.login(email, pass));
   }
 

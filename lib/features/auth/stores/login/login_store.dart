@@ -19,11 +19,9 @@ abstract class LoginStoreBase with Store {
 
   @readonly
   bool _isGoogleLoading = false;
- 
 
   @readonly
   bool _isLoading = false;
-
 
   @observable
   String? error;
@@ -36,20 +34,18 @@ abstract class LoginStoreBase with Store {
   void toggleShowPassword() => _showPassword = !_showPassword;
 
   @action
-  Future<bool> login(String email, String pass) async {
+  Future<UserModel?> login(String email, String pass) async {
     try {
       error = null;
       _isLoading = true;
 
-      // Simula o tempo de resposta da API
-      await Future.delayed(const Duration(seconds: 1));
+      final user = await _repository.login(AuthDto(email: email, pass: pass));
 
-      await _repository.login(AuthDto(email: email, pass: pass));
-
-      return true;
+      return user;
     } on CustomError catch (e) {
       error = e.message;
-      return false;
+      // Retorna nulo em caso de erro, que será tratado na UI
+      return null;
     } finally {
       _isLoading = false;
     }
@@ -71,8 +67,7 @@ abstract class LoginStoreBase with Store {
     } catch (e) {
       error = 'Não foi possível realizar o login com Google. Tente novamente.';
       return false;
-    }
-    finally {
+    } finally {
       _isGoogleLoading = false;
     }
   }

@@ -110,28 +110,14 @@ mixin _$RegisterStore on RegisterStoreBase, Store {
     });
   }
 
-  late final _$_acceptedTermsAtom =
-      Atom(name: 'RegisterStoreBase._acceptedTerms', context: context);
-
-  @override
-  bool get _acceptedTerms {
-    _$_acceptedTermsAtom.reportRead();
-    return super._acceptedTerms;
-  }
-
-  @override
-  set _acceptedTerms(bool value) {
-    _$_acceptedTermsAtom.reportWrite(value, super._acceptedTerms, () {
-      super._acceptedTerms = value;
-    });
-  }
-
   late final _$registerAsyncAction =
       AsyncAction('RegisterStoreBase.register', context: context);
 
   @override
-  Future<bool> register(String email, String pass) {
-    return _$registerAsyncAction.run(() => super.register(email, pass));
+  Future<UserModel?> register(
+      {required String name, required String email, required String pass}) {
+    return _$registerAsyncAction
+        .run(() => super.register(name: name, email: email, pass: pass));
   }
 
   late final _$loginWithGoogleAsyncAction =
@@ -162,17 +148,6 @@ mixin _$RegisterStore on RegisterStoreBase, Store {
         name: 'RegisterStoreBase.toggleConfirmPasswordVisibility');
     try {
       return super.toggleConfirmPasswordVisibility();
-    } finally {
-      _$RegisterStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setAcceptedTerms(bool value) {
-    final _$actionInfo = _$RegisterStoreBaseActionController.startAction(
-        name: 'RegisterStoreBase.setAcceptedTerms');
-    try {
-      return super.setAcceptedTerms(value);
     } finally {
       _$RegisterStoreBaseActionController.endAction(_$actionInfo);
     }

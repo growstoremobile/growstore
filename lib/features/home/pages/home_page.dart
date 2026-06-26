@@ -16,6 +16,7 @@ import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/features/home/widgets/home_product_grid.dart';
 import 'package:growstore/features/home/widgets/home_promo_carousel.dart';
 import 'package:growstore/features/home/widgets/home_search_bar.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -232,7 +233,10 @@ class _HomePageState extends State<HomePage> {
                 colors: colors,
                 isDark: isDark,
                 onSearch: () => Navigator.of(context).pushNamed('/search'),
-                onProfile: () => _comingSoon(context, 'Perfil'),
+                onProfile: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                ),
                 onThemeToggle: () => ThemeModeController.of(
                   context,
                 ).toggleTheme(Theme.of(context).brightness),

@@ -34,10 +34,6 @@ abstract class RegisterStoreBase with Store {
   bool _obscureConfirmPassword = true;
   bool get obscureConfirmPassword => _obscureConfirmPassword;
 
-  @observable
-  bool _acceptedTerms = false;
-  bool get acceptedTerms => _acceptedTerms;
-
   @action
   void togglePasswordVisibility() => _obscurePassword = !_obscurePassword;
 
@@ -46,22 +42,25 @@ abstract class RegisterStoreBase with Store {
       _obscureConfirmPassword = !_obscureConfirmPassword;
 
   @action
-  void setAcceptedTerms(bool value) => _acceptedTerms = value;
-
-  @action
-  Future<bool> register(String email, String pass) async {
+  Future<UserModel?> register({
+    required String name,
+    required String email,
+    required String pass,
+  }) async {
     try {
       error = null;
       _isLoading = true;
 
-      // Simula o tempo de resposta da API
-      await Future.delayed(const Duration(seconds: 2));
-
       // O Repository fará a criação e o login automático em seguida
-      return await _repository.createAccount(AuthDto(email: email, pass: pass));
+      // e retornará o usuário criado.
+      final user = await _repository.createAccount(
+        AuthDto(name: name, email: email, pass: pass),
+      );
+
+      return user;
     } on CustomError catch (e) {
       error = e.message;
-      return false;
+      return null;
     } finally {
       _isLoading = false;
     }

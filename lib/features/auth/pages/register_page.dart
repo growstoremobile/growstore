@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
-import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
-import 'package:growstore/features/home/pages/home_page.dart';
-import 'package:growstore/shared/colors/colors.dart';
-import 'package:growstore/features/auth/widgets/login/login_google_button_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_app_bar_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_background_painter_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_button_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_divider_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_footer_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_header_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_terms_checkbox_widget.dart';
-import 'package:growstore/features/auth/widgets/register/register_form_fields_widget.dart';
 import 'package:growstore/features/auth/stores/register/register_store.dart';
+import 'package:growstore/features/auth/widgets/auth_button_widget.dart';
+import 'package:growstore/features/auth/widgets/auth_input_decoration.dart';
+import 'package:growstore/features/home/pages/home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -46,49 +37,24 @@ class _RegisterPageState extends State<RegisterPage> {
     if (_registerStore.isLoading) return;
 
     if (_formKey.currentState?.validate() ?? false) {
-      if (!_registerStore.acceptedTerms) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Você precisa aceitar os Termos de Uso.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('As senhas não coincidem.')),
-        );
-        return;
-      }
-
-      final success = await _registerStore.register(
-        _emailController.text,
-        _passwordController.text,
+      final user = await _registerStore.register(
+        name: _nameController.text,
+        email: _emailController.text,
+        pass: _passwordController.text,
       );
 
       if (mounted) {
-        if (success) {
-          // Cria o modelo do usuário com os dados do formulário
-          final user = UserModel(
-            id: 'new_user_id', // Idealmente, este ID viria da resposta da API
-            name: _nameController.text,
-            email: _emailController.text,
-          );
-          // Salva o usuário no store global de autenticação
+        if (user != null) {
           _authStore.setUser(user);
-
-          // Redireciona para a tela inicial e limpa a pilha de navegação
+          // Navega para a HomePage e limpa a pilha de navegação
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomePage()),
-            (route) =>
-                false, // O (route) => false é o que remove as telas de login/cadastro do histórico
+            (route) => false,
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_registerStore.error ?? 'Erro ao cadastrar'),
+              content: Text(_registerStore.error ?? 'Erro ao criar conta'),
             ),
           );
         }
@@ -96,125 +62,134 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  Future<void> _handleGoogleLogin() async {
-    if (_registerStore.isGoogleLoading) return;
-
-    final success = await _registerStore.loginWithGoogle();
-
-    if (mounted) {
-      if (success) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) =>
-                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
-          ),
-          (route) => false,
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _registerStore.error ?? 'Erro ao fazer login com Google',
-            ),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      body: Stack(
-        children: [
-          // Background Hero Pattern (Bolinhas pontilhadas)
-          Positioned.fill(
-            child: CustomPaint(painter: RegisterBackgroundPainterWidget()),
-          ),
-          // Visual Accent Element (Ícone da planta no canto inferior)
-          const Positioned(
-            bottom: -20,
-            right: -20,
-            child: Opacity(
-              opacity: 0.1,
-              child: Icon(Icons.eco, size: 160, color: AppColors.growthGreen),
-            ),
-          ),
-          // Conteúdo Principal
-          SafeArea(
+      backgroundColor: const Color(0xFF38a83d),
+      appBar: AppBar(
+        title: const Text('Criar Conta'),
+        backgroundColor: const Color(0xFF38a83d),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const RegisterAppBarWidget(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 24.0,
+                // BEGIN: LogoSection
+                Column(
+                  children: [
+                    Image.asset('assets/images/G-logomarca.png', height: 100),
+                    const SizedBox(height: 30),
+                    Image.asset(
+                      'assets/images/GrowStore-logomarca.png',
+                      width: 250,
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 420),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const RegisterHeaderWidget(),
-                              const SizedBox(height: 40),
-                              RegisterFormFieldsWidget(
-                                nameController: _nameController,
-                                emailController: _emailController,
-                                passwordController: _passwordController,
-                                confirmPasswordController:
-                                    _confirmPasswordController,
-                                store: _registerStore,
-                              ),
-                              const SizedBox(height: 24),
-                              Observer(
-                                builder: (_) {
-                                  return RegisterTermsCheckboxWidget(
-                                    value: _registerStore.acceptedTerms,
-                                    onChanged: (v) => _registerStore
-                                        .setAcceptedTerms(v ?? false),
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 24),
-                              Observer(
-                                builder: (_) {
-                                  return RegisterButtonWidget(
-                                    isLoading: _registerStore.isLoading,
-                                    onPressed: () {
-                                      _handleRegister();
-                                    },
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 32),
-                              const RegisterDividerWidget(),
-                              const SizedBox(height: 24),
-                              Observer(
-                                builder: (_) {
-                                  return LoginGoogleButtonWidget(
-                                    isLoading: _registerStore.isGoogleLoading,
-                                    onPressed: _handleGoogleLogin,
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 32),
-                              const RegisterFooterWidget(),
-                            ],
-                          ),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+                // END: LogoSection
+
+                // BEGIN: RegisterForm
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AuthInputWidget(
+                        controller: _nameController,
+                        label: 'Nome',
+                        prefixIcon: Icons.person,
+                        validator: (value) => (value?.isEmpty ?? true)
+                            ? 'Por favor, insira seu nome'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      AuthInputWidget(
+                        controller: _emailController,
+                        label: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.email,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, insira seu email';
+                          }
+                          if (!value.contains('@')) {
+                            return 'Por favor, insira um email válido';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Observer(
+                        builder: (_) => AuthInputWidget(
+                          controller: _passwordController,
+                          label: 'Senha',
+                          prefixIcon: Icons.lock,
+                          isPassword: true,
+                          isObscured: _registerStore.obscurePassword,
+                          onToggleVisibility:
+                              _registerStore.togglePasswordVisibility,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, insira sua senha';
+                            }
+                            return null;
+                          },
+                          onFieldSubmitted: (_) => _handleRegister(),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                      Observer(
+                        builder: (_) => AuthInputWidget(
+                          controller: _confirmPasswordController,
+                          label: 'Confirmar Senha',
+                          prefixIcon: Icons.lock_outline,
+                          isPassword: true,
+                          isObscured: _registerStore.obscureConfirmPassword,
+                          onToggleVisibility:
+                              _registerStore.toggleConfirmPasswordVisibility,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor, confirme sua senha';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'As senhas não coincidem';
+                            }
+                            return null;
+                          },
+                          onFieldSubmitted: (_) => _handleRegister(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                // END: RegisterForm
+
+                // BEGIN: ActionButtons
+                Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    Observer(
+                      builder: (_) {
+                        return AuthButtonWidget(
+                          text: 'CRIAR CONTA',
+                          onPressed: _handleRegister,
+                          isLoading: _registerStore.isLoading,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+                // END: ActionButtons
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

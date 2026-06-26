@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
-import 'package:growstore/features/auth/models/user_model.dart';
 import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/auth/stores/login/login_store.dart';
-import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/features/auth/widgets/auth_button_widget.dart';
+import 'package:growstore/features/auth/widgets/auth_input_decoration.dart';
 import 'package:growstore/features/home/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,21 +33,14 @@ class _LoginPageState extends State<LoginPage> {
     if (_loginStore.isLoading) return;
 
     if (_formKey.currentState?.validate() ?? false) {
-      final success = await _loginStore.login(
+      final user = await _loginStore.login(
         _emailController.text,
         _passwordController.text,
       );
 
       // Garante que o widget ainda está na tela antes de mostrar a mensagem
       if (mounted) {
-        if (success) {
-          // Mock de dados do usuário
-          final user = UserModel(
-            id: '123',
-            name: 'Fulano de Tal',
-            email: _emailController.text,
-            password: '123456',
-          );
+        if (user != null) {
           _authStore.setUser(user);
 
           // Redireciona para a tela inicial e limpa a pilha de navegação
@@ -112,25 +105,9 @@ class _LoginPageState extends State<LoginPage> {
                   // BEGIN: LogoSection
                   Column(
                     children: [
-                      const SizedBox(height: 48),
-                      const Icon(
-                        Icons.shopping_bag,
-                        color: Colors.white,
-                        size: 150,
-                      ),
-                      Transform.translate(
-                        offset: const Offset(0, -20),
-                        child: const Text(
-                          'GrowStore',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 50,
-                            fontWeight: FontWeight.w900,
-                            fontStyle: FontStyle.italic,
-                            letterSpacing: -2.5,
-                          ),
-                        ),
-                      ),
+                      Image.asset('assets/images/G-logomarca.png'),
+                      const SizedBox(height: 30),
+                      Image.asset('assets/images/GrowStore-logomarca.png'),
                     ],
                   ),
                   // END: LogoSection
@@ -141,17 +118,11 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        TextFormField(
+                        AuthInputWidget(
                           controller: _emailController,
+                          label: 'Email',
                           keyboardType: TextInputType.emailAddress,
-                          decoration: _buildInputDecoration(
-                            'Email',
-                            Icons.email_outlined,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: GrowColors.lightTextPrimary,
-                          ),
+                          prefixIcon: Icons.email,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Por favor, insira seu email';
@@ -164,21 +135,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 16),
                         Observer(
-                          builder: (_) => TextFormField(
+                          builder: (_) => AuthInputWidget(
                             controller: _passwordController,
-                            obscureText: _loginStore.showPassword,
-                            decoration: _buildInputDecoration(
-                              'Senha',
-                              Icons.lock_outline,
-                              isPassword: true,
-                              onToggleVisibility:
-                                  _loginStore.toggleShowPassword,
-                              isObscured: _loginStore.showPassword,
-                            ),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: GrowColors.lightTextPrimary,
-                            ),
+                            label: 'Senha',
+                            prefixIcon: Icons.lock,
+                            isPassword: true,
+                            isObscured: !_loginStore.showPassword,
+                            onToggleVisibility: _loginStore.toggleShowPassword,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Por favor, insira sua senha';
@@ -198,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Observer(
                         builder: (_) {
-                          return _buildAuthButton(
+                          return AuthButtonWidget(
                             text: 'ENTRAR',
                             onPressed: _handleLogin,
                             isLoading: _loginStore.isLoading,
@@ -206,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      _buildAuthButton(
+                      AuthButtonWidget(
                         text: 'CRIAR CONTA',
                         onPressed: () {
                           Navigator.of(context).push(
@@ -221,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                         builder: (_) {
                           return _loginStore.isGoogleLoading
                               ? const CircularProgressIndicator(
-                                  color: Colors.white,
+                                  color: Color(0xFF38a83d),
                                 )
                               : GestureDetector(
                                   onTap: _handleGoogleLogin,
@@ -239,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                                       ],
                                     ),
                                     child: Image.asset(
-                                      'assets/icons/google_logo.png',
+                                      'assets/images/google.png',
                                       width: 28,
                                       height: 28,
                                     ),
@@ -256,78 +219,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(
-    String label,
-    IconData prefixIcon, {
-    bool isPassword = false,
-    VoidCallback? onToggleVisibility,
-    bool isObscured = false,
-  }) {
-    return InputDecoration(
-      hintText: label,
-      hintStyle: const TextStyle(color: GrowColors.lightTextDisabled),
-      prefixIcon: Icon(prefixIcon, color: GrowColors.lightTextDisabled),
-      suffixIcon: isPassword
-          ? IconButton(
-              icon: Icon(
-                isObscured
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: GrowColors.lightTextDisabled,
-              ),
-              onPressed: onToggleVisibility,
-            )
-          : null,
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(50),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(50),
-        borderSide: const BorderSide(color: Colors.white, width: 2),
-      ),
-    );
-  }
-
-  Widget _buildAuthButton({
-    required String text,
-    required VoidCallback onPressed,
-    bool isLoading = false,
-  }) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.8,
-          ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                  strokeWidth: 3,
-                ),
-              )
-            : Text(text),
       ),
     );
   }
