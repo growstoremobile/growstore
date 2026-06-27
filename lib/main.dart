@@ -11,8 +11,8 @@ import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
-import 'package:growstore/features/catalog/pages/catalog_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
+import 'package:growstore/features/categories/pages/categories_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
@@ -129,7 +129,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/home': (_) => const HomePage(),
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
-          '/catalog': (_) => const CatalogPage(),
+          '/categories': (_) => const CategoriesPage(),
           '/search': (_) => const SearchPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:growstore/features/catalog/services/catalog_api_service.dart';
-import 'package:growstore/features/catalog/stores/catalog_store.dart';
-import 'package:growstore/features/catalog/widgets/catalog_bottom_navigation.dart';
-import 'package:growstore/features/catalog/widgets/catalog_search_bar.dart';
+import 'package:growstore/features/categories/services/category_service.dart';
+import 'package:growstore/features/categories/stores/category_store.dart';
+import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
+import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/shared/widgets/app_error_dialog.dart';
 import 'package:mobx/mobx.dart';
 
-class CatalogPage extends StatefulWidget {
-  const CatalogPage({super.key});
+class CategoriesPage extends StatefulWidget {
+  const CategoriesPage({super.key});
 
   @override
-  State<CatalogPage> createState() => _CatalogPageState();
+  State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class _CatalogPageState extends State<CatalogPage> {
-  final CatalogStore _store = CatalogStore(
-    serviceCatalog: CatalogMockService(),
+class _CategoriesPageState extends State<CategoriesPage> {
+  final CategoryStore _store = CategoryStore(
+    categoryService: CategoryMockService(),
   );
 
   late ReactionDisposer _errorDisposer;
@@ -32,7 +32,7 @@ class _CatalogPageState extends State<CatalogPage> {
         _store.clearError();
       }
     });
-    _store.loadCatalog();
+    _store.loadCategories();
   }
 
   @override
@@ -72,7 +72,7 @@ class _CatalogPageState extends State<CatalogPage> {
         bottom: false,
         child: Column(
           children: [
-            CatalogSearchBar(
+            CategorySearchBar(
               colors: colors,
               isDark: isDark,
               onSearchChanged: _store.setSearch,
@@ -84,7 +84,7 @@ class _CatalogPageState extends State<CatalogPage> {
                 padding: const EdgeInsets.only(left: 32, top: 24, right: 32),
                 child: Observer(
                   builder: (context) {
-                    final filteredList = _store.filteredCatalogs;
+                    final filteredList = _store.filteredCategories;
                     return _store.isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : GridView.builder(
@@ -97,7 +97,7 @@ class _CatalogPageState extends State<CatalogPage> {
                                   crossAxisSpacing: 19,
                                 ),
                             itemBuilder: (BuildContext context, int index) {
-                              final catalog = filteredList[index];
+                              final category = filteredList[index];
 
                               return InkWell(
                                 onTap: () =>
@@ -109,9 +109,9 @@ class _CatalogPageState extends State<CatalogPage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        const Icon(size: 35, Icons.person),
+                                        Image.asset('assets/images/icon_0.png'),
                                         Text(
-                                          catalog.title,
+                                          category.title,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           softWrap: false,
@@ -120,7 +120,7 @@ class _CatalogPageState extends State<CatalogPage> {
                                           ).textTheme.titleLarge,
                                         ),
                                         Text(
-                                          '${catalog.productQtn} itens',
+                                          '${category.productQtn} itens',
                                           style: Theme.of(
                                             context,
                                           ).textTheme.bodyMedium,
@@ -139,7 +139,7 @@ class _CatalogPageState extends State<CatalogPage> {
           ],
         ),
       ),
-      bottomNavigationBar: CatalogBottomNavigation(
+      bottomNavigationBar: CategoryBottomNavigation(
         onTap: _handleBottomNavigation,
       ),
     );

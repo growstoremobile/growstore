@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 
-class CatalogSearchBar extends StatelessWidget {
-  const CatalogSearchBar({
+class CategorySearchBar extends StatelessWidget {
+  const CategorySearchBar({
     super.key,
     required this.colors,
     required this.isDark,

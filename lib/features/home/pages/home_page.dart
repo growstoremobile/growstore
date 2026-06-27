@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       case 'Inicio':
         break;
       case 'Categorias':
-        Navigator.of(context).pushNamed('/catalog');
+        Navigator.of(context).pushNamed('/categories');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');

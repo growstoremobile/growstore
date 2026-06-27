@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CatalogBottomNavigation extends StatelessWidget {
-  const CatalogBottomNavigation({
+class CategoryBottomNavigation extends StatelessWidget {
+  const CategoryBottomNavigation({
     super.key,
     required this.onTap,
     this.cartItemCount = 0,
