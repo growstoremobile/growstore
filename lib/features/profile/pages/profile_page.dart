@@ -43,8 +43,10 @@ class ProfilePage extends StatelessWidget {
         ).pushNamedAndRemoveUntil('/home', (route) => false);
         break;
       case 'Buscar':
-      case 'Categorias':
         Navigator.of(context).pushNamed('/search');
+        break;
+      case 'Categorias':
+        Navigator.of(context).pushNamed('/catalog');
         break;
       case 'Favoritos':
         Navigator.of(context).pushNamed('/favorites');
@@ -69,7 +71,7 @@ class ProfilePage extends StatelessWidget {
         ).pushNamedAndRemoveUntil('/home', (route) => false);
         break;
       case 'Categorias':
-        Navigator.of(context).pushNamed('/search');
+        Navigator.of(context).pushNamed('/catalog');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');

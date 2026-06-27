@@ -56,7 +56,7 @@ class _CartPageState extends State<CartPage> {
         ).pushNamedAndRemoveUntil('/home', (route) => false);
         break;
       case 'Categorias':
-        Navigator.of(context).pushNamed('/search');
+        Navigator.of(context).pushNamed('/catalog');
         break;
       case 'Carrinho':
         break;

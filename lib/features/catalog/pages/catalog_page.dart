@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:growstore/features/catalog/services/catalog_api_service.dart';
 import 'package:growstore/features/catalog/stores/catalog_store.dart';
+import 'package:growstore/features/catalog/widgets/catalog_bottom_navigation.dart';
+import 'package:growstore/features/catalog/widgets/catalog_search_bar.dart';
+import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/shared/widgets/app_error_dialog.dart';
 import 'package:mobx/mobx.dart';
 
@@ -38,56 +41,47 @@ class _CatalogPageState extends State<CatalogPage> {
     super.dispose();
   }
 
+  void _handleBottomNavigation(String label) {
+    switch (label) {
+      case 'Inicio':
+        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+        break;
+      case 'Categorias':
+        break;
+      case 'Carrinho':
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      case 'Favoritos':
+        Navigator.of(context).pushNamed('/favorites');
+        break;
+      case 'Pedidos':
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Pedidos em breve.')));
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text('Categorias', style: TextTheme.of(context).displayMedium),
-        centerTitle: true,
-        shape: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 1,
-          ),
-        ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = HomeLayoutColors.resolve(isDark);
 
-        bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, 54),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              spacing: 16,
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hint: Text(
-                        'Buscar produtos...',
-                        style: TextStyle(fontSize: 17),
-                      ),
-                    ),
-                    onChanged: _store.setSearch,
-                  ),
-                ),
-                const CircleAvatar(child: Icon(Icons.person)),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 32,
-            top: 24,
-            right: 32,
-            bottom: 0,
-          ),
-          child: Column(
-            children: [
-              Expanded(
+        bottom: false,
+        child: Column(
+          children: [
+            CatalogSearchBar(
+              colors: colors,
+              isDark: isDark,
+              onSearchChanged: _store.setSearch,
+              onProfile: () => Navigator.of(context).pushNamed('/profile'),
+            ),
+            Divider(height: 1, thickness: 1, color: colors.divider),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 32, top: 24, right: 32),
                 child: Observer(
                   builder: (context) {
                     final filteredList = _store.filteredCatalogs;
@@ -106,7 +100,8 @@ class _CatalogPageState extends State<CatalogPage> {
                               final catalog = filteredList[index];
 
                               return InkWell(
-                                onTap: () {},
+                                onTap: () =>
+                                    Navigator.of(context).pushNamed('/search'),
                                 child: Card(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -140,35 +135,12 @@ class _CatalogPageState extends State<CatalogPage> {
                   },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, size: 35),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.view_comfy_alt, size: 35),
-            label: 'Categorias',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart, size: 35),
-            label: 'Carrinho',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, size: 35),
-            label: 'Favoritos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag, size: 35),
-            label: 'Pedidos',
-          ),
-        ],
-        currentIndex: 1,
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      bottomNavigationBar: CatalogBottomNavigation(
+        onTap: _handleBottomNavigation,
       ),
     );
   }

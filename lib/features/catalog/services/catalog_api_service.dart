@@ -10,7 +10,9 @@ class CatalogMockService implements CatalogService {
   @override
   Future<List<CatalogModel>> getCatalogs() async {
     try {
-      final response = await rootBundle.loadString('assets/mocks/catalogs.jso');
+      final response = await rootBundle.loadString(
+        'assets/mocks/catalogs.json',
+      );
       final data = jsonDecode(response) as List;
 
       return data.map((item) => CatalogModel.fromMap(item)).toList();
