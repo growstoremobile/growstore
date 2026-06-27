@@ -1,5 +1,5 @@
-import 'package:growstore/features/categories/models/category_model.dart';
-import 'package:growstore/features/categories/services/category_service.dart';
+import 'package:growstore/features/categories/models/categories_model.dart';
+import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:mobx/mobx.dart';
 
 // Include generated file
@@ -10,10 +10,10 @@ class CategoryStore = CategoryStoreBase with _$CategoryStore;
 
 // The store-class
 abstract class CategoryStoreBase with Store {
-  final CategoryService _categoryService;
+  final _repository;
 
-  CategoryStoreBase({required CategoryService categoryService})
-    : _categoryService = categoryService;
+  CategoryStoreBase({required CategoriesRepository repository})
+    : _repository = repository;
 
   @observable
   bool _isLoading = false;
@@ -53,7 +53,7 @@ abstract class CategoryStoreBase with Store {
     try {
       _isLoading = true;
 
-      final responseCategories = await _categoryService.getCategories();
+      final responseCategories = await _repository.getCategories();
 
       _categories.addAll(responseCategories);
     } catch (error) {

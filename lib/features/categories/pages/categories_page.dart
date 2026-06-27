@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:growstore/features/categories/services/category_service.dart';
+import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:growstore/features/categories/stores/category_store.dart';
 import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
+import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:growstore/shared/widgets/app_error_dialog.dart';
 import 'package:mobx/mobx.dart';
 
@@ -17,7 +18,7 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   final CategoryStore _store = CategoryStore(
-    categoryService: CategoryMockService(),
+    repository: CategoriesRepository(productService: ProductService()),
   );
 
   late ReactionDisposer _errorDisposer;
@@ -120,7 +121,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                           ).textTheme.titleLarge,
                                         ),
                                         Text(
-                                          '${category.productQtn} itens',
+                                          '1',
                                           style: Theme.of(
                                             context,
                                           ).textTheme.bodyMedium,
