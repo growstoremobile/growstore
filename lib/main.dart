@@ -39,7 +39,9 @@ Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
 
-  GetIt.I.registerSingleton<FavorityService>(FavorityService());
+  final locator = GetIt.I;
+
+  locator.registerSingleton<FavorityService>(FavorityService());
   final authStore = AuthStore();
   final savedToken = authBox.get('token_user') as String?;
   final savedUserId = authBox.get('user_id') as String?;
@@ -63,29 +65,56 @@ Future<void> initServiceLocator() async {
     );
   }
 
-  GetIt.I.registerSingleton<AuthStore>(authStore);
-  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
-  GetIt.I.registerSingleton<HomeStore>(
-    HomeStore(GetIt.I.get<HomeRepository>()),
+  locator.registerSingleton<AuthStore>(authStore);
+  locator.registerSingleton<HomeRepository>(HomeRepository());
+  locator.registerSingleton<HomeStore>(
+    HomeStore(locator.get<HomeRepository>()),
   );
 
-  GetIt.I.registerSingleton<FavorityRepository>(
+  locator.registerSingleton<FavorityRepository>(
     FavorityRepository(
       boxFavoritiesProducts: favorityBox,
-      favoriteService: GetIt.I.get<FavorityService>(),
+      favoriteService: locator.get<FavorityService>(),
     ),
   );
-  GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
-  GetIt.I.registerSingleton<CartStore>(CartStore());
+  locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+
+  // CartStore agora é gerenciado centralizadamente para evitar duplicações
+  if (!locator.isRegistered<CartStore>()) {
+    locator.registerSingleton<CartStore>(CartStore());
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await Supabase.initialize(
-    url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
-    publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
-  );
+
+  // 1. Inicialização blindada do Firebase
+  try {
+    if (Firebase.apps.isNotEmpty) {
+      // Se por algum motivo bizarro ele já existir no ecossistema nativo,
+      // nós não fazemos nada ou usamos a instância existente.
+      print("Firebase já estava inicializado nativamente.");
+    } else {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      print("Firebase inicializado com sucesso.");
+    }
+  } catch (e) {
+    print("Aviso Firebase: $e");
+    // Mesmo que dê erro de duplicado aqui, o try/catch engole o erro e não deixa o app travar
+  }
+
+  // 2. Inicialização do Supabase
+  try {
+    await Supabase.initialize(
+      url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
+      publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
+    );
+  } catch (e) {
+    print("Erro Supabase: $e");
+  }
+
   await initHive();
   await initServiceLocator();
   await setupDependencies();
