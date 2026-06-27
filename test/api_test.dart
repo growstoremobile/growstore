@@ -1,13 +1,21 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+class HttpTestOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = null;
+  HttpOverrides.global = HttpTestOverrides();
 
-  test('Deve buscar a lista de produtos do Supabase com sucesso', () async {
+  setUpAll(() async {
     await Supabase.initialize(
       url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
       publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
@@ -16,13 +24,20 @@ void main() {
         pkceAsyncStorage: _MemoryGotrueAsyncStorage(),
       ),
     );
+  });
 
+  test('Deve buscar a lista de produtos do Supabase com sucesso', () async {
     final supabase = Supabase.instance.client;
+
+    // Executa a busca real no seu banco de dados
     final response = await supabase.from('produtos').select();
 
+    // Validações
     expect(response, isNotNull);
     expect(response, isNotEmpty);
     expect(response.length, greaterThan(0));
+
+    print('Produtos retornados: $response');
   });
 }
 
