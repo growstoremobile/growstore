@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/shared/utils/price_utils.dart';
 
 class ProductDetailInfoWidget extends StatelessWidget {
   final String name;
@@ -27,10 +28,7 @@ class ProductDetailInfoWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
-          Text(
-            'R\$ ${price.toStringAsFixed(2).replaceAll('.', ',')}',
-            style: textTheme.priceStyle,
-          ),
+          Text(formatGrowCurrency(price), style: textTheme.priceStyle),
         ],
       ),
     );

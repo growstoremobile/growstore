@@ -33,11 +33,26 @@ abstract class ProductDetailStoreBase with Store {
   @observable
   String? selectedColor;
 
+  @observable
+  int quantity = 1;
+
   @action
   void selectSize(String size) => selectedSize = size;
 
   @action
   void selectColor(String color) => selectedColor = color;
+
+  @action
+  void incrementQuantity() {
+    quantity++;
+  }
+
+  @action
+  void decrementQuantity() {
+    if (quantity <= 1) return;
+
+    quantity--;
+  }
 
   bool get hasValidSelection {
     return product != null &&
@@ -50,6 +65,9 @@ abstract class ProductDetailStoreBase with Store {
     try {
       isLoading = true;
       error = null;
+      selectedSize = null;
+      selectedColor = null;
+      quantity = 1;
       product = await _repository.getProductById(id);
     } catch (_) {
       error = 'Erro ao carregar produto.';
@@ -79,6 +97,7 @@ abstract class ProductDetailStoreBase with Store {
         variation: '$color / $size',
         price: currentProduct.price,
         imageUrl: currentProduct.mainImageUrl,
+        quantity: quantity,
       ),
     );
 

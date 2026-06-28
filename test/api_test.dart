@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
+import 'package:growstore/shared/utils/app_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HttpTestOverrides extends HttpOverrides {
@@ -17,9 +19,11 @@ void main() {
   HttpOverrides.global = HttpTestOverrides();
 
   setUpAll(() async {
+    if (!AppConfig.hasSupabaseConfig) return;
+
     await Supabase.initialize(
-      url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
-      publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
+      url: AppConfig.supabaseUrl,
+      publishableKey: AppConfig.supabaseAnonKey,
       authOptions: FlutterAuthClientOptions(
         localStorage: const EmptyLocalStorage(),
         pkceAsyncStorage: _MemoryGotrueAsyncStorage(),
@@ -27,28 +31,35 @@ void main() {
     );
   });
 
-  test('Deve buscar a lista de produtos do Supabase com sucesso', () async {
-    final supabase = Supabase.instance.client;
+  test(
+    'ProductService busca produtos normalizados com sucesso',
+    () async {
+      final produtos = await ProductService().fetchAllProducts();
+      final primeiroProduto = produtos.first;
 
-    // Executa a busca real no seu banco de dados
-    final response = await supabase.from('produtos').select();
+      expect(produtos, isNotEmpty);
+      expect(primeiroProduto['title'].toString(), isNotEmpty);
+      expect(primeiroProduto['image'].toString(), isNotEmpty);
+      expect(primeiroProduto['category'].toString(), isNotEmpty);
+      expect(primeiroProduto['price'], isNotNull);
+    },
+    skip: AppConfig.hasSupabaseConfig
+        ? false
+        : 'Defina SUPABASE_URL e SUPABASE_ANON_KEY para rodar este teste.',
+  );
 
-    // Validações
-    expect(response, isNotNull);
-    expect(response, isNotEmpty);
-    expect(response.length, greaterThan(0));
-  });
+  test(
+    'ProductService busca categorias com imagens com sucesso',
+    () async {
+      final categorias = await ProductService().fetchCategoriesWithQuantity();
 
-  test('ProductService normaliza os produtos para a UI', () async {
-    final products = await ProductService().fetchAllProducts();
-    final firstProduct = products.first;
-
-    expect(products, isNotEmpty);
-    expect(firstProduct['title'].toString(), isNotEmpty);
-    expect(firstProduct['image'].toString(), isNotEmpty);
-    expect(firstProduct['category'].toString(), isNotEmpty);
-    expect(firstProduct['price'], isNotNull);
-  });
+      expect(categorias, isNotEmpty);
+      expect(categorias.first['category_images'], isA<List>());
+    },
+    skip: AppConfig.hasSupabaseConfig
+        ? false
+        : 'Defina SUPABASE_URL e SUPABASE_ANON_KEY para rodar este teste.',
+  );
 }
 
 class _MemoryGotrueAsyncStorage extends GotrueAsyncStorage {

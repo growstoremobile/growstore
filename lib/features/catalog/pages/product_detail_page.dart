@@ -161,6 +161,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _ProductQuantitySelector(store: _store),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ExpandableDescriptionWidget(
                   description: product.description,
                 ),
@@ -170,6 +175,36 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
         );
       },
+    );
+  }
+}
+
+class _ProductQuantitySelector extends StatelessWidget {
+  const _ProductQuantitySelector({required this.store});
+
+  final ProductDetailStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Quantidade',
+            style: textTheme.bodyMedium?.copyWith(
+              color: GrowColors.darkTextSecondary,
+              fontWeight: GrowTypography.bold,
+            ),
+          ),
+        ),
+        GrowQuantityStepper(
+          quantity: store.quantity,
+          onDecrement: store.decrementQuantity,
+          onIncrement: store.incrementQuantity,
+        ),
+      ],
     );
   }
 }

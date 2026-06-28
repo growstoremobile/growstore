@@ -1,5 +1,6 @@
 import 'package:growstore/features/orders/models/order_item_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
+import 'package:growstore/shared/utils/price_utils.dart';
 
 class OrderModel {
   const OrderModel({
@@ -11,6 +12,7 @@ class OrderModel {
     required this.shipping,
     required this.discount,
     required this.total,
+    this.shippingAddress,
   });
 
   final String id;
@@ -21,6 +23,7 @@ class OrderModel {
   final double shipping;
   final double discount;
   final double total;
+  final String? shippingAddress;
 
   int get totalItems => items.fold(0, (total, item) => total + item.quantity);
 
@@ -36,10 +39,11 @@ class OrderModel {
       items: rawItems is List
           ? rawItems.whereType<Map>().map(OrderItemModel.fromJson).toList()
           : const [],
-      subtotal: _parseDouble(json['subtotal']),
-      shipping: _parseDouble(json['shipping']),
-      discount: _parseDouble(json['discount']),
-      total: _parseDouble(json['total']),
+      subtotal: parseGrowPrice(json['subtotal']),
+      shipping: parseGrowPrice(json['shipping']),
+      discount: parseGrowPrice(json['discount']),
+      total: parseGrowPrice(json['total']),
+      shippingAddress: json['shippingAddress']?.toString(),
     );
   }
 
@@ -53,11 +57,7 @@ class OrderModel {
       'shipping': shipping,
       'discount': discount,
       'total': total,
+      'shippingAddress': shippingAddress,
     };
-  }
-
-  static double _parseDouble(Object? value) {
-    if (value is num) return value.toDouble();
-    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 }

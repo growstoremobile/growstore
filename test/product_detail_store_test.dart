@@ -22,12 +22,14 @@ void main() {
     );
     store.selectColor('Preto');
     store.selectSize('M');
+    store.incrementQuantity();
 
     expect(store.addToCart(), isTrue);
     expect(cartStore.items, hasLength(1));
     expect(cartStore.items.single.id, '13');
     expect(cartStore.items.single.variation, 'Preto / M');
-    expect(cartStore.totalItems, 1);
+    expect(cartStore.items.single.quantity, 2);
+    expect(cartStore.totalItems, 2);
   });
 
   test('addToCart does not add without size and color selection', () {
@@ -78,6 +80,24 @@ void main() {
     expect(product.name, 'Camiseta Dev Growdev');
     expect(product.mainImageUrl, 'https://example.com/camiseta.png');
     expect(product.galleryUrls, ['https://example.com/camiseta.png']);
+  });
+
+  test('ProductDetailsModel parses price and image from product details', () {
+    final product = ProductDetailsModel.fromJson({
+      'id': 8,
+      'title_product': 'Camiseta Dev Growdev',
+      'product_details': [
+        {
+          'price': 'R\$ 129,90',
+          'main_image': 'https://example.com/detail.png',
+          'description': 'Detalhe vindo do Supabase',
+        },
+      ],
+    });
+
+    expect(product.price, 129.90);
+    expect(product.mainImageUrl, 'https://example.com/detail.png');
+    expect(product.description, 'Detalhe vindo do Supabase');
   });
 }
 
