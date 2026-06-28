@@ -46,6 +46,9 @@ dependencies:
   flutter_secure_storage: ^10.3.1
   google_fonts: ^8.1.0
   supabase_flutter: ^2.15.0
+  brasil_fields: ^1.19.0
+  cloud_firestore: ^6.6.0
+ 
 
 dev_dependencies:
   flutter_test:
@@ -81,8 +84,6 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
   fonts:
       - family: Inter
         fonts:
@@ -94,6 +95,8 @@ flutter:
           - asset: assets/fonts/Syne-Regular.ttf
           - asset: assets/fonts/Syne-Bold.ttf
             weight: 700
+ 
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

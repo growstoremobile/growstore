@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/core/routing/app_routes.dart';
 import 'package:growstore/shared/colors/colors.dart';
 import 'package:growstore/features/auth/widgets/login/login_header_widget.dart';
 import 'package:growstore/features/auth/widgets/login/login_email_field_widget.dart';
@@ -70,13 +71,9 @@ class _LoginPageState extends State<LoginPage> {
 
     if (mounted) {
       if (success) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) =>
-                const Scaffold(body: Center(child: Text('Sua Home Page Aqui'))),
-          ),
-          (route) => false,
-        );
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.cartPage, (route) => false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

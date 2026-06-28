@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
+import 'package:growstore/core/routing/app_routes.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_coupon_widget.dart';
@@ -16,7 +18,7 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  final _cartStore = CartStore();
+  final _cartStore = GetIt.I<CartStore>();
   final _couponController = TextEditingController();
 
   @override
@@ -47,13 +49,12 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  void _handleCheckout() {
-    // Limpa o carrinho ao finalizar a compra
-    _cartStore.clearCart();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Compra finalizada com sucesso!')),
-    );
-  }
+void _handleCheckout() {
+  Navigator.pushNamed(
+    context,
+    AppRoutes.checkout,
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +129,14 @@ class _CartPageState extends State<CartPage> {
                     couponError: _cartStore.couponError,
                     onApply: _handleApplyCoupon,
                     onRemove: _cartStore.removeCoupon,
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${_cartStore.totalItems} itens no pedido',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   CartSummaryWidget(
