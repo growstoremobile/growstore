@@ -44,8 +44,12 @@ Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
   final ordersBox = await Hive.openBox(OrderRepository.boxName);
+  final locator = GetIt.I;
 
-  GetIt.I.registerSingleton<FavorityService>(FavorityService());
+  if (!locator.isRegistered<FavorityService>()) {
+    locator.registerSingleton<FavorityService>(FavorityService());
+  }
+
   final authStore = AuthStore();
   final savedToken = authBox.get('token_user') as String?;
   final savedUserId = authBox.get('user_id') as String?;
@@ -69,24 +73,33 @@ Future<void> initServiceLocator() async {
     );
   }
 
-  GetIt.I.registerSingleton<AuthStore>(authStore);
-  GetIt.I.registerSingleton<HomeRepository>(HomeRepository());
-  GetIt.I.registerSingleton<HomeStore>(
-    HomeStore(GetIt.I.get<HomeRepository>()),
-  );
-
-  GetIt.I.registerSingleton<FavorityRepository>(
-    FavorityRepository(
-      boxFavoritiesProducts: favorityBox,
-      favoriteService: GetIt.I.get<FavorityService>(),
-    ),
-  );
-  GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
-  if (!GetIt.I.isRegistered<OrderRepository>()) {
-    GetIt.I.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
+  if (!locator.isRegistered<AuthStore>()) {
+    locator.registerSingleton<AuthStore>(authStore);
   }
-  if (!GetIt.I.isRegistered<CartStore>()) {
-    GetIt.I.registerSingleton<CartStore>(CartStore());
+  if (!locator.isRegistered<HomeRepository>()) {
+    locator.registerSingleton<HomeRepository>(HomeRepository());
+  }
+  if (!locator.isRegistered<HomeStore>()) {
+    locator.registerSingleton<HomeStore>(
+      HomeStore(locator.get<HomeRepository>()),
+    );
+  }
+  if (!locator.isRegistered<FavorityRepository>()) {
+    locator.registerSingleton<FavorityRepository>(
+      FavorityRepository(
+        boxFavoritiesProducts: favorityBox,
+        favoriteService: locator.get<FavorityService>(),
+      ),
+    );
+  }
+  if (!locator.isRegistered<FavorityProductsStore>()) {
+    locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  }
+  if (!locator.isRegistered<OrderRepository>()) {
+    locator.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
+  }
+  if (!locator.isRegistered<CartStore>()) {
+    locator.registerSingleton<CartStore>(CartStore());
   }
 }
 
@@ -95,15 +108,15 @@ Future<void> main() async {
 
   try {
     if (Firebase.apps.isNotEmpty) {
-      debugPrint("Firebase ja estava inicializado nativamente.");
+      debugPrint('Firebase ja estava inicializado nativamente.');
     } else {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      debugPrint("Firebase inicializado com sucesso.");
+      debugPrint('Firebase inicializado com sucesso.');
     }
   } catch (e) {
-    debugPrint("Aviso Firebase: $e");
+    debugPrint('Aviso Firebase: $e');
   }
 
   try {
@@ -112,7 +125,7 @@ Future<void> main() async {
       publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
     );
   } catch (e) {
-    debugPrint("Erro Supabase: $e");
+    debugPrint('Erro Supabase: $e');
   }
 
   await initHive();

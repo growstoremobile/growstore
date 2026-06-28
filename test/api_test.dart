@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,8 +29,11 @@ void main() {
 
   test('Deve buscar a lista de produtos do Supabase com sucesso', () async {
     final supabase = Supabase.instance.client;
+
+    // Executa a busca real no seu banco de dados
     final response = await supabase.from('produtos').select();
 
+    // Validações
     expect(response, isNotNull);
     expect(response, isNotEmpty);
     expect(response.length, greaterThan(0));

@@ -5,7 +5,9 @@ class ProductService {
     try {
       final response = await Supabase.instance.client
           .from('produtos')
-          .select('*,categorias(id_category,name_category)');
+          .select(
+            '*,categorias(id_category,name_category),product_details(price)',
+          );
 
       return List<Map<String, dynamic>>.from(
         response.map((product) => _normalizeProduct(product)),
@@ -24,7 +26,13 @@ class ProductService {
     final title = product['title'] ?? product['title_product'];
     final image =
         product['image'] ?? product['imageUrl'] ?? product['path_image'];
-    final price = product['price'] ?? product['price_product'] ?? 0;
+    final rawDetails = product['product_details'];
+    final detail = rawDetails is List && rawDetails.isNotEmpty
+        ? rawDetails.first
+        : rawDetails;
+    final detailPrice = detail is Map ? detail['price'] : null;
+    final price =
+        product['price'] ?? product['price_product'] ?? detailPrice ?? 0;
 
     return {
       ...product,

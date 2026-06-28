@@ -4,28 +4,28 @@ import 'package:growstore/features/catalog/repositories/product_detail_repositor
 import 'package:growstore/features/catalog/services/product_detail_service.dart';
 import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 
-final getIt = GetIt.instance;
-
 Future<void> setupDependencies() async {
-  if (!getIt.isRegistered<CartStore>()) {
-    getIt.registerSingleton<CartStore>(CartStore());
+  final locator = GetIt.I;
+
+  if (!locator.isRegistered<CartStore>()) {
+    locator.registerSingleton<CartStore>(CartStore());
   }
 
-  if (!getIt.isRegistered<ProductDetailService>()) {
-    getIt.registerSingleton<ProductDetailService>(ProductDetailService());
+  if (!locator.isRegistered<ProductDetailService>()) {
+    locator.registerSingleton<ProductDetailService>(ProductDetailService());
   }
 
-  if (!getIt.isRegistered<ProductDetailRepository>()) {
-    getIt.registerSingleton<ProductDetailRepository>(
-      ProductDetailRepository(service: getIt<ProductDetailService>()),
+  if (!locator.isRegistered<ProductDetailRepository>()) {
+    locator.registerSingleton<ProductDetailRepository>(
+      ProductDetailRepository(service: locator<ProductDetailService>()),
     );
   }
 
-  if (!getIt.isRegistered<ProductDetailStore>()) {
-    getIt.registerFactory<ProductDetailStore>(
+  if (!locator.isRegistered<ProductDetailStore>()) {
+    locator.registerFactory<ProductDetailStore>(
       () => ProductDetailStore(
-        repository: getIt<ProductDetailRepository>(),
-        cartStore: getIt<CartStore>(),
+        repository: locator<ProductDetailRepository>(),
+        cartStore: locator<CartStore>(),
       ),
     );
   }
