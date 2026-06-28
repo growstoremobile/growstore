@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/features/categories/models/category_model.dart';
 import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:growstore/features/categories/stores/detail_categories_store.dart';
@@ -7,9 +8,7 @@ import 'package:growstore/features/categories/widgets/category_bottom_navigation
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
-import 'package:growstore/shared/widgets/app_error_dialog.dart';
 import 'package:growstore/shared/widgets/default_product_card_widget.dart';
-import 'package:mobx/mobx.dart';
 
 class DetailCategoriesPage extends StatefulWidget {
   const DetailCategoriesPage({super.key, required this.category});
@@ -22,7 +21,6 @@ class DetailCategoriesPage extends StatefulWidget {
 
 class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
   late final DetailCategoriesStore _store;
-  late final ReactionDisposer _errorDisposer;
 
   @override
   void initState() {
@@ -32,20 +30,7 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
       categoryId: widget.category.id,
     );
 
-    _errorDisposer = reaction<String?>((_) => _store.errorMessage, (message) {
-      if (message == null || !mounted) return;
-
-      showAppErrorDialog(context: context, message: message);
-      _store.clearError();
-    });
-
     _store.loadProducts();
-  }
-
-  @override
-  void dispose() {
-    _errorDisposer();
-    super.dispose();
   }
 
   void _handleBottomNavigation(String label) {
@@ -63,9 +48,7 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Pedidos':
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Pedidos em breve.')));
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }
@@ -94,6 +77,15 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
                 builder: (_) {
                   if (_store.isLoading) {
                     return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (_store.errorMessage != null) {
+                    return GrowErrorState(
+                      type: GrowErrorType.custom,
+                      title: 'Erro ao carregar produtos',
+                      description: 'Não foi possível carregar os produtos.',
+                      onRetry: _store.loadProducts,
+                    );
                   }
 
                   final products = _store.filteredProducts;
