@@ -11,6 +11,8 @@ import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/categories/pages/category_detail_page.dart';
+import 'package:growstore/features/categories/pages/category_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
@@ -20,6 +22,9 @@ import 'package:growstore/features/favorites/stores/favority/favority_products_s
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
+import 'package:growstore/features/orders/pages/order_detail_page.dart';
+import 'package:growstore/features/orders/pages/orders_page.dart';
+import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/features/splash/pages/splash_page.dart';
@@ -38,10 +43,13 @@ Future<void> initHive() async {
 Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
-
+  final ordersBox = await Hive.openBox(OrderRepository.boxName);
   final locator = GetIt.I;
 
-  locator.registerSingleton<FavorityService>(FavorityService());
+  if (!locator.isRegistered<FavorityService>()) {
+    locator.registerSingleton<FavorityService>(FavorityService());
+  }
+
   final authStore = AuthStore();
   final savedToken = authBox.get('token_user') as String?;
   final savedUserId = authBox.get('user_id') as String?;
@@ -65,21 +73,31 @@ Future<void> initServiceLocator() async {
     );
   }
 
-  locator.registerSingleton<AuthStore>(authStore);
-  locator.registerSingleton<HomeRepository>(HomeRepository());
-  locator.registerSingleton<HomeStore>(
-    HomeStore(locator.get<HomeRepository>()),
-  );
-
-  locator.registerSingleton<FavorityRepository>(
-    FavorityRepository(
-      boxFavoritiesProducts: favorityBox,
-      favoriteService: locator.get<FavorityService>(),
-    ),
-  );
-  locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
-
-  // CartStore agora é gerenciado centralizadamente para evitar duplicações
+  if (!locator.isRegistered<AuthStore>()) {
+    locator.registerSingleton<AuthStore>(authStore);
+  }
+  if (!locator.isRegistered<HomeRepository>()) {
+    locator.registerSingleton<HomeRepository>(HomeRepository());
+  }
+  if (!locator.isRegistered<HomeStore>()) {
+    locator.registerSingleton<HomeStore>(
+      HomeStore(locator.get<HomeRepository>()),
+    );
+  }
+  if (!locator.isRegistered<FavorityRepository>()) {
+    locator.registerSingleton<FavorityRepository>(
+      FavorityRepository(
+        boxFavoritiesProducts: favorityBox,
+        favoriteService: locator.get<FavorityService>(),
+      ),
+    );
+  }
+  if (!locator.isRegistered<FavorityProductsStore>()) {
+    locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  }
+  if (!locator.isRegistered<OrderRepository>()) {
+    locator.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
+  }
   if (!locator.isRegistered<CartStore>()) {
     locator.registerSingleton<CartStore>(CartStore());
   }
@@ -88,31 +106,26 @@ Future<void> initServiceLocator() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inicialização blindada do Firebase
   try {
     if (Firebase.apps.isNotEmpty) {
-      // Se por algum motivo bizarro ele já existir no ecossistema nativo,
-      // nós não fazemos nada ou usamos a instância existente.
-      print("Firebase já estava inicializado nativamente.");
+      debugPrint('Firebase ja estava inicializado nativamente.');
     } else {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      print("Firebase inicializado com sucesso.");
+      debugPrint('Firebase inicializado com sucesso.');
     }
   } catch (e) {
-    print("Aviso Firebase: $e");
-    // Mesmo que dê erro de duplicado aqui, o try/catch engole o erro e não deixa o app travar
+    debugPrint('Aviso Firebase: $e');
   }
 
-  // 2. Inicialização do Supabase
   try {
     await Supabase.initialize(
       url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
       publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
     );
   } catch (e) {
-    print("Erro Supabase: $e");
+    debugPrint('Erro Supabase: $e');
   }
 
   await initHive();
@@ -158,8 +171,10 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
           '/search': (_) => const SearchPage(),
+          '/categories': (_) => const CategoryPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
+          '/orders': (_) => const OrdersPage(),
           '/profile': (_) => ProfilePage(),
         },
         onGenerateRoute: (settings) {
@@ -176,6 +191,36 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
                 }
 
                 return ProductDetailPage(productId: productId);
+              },
+            );
+          }
+
+          if (settings.name == '/categoryDetail') {
+            final categoryName = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (categoryName == null || categoryName.isEmpty) {
+                  return const CategoryPage();
+                }
+
+                return CategoryDetailPage(categoryName: categoryName);
+              },
+            );
+          }
+
+          if (settings.name == '/orderDetail') {
+            final orderId = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (orderId == null || orderId.isEmpty) {
+                  return const OrdersPage();
+                }
+
+                return OrderDetailPage(orderId: orderId);
               },
             );
           }

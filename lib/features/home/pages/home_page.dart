@@ -64,18 +64,12 @@ class _HomePageState extends State<HomePage> {
     _homeStore.loadProducts();
   }
 
-  void _comingSoon(BuildContext context, String destination) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$destination em breve.')));
-  }
-
   void _handleBottomNavigation(BuildContext context, String label) {
     switch (label) {
       case 'Inicio':
         break;
       case 'Categorias':
-        Navigator.of(context).pushNamed('/search');
+        Navigator.of(context).pushNamed('/categories');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
@@ -87,7 +81,7 @@ class _HomePageState extends State<HomePage> {
         });
         break;
       case 'Pedidos':
-        _comingSoon(context, label);
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }
@@ -150,59 +144,56 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Scaffold(
         backgroundColor: colors.page,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              HomeSearchBar(
-                colors: colors,
-                isDark: isDark,
-                onSearch: () => Navigator.of(context).pushNamed('/search'),
-                onProfile: () => Navigator.of(context).pushNamed('/profile'),
-                onThemeToggle: () => ThemeModeController.of(
-                  context,
-                ).toggleTheme(Theme.of(context).brightness),
-              ),
-              Divider(height: 1, thickness: 1, color: colors.divider),
-              Expanded(
-                child: Observer(
-                  builder: (_) => RefreshIndicator(
-                    color: colors.primary,
-                    onRefresh: _homeStore.loadProducts,
-                    child: CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      cacheExtent: 360,
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: HomeCategoryCarousel(
-                            categories: _homeStore.categories,
-                            selectedCategory: _homeStore.selectedCategory,
-                            colors: colors,
-                            onSelected: _homeStore.selectCategory,
-                          ),
+        body: Column(
+          children: [
+            HomeSearchBar(
+              colors: colors,
+              isDark: isDark,
+              onSearch: () => Navigator.of(context).pushNamed('/search'),
+              onProfile: () => Navigator.of(context).pushNamed('/profile'),
+              onThemeToggle: () => ThemeModeController.of(
+                context,
+              ).toggleTheme(Theme.of(context).brightness),
+            ),
+            Divider(height: 1, thickness: 1, color: colors.divider),
+            Expanded(
+              child: Observer(
+                builder: (_) => RefreshIndicator(
+                  color: colors.primary,
+                  onRefresh: _homeStore.loadProducts,
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    cacheExtent: 360,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: HomeCategoryCarousel(
+                          categories: _homeStore.categories,
+                          selectedCategory: _homeStore.selectedCategory,
+                          colors: colors,
+                          onSelected: _homeStore.selectCategory,
                         ),
-                        SliverToBoxAdapter(
-                          child: HomePromoCarousel(
-                            items: _carousel,
-                            colors: colors,
-                            isDark: isDark,
-                          ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: HomePromoCarousel(
+                          items: _carousel,
+                          colors: colors,
+                          isDark: isDark,
                         ),
-                        SliverToBoxAdapter(
-                          child: HomeFeaturedTitle(
-                            colors: colors,
-                            onViewAll: () =>
-                                Navigator.of(context).pushNamed('/search'),
-                          ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: HomeFeaturedTitle(
+                          colors: colors,
+                          onViewAll: () =>
+                              Navigator.of(context).pushNamed('/search'),
                         ),
-                        _buildProductsContent(colors),
-                      ],
-                    ),
+                      ),
+                      _buildProductsContent(colors),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         bottomNavigationBar: Observer(
           builder: (_) => HomeBottomNavigation(

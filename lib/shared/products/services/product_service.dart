@@ -1,45 +1,47 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
-  Future<Map<String, dynamic>> fetchAllProducts() async {
+  Future<List<Map<String, dynamic>>> fetchAllProducts() async {
     try {
-      final resultados = await Future.wait([
-        // Consulta 1: Traz os produtos + Categoria + Preço (que está em product_details)
-        Supabase.instance.client.from('produtos').select('''
-            *, 
-            categorias(id_category, name_category),
-            product_details(price)
-          '''),
+      final response = await Supabase.instance.client
+          .from('produtos')
+          .select(
+            '*,categorias(id_category,name_category),product_details(price)',
+          );
 
-        // Consulta 2: Traz as categorias para o contador do menu
-        Supabase.instance.client.from('categorias').select('''
-            id_category, 
-            name_category, 
-            produtos(id)
-          '''),
-      ]);
-
-      // Mapeia a lista geral de produtos
-      final todosOsProdutos = List<Map<String, dynamic>>.from(resultados[0]);
-
-      // Mapeia o menu de categorias
-      final listaCategorias = List<Map<String, dynamic>>.from(
-        (resultados[1] as List).map((item) => Map<String, dynamic>.from(item)),
+      return List<Map<String, dynamic>>.from(
+        response.map((product) => _normalizeProduct(product)),
       );
-
-      // Calcula a quantidade de produtos por categoria
-      for (var categoria in listaCategorias) {
-        final listaProdutosRelacionados = categoria['produtos'] as List? ?? [];
-        categoria['product_qtd'] = listaProdutosRelacionados.length;
-        categoria.remove('produtos');
-      }
-
-      return {
-        'produtos_geral': todosOsProdutos,
-        'categorias_menu': listaCategorias,
-      };
     } catch (_) {
       rethrow;
     }
+  }
+
+  Map<String, dynamic> _normalizeProduct(Map<String, dynamic> product) {
+    final rawCategory = product['categorias'];
+    final category = rawCategory is Map
+        ? rawCategory['name_category']
+        : product['category'] ?? product['categoria'];
+    final categoryName = category?.toString().trim();
+    final title = product['title'] ?? product['title_product'];
+    final image =
+        product['image'] ?? product['imageUrl'] ?? product['path_image'];
+    final rawDetails = product['product_details'];
+    final detail = rawDetails is List && rawDetails.isNotEmpty
+        ? rawDetails.first
+        : rawDetails;
+    final detailPrice = detail is Map ? detail['price'] : null;
+    final price =
+        product['price'] ?? product['price_product'] ?? detailPrice ?? 0;
+
+    return {
+      ...product,
+      'title': title?.toString().trim().isNotEmpty == true ? title : 'Produto',
+      'image': image ?? '',
+      'price': price,
+      'category': categoryName == null || categoryName.isEmpty
+          ? 'Produto'
+          : categoryName,
+    };
   }
 }

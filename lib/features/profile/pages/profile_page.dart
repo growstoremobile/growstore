@@ -43,14 +43,19 @@ class ProfilePage extends StatelessWidget {
         ).pushNamedAndRemoveUntil('/home', (route) => false);
         break;
       case 'Buscar':
-      case 'Categorias':
         Navigator.of(context).pushNamed('/search');
+        break;
+      case 'Categorias':
+        Navigator.of(context).pushNamed('/categories');
         break;
       case 'Favoritos':
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
+        break;
+      case 'Minhas Compras':
+        Navigator.of(context).pushNamed('/orders');
         break;
       case 'Sair':
         _handleLogout(context);
@@ -69,7 +74,7 @@ class ProfilePage extends StatelessWidget {
         ).pushNamedAndRemoveUntil('/home', (route) => false);
         break;
       case 'Categorias':
-        Navigator.of(context).pushNamed('/search');
+        Navigator.of(context).pushNamed('/categories');
         break;
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
@@ -78,7 +83,7 @@ class ProfilePage extends StatelessWidget {
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Pedidos':
-        _comingSoon(context, label);
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }
