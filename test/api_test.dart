@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HttpTestOverrides extends HttpOverrides {
@@ -36,8 +37,17 @@ void main() {
     expect(response, isNotNull);
     expect(response, isNotEmpty);
     expect(response.length, greaterThan(0));
+  });
 
-    print('Produtos retornados: $response');
+  test('ProductService normaliza os produtos para a UI', () async {
+    final products = await ProductService().fetchAllProducts();
+    final firstProduct = products.first;
+
+    expect(products, isNotEmpty);
+    expect(firstProduct['title'].toString(), isNotEmpty);
+    expect(firstProduct['image'].toString(), isNotEmpty);
+    expect(firstProduct['category'].toString(), isNotEmpty);
+    expect(firstProduct['price'], isNotNull);
   });
 }
 

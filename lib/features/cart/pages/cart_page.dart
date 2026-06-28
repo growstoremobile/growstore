@@ -9,6 +9,9 @@ import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_item_widget.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
 import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
+import 'package:growstore/features/orders/widgets/order_header.dart';
+import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
+import 'package:growstore/features/orders/repositories/order_repository.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -21,6 +24,10 @@ class _CartPageState extends State<CartPage> {
   final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
       ? GetIt.I<CartStore>()
       : CartStore();
+  final OrderRepository _orderRepository =
+      GetIt.I.isRegistered<OrderRepository>()
+      ? GetIt.I<OrderRepository>()
+      : OrderRepository();
 
   @override
   void initState() {
@@ -35,17 +42,26 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  void _handleCheckout() {
-    _cartStore.clearCart();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Compra finalizada com sucesso!')),
-    );
-  }
+  Future<void> _handleCheckout() async {
+    final cartItems = _cartStore.items.toList();
+    if (cartItems.isEmpty) return;
 
-  void _comingSoon(BuildContext context, String destination) {
+    final order = await _orderRepository.createOrder(
+      cartItems: cartItems,
+      subtotal: _cartStore.subtotal,
+      shipping: _cartStore.shipping,
+      discount: _cartStore.discount,
+      total: _cartStore.total,
+    );
+
+    _cartStore.clearCart();
+
+    if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('$destination em breve.')));
+    ).showSnackBar(const SnackBar(content: Text('Pedido criado com sucesso!')));
+    Navigator.of(context).pushNamed('/orderDetail', arguments: order.id);
   }
 
   void _handleBottomNavigation(BuildContext context, String label) {
@@ -64,7 +80,7 @@ class _CartPageState extends State<CartPage> {
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Pedidos':
-        _comingSoon(context, label);
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }
@@ -73,10 +89,11 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = CartLayoutColors.resolve(isDark);
+    final headerColors = OrderLayoutColors.resolve(isDark);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: colors.statusBar,
+        statusBarColor: headerColors.statusBar,
         statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
         systemNavigationBarColor: colors.bottomBar,
@@ -86,16 +103,13 @@ class _CartPageState extends State<CartPage> {
       ),
       child: Scaffold(
         backgroundColor: colors.page,
-        body: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              _CartHeader(colors: colors),
-              Expanded(
-                child: Observer(builder: (_) => _buildCartContent(colors)),
-              ),
-            ],
-          ),
+        body: Column(
+          children: [
+            OrderHeader(title: 'Carrinho', colors: headerColors),
+            Expanded(
+              child: Observer(builder: (_) => _buildCartContent(colors)),
+            ),
+          ],
         ),
         bottomNavigationBar: Observer(
           builder: (_) => Column(
@@ -161,34 +175,6 @@ class _CartPageState extends State<CartPage> {
   }
 }
 
-class _CartHeader extends StatelessWidget {
-  const _CartHeader({required this.colors});
-
-  final CartLayoutColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 54,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: colors.header,
-        border: Border(bottom: BorderSide(color: colors.divider)),
-      ),
-      child: Text(
-        'Carrinho',
-        style: GoogleFonts.syne(
-          fontSize: 24,
-          fontWeight: FontWeight.w500,
-          height: 29 / 24,
-          color: colors.textPrimary,
-          letterSpacing: 0,
-        ),
-      ),
-    );
-  }
-}
-
 class _CartCheckoutPanel extends StatelessWidget {
   const _CartCheckoutPanel({
     required this.colors,
@@ -198,7 +184,7 @@ class _CartCheckoutPanel extends StatelessWidget {
 
   final CartLayoutColors colors;
   final double total;
-  final VoidCallback onCheckout;
+  final Future<void> Function() onCheckout;
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +229,7 @@ class _CartCheckoutPanel extends StatelessWidget {
             width: double.infinity,
             height: 54,
             child: ElevatedButton(
-              onPressed: onCheckout,
+              onPressed: () => onCheckout(),
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: colors.primary,

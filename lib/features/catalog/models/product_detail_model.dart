@@ -24,18 +24,23 @@ class ProductDetailsModel {
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) {
     final galleryUrls = _parseGalleryUrls(json);
     final mainImageUrl = _parseString(
-      json['image'] ?? json['imageUrl'] ?? json['asset'],
+      json['image'] ?? json['imageUrl'] ?? json['path_image'] ?? json['asset'],
     );
 
     return ProductDetailsModel(
       uid: _parseString(json['id']),
-      name: _parseString(json['title'] ?? json['name'], fallback: 'Produto'),
-      description: _parseString(json['description']),
+      name: _parseString(
+        json['title'] ?? json['title_product'] ?? json['name'],
+        fallback: 'Produto',
+      ),
+      description: _parseString(
+        json['description'] ?? json['description_product'],
+      ),
       mainImageUrl: mainImageUrl.isNotEmpty
           ? mainImageUrl
           : (galleryUrls.isNotEmpty ? galleryUrls.first : ''),
       galleryUrls: galleryUrls,
-      price: _parsePrice(json['price']),
+      price: _parsePrice(json['price'] ?? json['price_product']),
       options: const [
         ProductOption(
           name: 'Tamanho',
@@ -79,7 +84,7 @@ class ProductDetailsModel {
     }
 
     final image = _parseString(
-      json['image'] ?? json['imageUrl'] ?? json['asset'],
+      json['image'] ?? json['imageUrl'] ?? json['path_image'] ?? json['asset'],
     );
     return image.isEmpty ? const [] : [image];
   }

@@ -54,6 +54,9 @@ class ProfilePage extends StatelessWidget {
       case 'Carrinho':
         Navigator.of(context).pushNamed('/cart');
         break;
+      case 'Minhas Compras':
+        Navigator.of(context).pushNamed('/orders');
+        break;
       case 'Sair':
         _handleLogout(context);
         break;
@@ -80,7 +83,7 @@ class ProfilePage extends StatelessWidget {
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Pedidos':
-        _comingSoon(context, label);
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }
