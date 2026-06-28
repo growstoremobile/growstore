@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:growstore/features/search/widgets/search_layout_colors.dart';
-import 'package:growstore/features/search/widgets/search_product_card.dart';
+import 'package:growstore/features/categories/widgets/category_header.dart';
+import 'package:growstore/features/categories/widgets/category_layout_colors.dart';
+import 'package:growstore/features/categories/widgets/category_product_card.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 
 class SearchPage extends StatefulWidget {
@@ -19,6 +20,19 @@ class _SearchPageState extends State<SearchPage> {
   List<Map<String, dynamic>> _filteredProducts = [];
   bool _isLoading = true;
   String? _errorMessage;
+  String _selectedCategory = 'Todas';
+
+  List<String> get _categories {
+    final values =
+        _products
+            .map((product) => (product['category'] ?? '').toString().trim())
+            .where((category) => category.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
+
+    return ['Todas', ...values];
+  }
 
   @override
   void initState() {
@@ -50,7 +64,7 @@ class _SearchPageState extends State<SearchPage> {
       if (!mounted) return;
 
       setState(() {
-        _errorMessage = 'Não foi possível carregar os produtos.';
+        _errorMessage = 'Nao foi possivel carregar os produtos.';
         _isLoading = false;
       });
     }
@@ -60,57 +74,65 @@ class _SearchPageState extends State<SearchPage> {
     final query = _controller.text.trim().toLowerCase();
 
     setState(() {
-      if (query.isEmpty) {
-        _filteredProducts = _products;
-        return;
-      }
-
       _filteredProducts = _products.where((product) {
         final title = (product['title'] ?? '').toString().toLowerCase();
         final category = (product['category'] ?? '').toString().toLowerCase();
         final description = (product['description'] ?? '')
             .toString()
             .toLowerCase();
-
-        return title.contains(query) ||
+        final matchesCategory =
+            _selectedCategory == 'Todas' ||
+            category == _selectedCategory.toLowerCase();
+        final matchesQuery =
+            query.isEmpty ||
+            title.contains(query) ||
             category.contains(query) ||
             description.contains(query);
+
+        return matchesCategory && matchesQuery;
       }).toList();
     });
   }
 
-  void _showDetailsSoon(Map<String, dynamic> product) {
-    final title = (product['title'] ?? 'Produto').toString();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$title em breve.')));
+  void _selectCategory(String category) {
+    setState(() {
+      _selectedCategory = category;
+    });
+    _filterProducts();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = SearchLayoutColors.resolve(
+    final colors = CategoryLayoutColors.resolve(
       Theme.of(context).brightness == Brightness.dark,
     );
 
     return Scaffold(
       backgroundColor: colors.page,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _SearchHeader(
-              controller: _controller,
+      body: Column(
+        children: [
+          CategoryHeader(
+            title: 'Buscar',
+            colors: colors,
+            controller: _controller,
+            onBack: () => Navigator.of(context).pop(),
+            onClear: _controller.clear,
+            onProfile: () => Navigator.of(context).pushNamed('/profile'),
+          ),
+          if (!_isLoading && _errorMessage == null)
+            _SearchCategoryFilters(
+              categories: _categories,
+              selectedCategory: _selectedCategory,
               colors: colors,
-              onBack: () => Navigator.of(context).pop(),
-              onClear: _controller.clear,
+              onSelected: _selectCategory,
             ),
-            Expanded(child: _buildContent(colors)),
-          ],
-        ),
+          Expanded(child: _buildContent(colors)),
+        ],
       ),
     );
   }
 
-  Widget _buildContent(SearchLayoutColors colors) {
+  Widget _buildContent(CategoryLayoutColors colors) {
     if (_isLoading) {
       return Center(child: CircularProgressIndicator(color: colors.primary));
     }
@@ -138,103 +160,84 @@ class _SearchPageState extends State<SearchPage> {
         icon: Icons.search_off_rounded,
         title: 'Nenhum produto encontrado',
         description:
-            'Tente buscar por camiseta, mochila, caneca ou acessórios.',
+            'Tente buscar por camiseta, mochila, caneca ou acessorios.',
       );
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
       cacheExtent: 360,
       itemCount: _filteredProducts.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: .58,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
+        childAspectRatio: 177 / 250,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 16,
       ),
       itemBuilder: (context, index) {
         final product = _filteredProducts[index];
 
-        return SearchProductCard(
+        return CategoryProductCard(
           product: product,
           colors: colors,
-          onTap: () => _showDetailsSoon(product),
+          onTap: () => Navigator.of(
+            context,
+          ).pushNamed('/productDetail', arguments: product['id'].toString()),
         );
       },
     );
   }
 }
 
-class _SearchHeader extends StatelessWidget {
-  const _SearchHeader({
-    required this.controller,
+class _SearchCategoryFilters extends StatelessWidget {
+  const _SearchCategoryFilters({
+    required this.categories,
+    required this.selectedCategory,
     required this.colors,
-    required this.onBack,
-    required this.onClear,
+    required this.onSelected,
   });
 
-  final TextEditingController controller;
-  final SearchLayoutColors colors;
-  final VoidCallback onBack;
-  final VoidCallback onClear;
+  final List<String> categories;
+  final String selectedCategory;
+  final CategoryLayoutColors colors;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 20, 16),
-      decoration: BoxDecoration(
-        color: colors.header,
-        border: Border(bottom: BorderSide(color: colors.headerBorder)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: onBack,
-            icon: Icon(Icons.arrow_back_rounded, color: colors.primary),
-          ),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              autofocus: true,
-              onTapOutside: (_) => FocusScope.of(context).unfocus(),
-              cursorColor: colors.primary,
-              style: GoogleFonts.inter(
-                color: colors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Buscar produtos',
-                hintStyle: GoogleFonts.inter(
-                  color: colors.textSecondary,
-                  fontSize: 16,
-                ),
-                prefixIcon: Icon(Icons.search_rounded, color: colors.primary),
-                suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: controller,
-                  builder: (_, value, _) {
-                    if (value.text.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 54,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          final selected = category == selectedCategory;
 
-                    return IconButton(
-                      onPressed: onClear,
-                      icon: Icon(Icons.close_rounded, color: colors.primary),
-                    );
-                  },
-                ),
-                filled: true,
-                fillColor: colors.field,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: colors.fieldBorder),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: colors.primary),
-                ),
-              ),
+          return ChoiceChip(
+            selected: selected,
+            label: Text(category),
+            showCheckmark: false,
+            onSelected: (_) => onSelected(category),
+            labelStyle: GoogleFonts.inter(
+              color: selected ? Colors.white : colors.primary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
             ),
-          ),
-        ],
+            backgroundColor: colors.page,
+            selectedColor: colors.primary,
+            side: BorderSide(
+              color: selected ? colors.primary : colors.categoryBorder,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            visualDensity: VisualDensity.compact,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+          );
+        },
       ),
     );
   }
@@ -250,7 +253,7 @@ class _SearchStateMessage extends StatelessWidget {
     this.onAction,
   });
 
-  final SearchLayoutColors colors;
+  final CategoryLayoutColors colors;
   final IconData icon;
   final String title;
   final String description;
@@ -271,7 +274,7 @@ class _SearchStateMessage extends StatelessWidget {
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.syne(
-                color: colors.textPrimary,
+                color: colors.categoryText,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 height: 32 / 24,
@@ -282,7 +285,7 @@ class _SearchStateMessage extends StatelessWidget {
               description,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                color: colors.textSecondary,
+                color: colors.categoryMeta,
                 fontSize: 15,
                 height: 22 / 15,
               ),
@@ -293,7 +296,7 @@ class _SearchStateMessage extends StatelessWidget {
                 onPressed: onAction,
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
-                  foregroundColor: colors.buttonForeground,
+                  foregroundColor: Colors.white,
                 ),
                 child: Text(actionLabel!),
               ),

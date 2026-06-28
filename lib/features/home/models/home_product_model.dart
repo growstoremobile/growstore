@@ -16,16 +16,27 @@ class HomeProductModel {
   final String asset;
 
   factory HomeProductModel.fromJson(Map<String, dynamic> json) {
-    final priceValue = _parsePrice(json['price']);
+    final priceValue = _parsePrice(json['price'] ?? json['price_product']);
+    final rawCategory = json['categorias'];
+    final category = rawCategory is Map
+        ? rawCategory['name_category']
+        : json['category'] ?? json['categoria'];
 
     return HomeProductModel(
       id: _parseId(json['id']),
-      name: (json['title'] ?? json['name'] ?? 'Produto').toString(),
-      category: (json['category'] ?? 'Produto').toString(),
+      name:
+          (json['title'] ?? json['title_product'] ?? json['name'] ?? 'Produto')
+              .toString(),
+      category: (category ?? 'Produto').toString(),
       price: _formatPrice(priceValue),
       priceValue: priceValue,
-      asset: (json['image'] ?? json['imageUrl'] ?? json['asset'] ?? '')
-          .toString(),
+      asset:
+          (json['image'] ??
+                  json['imageUrl'] ??
+                  json['path_image'] ??
+                  json['asset'] ??
+                  '')
+              .toString(),
     );
   }
 

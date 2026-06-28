@@ -67,6 +67,18 @@ void main() {
     expect(numericPrice.price, 79.90);
     expect(formattedPrice.price, 1234.56);
   });
+
+  test('ProductDetailsModel parses Supabase product column names', () {
+    final product = ProductDetailsModel.fromJson({
+      'id': 8,
+      'title_product': 'Camiseta Dev Growdev',
+      'path_image': 'https://example.com/camiseta.png',
+    });
+
+    expect(product.name, 'Camiseta Dev Growdev');
+    expect(product.mainImageUrl, 'https://example.com/camiseta.png');
+    expect(product.galleryUrls, ['https://example.com/camiseta.png']);
+  });
 }
 
 class _FakeProductDetailRepository implements ProductDetailRepository {

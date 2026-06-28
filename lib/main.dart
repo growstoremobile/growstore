@@ -11,6 +11,8 @@ import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/categories/pages/category_detail_page.dart';
+import 'package:growstore/features/categories/pages/category_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
@@ -76,16 +78,36 @@ Future<void> initServiceLocator() async {
     ),
   );
   GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
-  GetIt.I.registerSingleton<CartStore>(CartStore());
+  if (!GetIt.I.isRegistered<CartStore>()) {
+    GetIt.I.registerSingleton<CartStore>(CartStore());
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await Supabase.initialize(
-    url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
-    publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
-  );
+
+  try {
+    if (Firebase.apps.isNotEmpty) {
+      debugPrint("Firebase ja estava inicializado nativamente.");
+    } else {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      debugPrint("Firebase inicializado com sucesso.");
+    }
+  } catch (e) {
+    debugPrint("Aviso Firebase: $e");
+  }
+
+  try {
+    await Supabase.initialize(
+      url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
+      publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
+    );
+  } catch (e) {
+    debugPrint("Erro Supabase: $e");
+  }
+
   await initHive();
   await initServiceLocator();
   await setupDependencies();
@@ -129,6 +151,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
           '/search': (_) => const SearchPage(),
+          '/categories': (_) => const CategoryPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/profile': (_) => ProfilePage(),
@@ -147,6 +170,21 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
                 }
 
                 return ProductDetailPage(productId: productId);
+              },
+            );
+          }
+
+          if (settings.name == '/categoryDetail') {
+            final categoryName = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (categoryName == null || categoryName.isEmpty) {
+                  return const CategoryPage();
+                }
+
+                return CategoryDetailPage(categoryName: categoryName);
               },
             );
           }
