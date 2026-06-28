@@ -83,4 +83,28 @@ class _FakeProductService implements ProductService {
       },
     ];
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> fetchCategoriesWithQuantity() async {
+    return [
+      {
+        'id_category': 1,
+        'name_category': 'Camiseta',
+        'product_qtd': 1,
+        'category_images': ['assets/images/figma_home_product_tshirt.png'],
+      },
+      {
+        'id_category': 2,
+        'name_category': 'Adesivos',
+        'product_qtd': 1,
+        'category_images': ['assets/images/figma_home_product_stickers.png'],
+      },
+      {
+        'id_category': 3,
+        'name_category': 'Mochila',
+        'product_qtd': 1,
+        'category_images': ['assets/images/figma_home_product_backpack.png'],
+      },
+    ];
+  }
 }

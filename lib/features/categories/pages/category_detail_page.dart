@@ -1,43 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/widgets/category_header.dart';
 import 'package:growstore/features/categories/widgets/category_layout_colors.dart';
 import 'package:growstore/features/categories/widgets/category_product_card.dart';
+import 'package:growstore/features/favorites/models/favority_model.dart';
+import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
+import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 
-class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+class CategoryDetailPage extends StatefulWidget {
+  const CategoryDetailPage({super.key, required this.categoryName});
+
+  final String categoryName;
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<CategoryDetailPage> createState() => _CategoryDetailPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
-  static const _pageSize = 10;
+class _CategoryDetailPageState extends State<CategoryDetailPage> {
+  static const _pageSize = 8;
 
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
   final _productService = ProductService();
+  final CartStore? _cartStore = GetIt.I.isRegistered<CartStore>()
+      ? GetIt.I<CartStore>()
+      : null;
+  final FavorityProductsStore? _favorityStore =
+      GetIt.I.isRegistered<FavorityProductsStore>()
+      ? GetIt.I<FavorityProductsStore>()
+      : null;
 
   List<Map<String, dynamic>> _products = [];
   List<Map<String, dynamic>> _filteredProducts = [];
   bool _isLoading = true;
   String? _errorMessage;
-  String _selectedCategory = 'Todas';
   int _visibleCount = _pageSize;
-  _SearchProductViewMode _viewMode = _SearchProductViewMode.grid;
-
-  List<String> get _categories {
-    final values =
-        _products
-            .map((product) => (product['category'] ?? '').toString().trim())
-            .where((category) => category.isNotEmpty)
-            .toSet()
-            .toList()
-          ..sort();
-
-    return ['Todas', ...values];
-  }
+  _ProductListMode _viewMode = _ProductListMode.grid;
 
   @override
   void initState() {
@@ -86,18 +87,19 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _loadProducts() async {
     try {
       final products = await _productService.fetchAllProducts();
+      final categoryProducts = products.where((product) {
+        return (product['category'] ?? '').toString() == widget.categoryName;
+      }).toList();
 
       if (!mounted) return;
-
       setState(() {
-        _products = products;
-        _filteredProducts = products;
+        _products = categoryProducts;
+        _filteredProducts = categoryProducts;
         _visibleCount = _pageSize;
         _isLoading = false;
       });
     } catch (_) {
       if (!mounted) return;
-
       setState(() {
         _errorMessage = 'Nao foi possivel carregar os produtos.';
         _isLoading = false;
@@ -109,32 +111,64 @@ class _SearchPageState extends State<SearchPage> {
     final query = _controller.text.trim().toLowerCase();
 
     setState(() {
+      if (query.isEmpty) {
+        _filteredProducts = _products;
+        _visibleCount = _pageSize;
+        return;
+      }
+
       _filteredProducts = _products.where((product) {
         final title = (product['title'] ?? '').toString().toLowerCase();
-        final category = (product['category'] ?? '').toString().toLowerCase();
         final description = (product['description'] ?? '')
             .toString()
             .toLowerCase();
-        final matchesCategory =
-            _selectedCategory == 'Todas' ||
-            category == _selectedCategory.toLowerCase();
-        final matchesQuery =
-            query.isEmpty ||
-            title.contains(query) ||
-            category.contains(query) ||
-            description.contains(query);
 
-        return matchesCategory && matchesQuery;
+        return title.contains(query) || description.contains(query);
       }).toList();
       _visibleCount = _pageSize;
     });
   }
 
-  void _selectCategory(String category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-    _filterProducts();
+  Future<void> _toggleFavorite(Map<String, dynamic> product) async {
+    final store = _favorityStore;
+    if (store == null) return;
+
+    await store.toggleFavority(FavorityModel.fromJson(product));
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  bool _isFavorite(Map<String, dynamic> product) {
+    final id = product['id'];
+    final productId = id is int ? id : int.tryParse(id?.toString() ?? '');
+    if (productId == null) return false;
+
+    return _favorityStore?.isFavorite(productId) ?? false;
+  }
+
+  void _handleBottomNavigation(String label) {
+    switch (label) {
+      case 'Inicio':
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/home', (route) => false);
+        break;
+      case 'Categorias':
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/categories',
+          (route) => route.settings.name == '/home',
+        );
+        break;
+      case 'Carrinho':
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      case 'Favoritos':
+        Navigator.of(context).pushNamed('/favorites');
+        break;
+      case 'Pedidos':
+        Navigator.of(context).pushNamed('/orders');
+        break;
+    }
   }
 
   @override
@@ -143,44 +177,55 @@ class _SearchPageState extends State<SearchPage> {
       Theme.of(context).brightness == Brightness.dark,
     );
 
-    return Scaffold(
-      backgroundColor: colors.page,
-      body: Column(
-        children: [
-          CategoryHeader(
-            title: 'Buscar',
-            colors: colors,
-            controller: _controller,
-            onBack: () => Navigator.of(context).pop(),
-            onClear: _controller.clear,
-            onProfile: () => Navigator.of(context).pushNamed('/profile'),
-          ),
-          if (!_isLoading && _errorMessage == null)
-            _SearchCategoryFilters(
-              categories: _categories,
-              selectedCategory: _selectedCategory,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: colors.header,
+        statusBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: colors.isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: colors.bottomBar,
+        systemNavigationBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: colors.page,
+        body: Column(
+          children: [
+            CategoryHeader(
+              title: widget.categoryName,
               colors: colors,
-              onSelected: _selectCategory,
+              controller: _controller,
+              onClear: _controller.clear,
+              onBack: () => Navigator.of(context).pop(),
+              onProfile: () => Navigator.of(context).pushNamed('/profile'),
             ),
-          Expanded(child: _buildContent(colors)),
-        ],
+            Expanded(child: _buildBody(colors)),
+          ],
+        ),
+        bottomNavigationBar: HomeBottomNavigation(
+          selectedLabel: 'Categorias',
+          cartItemCount: _cartStore?.totalItems ?? 0,
+          showCartBadge: false,
+          onTap: _handleBottomNavigation,
+        ),
       ),
     );
   }
 
-  Widget _buildContent(CategoryLayoutColors colors) {
+  Widget _buildBody(CategoryLayoutColors colors) {
     if (_isLoading) {
       return Center(child: CircularProgressIndicator(color: colors.primary));
     }
 
     if (_errorMessage != null) {
-      return _SearchStateMessage(
+      return _CategoryDetailState(
         colors: colors,
         icon: Icons.wifi_off_rounded,
-        title: 'Erro na busca',
+        title: 'Erro ao carregar',
         description: _errorMessage!,
-        actionLabel: 'TENTAR NOVAMENTE',
-        onAction: () {
+        onRetry: () {
           setState(() {
             _isLoading = true;
             _errorMessage = null;
@@ -191,18 +236,17 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     if (_filteredProducts.isEmpty) {
-      return _SearchStateMessage(
+      return _CategoryDetailState(
         colors: colors,
-        icon: Icons.search_off_rounded,
+        icon: Icons.inventory_2_outlined,
         title: 'Nenhum produto encontrado',
-        description:
-            'Tente buscar por camiseta, mochila, caneca ou acessorios.',
+        description: 'Tente buscar outro termo nesta categoria.',
       );
     }
 
     return Column(
       children: [
-        _SearchProductToolbar(
+        _ProductListToolbar(
           total: _filteredProducts.length,
           visible: _visibleProducts.length,
           viewMode: _viewMode,
@@ -222,10 +266,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildProductList(CategoryLayoutColors colors) {
     final products = _visibleProducts;
 
-    if (_viewMode == _SearchProductViewMode.list) {
+    if (_viewMode == _ProductListMode.list) {
       return ListView.separated(
         controller: _scrollController,
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         cacheExtent: 420,
         itemCount: products.length,
         separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -235,6 +279,8 @@ class _SearchPageState extends State<SearchPage> {
           return CategoryProductListTile(
             product: product,
             colors: colors,
+            isFavorite: _isFavorite(product),
+            onFavorite: () => _toggleFavorite(product),
             onTap: () => Navigator.of(
               context,
             ).pushNamed('/productDetail', arguments: product['id'].toString()),
@@ -245,7 +291,7 @@ class _SearchPageState extends State<SearchPage> {
 
     return GridView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       cacheExtent: 420,
       itemCount: products.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -260,6 +306,8 @@ class _SearchPageState extends State<SearchPage> {
         return CategoryProductCard(
           product: product,
           colors: colors,
+          isFavorite: _isFavorite(product),
+          onFavorite: () => _toggleFavorite(product),
           onTap: () => Navigator.of(
             context,
           ).pushNamed('/productDetail', arguments: product['id'].toString()),
@@ -269,10 +317,10 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-enum _SearchProductViewMode { grid, list }
+enum _ProductListMode { grid, list }
 
-class _SearchProductToolbar extends StatelessWidget {
-  const _SearchProductToolbar({
+class _ProductListToolbar extends StatelessWidget {
+  const _ProductListToolbar({
     required this.total,
     required this.visible,
     required this.viewMode,
@@ -282,15 +330,15 @@ class _SearchProductToolbar extends StatelessWidget {
 
   final int total;
   final int visible;
-  final _SearchProductViewMode viewMode;
+  final _ProductListMode viewMode;
   final CategoryLayoutColors colors;
-  final ValueChanged<_SearchProductViewMode> onViewModeChanged;
+  final ValueChanged<_ProductListMode> onViewModeChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: colors.page,
-      padding: const EdgeInsets.fromLTRB(20, 6, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
       child: Row(
         children: [
           Expanded(
@@ -298,27 +346,27 @@ class _SearchProductToolbar extends StatelessWidget {
               '$visible de $total produtos',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
+              style: TextStyle(
                 color: colors.categoryMeta,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          _SearchViewModeButton(
+          _ViewModeButton(
             tooltip: 'Grade',
             icon: Icons.grid_view_rounded,
-            selected: viewMode == _SearchProductViewMode.grid,
+            selected: viewMode == _ProductListMode.grid,
             colors: colors,
-            onTap: () => onViewModeChanged(_SearchProductViewMode.grid),
+            onTap: () => onViewModeChanged(_ProductListMode.grid),
           ),
           const SizedBox(width: 6),
-          _SearchViewModeButton(
+          _ViewModeButton(
             tooltip: 'Lista',
             icon: Icons.view_agenda_outlined,
-            selected: viewMode == _SearchProductViewMode.list,
+            selected: viewMode == _ProductListMode.list,
             colors: colors,
-            onTap: () => onViewModeChanged(_SearchProductViewMode.list),
+            onTap: () => onViewModeChanged(_ProductListMode.list),
           ),
         ],
       ),
@@ -326,8 +374,8 @@ class _SearchProductToolbar extends StatelessWidget {
   }
 }
 
-class _SearchViewModeButton extends StatelessWidget {
-  const _SearchViewModeButton({
+class _ViewModeButton extends StatelessWidget {
+  const _ViewModeButton({
     required this.tooltip,
     required this.icon,
     required this.selected,
@@ -365,76 +413,20 @@ class _SearchViewModeButton extends StatelessWidget {
   }
 }
 
-class _SearchCategoryFilters extends StatelessWidget {
-  const _SearchCategoryFilters({
-    required this.categories,
-    required this.selectedCategory,
-    required this.colors,
-    required this.onSelected,
-  });
-
-  final List<String> categories;
-  final String selectedCategory;
-  final CategoryLayoutColors colors;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 54,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          final selected = category == selectedCategory;
-
-          return ChoiceChip(
-            selected: selected,
-            label: Text(category),
-            showCheckmark: false,
-            onSelected: (_) => onSelected(category),
-            labelStyle: GoogleFonts.inter(
-              color: selected ? Colors.white : colors.primary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-            backgroundColor: colors.page,
-            selectedColor: colors.primary,
-            side: BorderSide(
-              color: selected ? colors.primary : colors.categoryBorder,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            visualDensity: VisualDensity.compact,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _SearchStateMessage extends StatelessWidget {
-  const _SearchStateMessage({
+class _CategoryDetailState extends StatelessWidget {
+  const _CategoryDetailState({
     required this.colors,
     required this.icon,
     required this.title,
     required this.description,
-    this.actionLabel,
-    this.onAction,
+    this.onRetry,
   });
 
   final CategoryLayoutColors colors;
   final IconData icon;
   final String title;
   final String description;
-  final String? actionLabel;
-  final VoidCallback? onAction;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -445,36 +437,31 @@ class _SearchStateMessage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: colors.primary, size: 44),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.syne(
+              style: TextStyle(
                 color: colors.categoryText,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
-                height: 32 / 24,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               description,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: colors.categoryMeta,
-                fontSize: 15,
-                height: 22 / 15,
-              ),
+              style: TextStyle(color: colors.categoryMeta, fontSize: 14),
             ),
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 20),
+            if (onRetry != null) ...[
+              const SizedBox(height: 18),
               FilledButton(
-                onPressed: onAction,
+                onPressed: onRetry,
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: Text(actionLabel!),
+                child: const Text('Tentar novamente'),
               ),
             ],
           ],

@@ -24,10 +24,12 @@ import 'package:growstore/features/home/stores/home/home_store.dart';
 import 'package:growstore/features/orders/pages/order_detail_page.dart';
 import 'package:growstore/features/orders/pages/orders_page.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
+import 'package:growstore/features/profile/pages/addresses_page.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
+import 'package:growstore/features/profile/repositories/address_repository.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/features/splash/pages/splash_page.dart';
-import 'package:growstore/firebase_options.dart';
+import 'package:growstore/shared/utils/app_config.dart';
 import 'package:growstore/shared/utils/constants.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -43,6 +45,7 @@ Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
   final ordersBox = await Hive.openBox(OrderRepository.boxName);
+  final addressesBox = await Hive.openBox(AddressRepository.boxName);
   final locator = GetIt.I;
 
   if (!locator.isRegistered<FavorityService>()) {
@@ -97,6 +100,11 @@ Future<void> initServiceLocator() async {
   if (!locator.isRegistered<OrderRepository>()) {
     locator.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
   }
+  if (!locator.isRegistered<AddressRepository>()) {
+    locator.registerSingleton<AddressRepository>(
+      AddressRepository(box: addressesBox),
+    );
+  }
   if (!locator.isRegistered<CartStore>()) {
     locator.registerSingleton<CartStore>(CartStore());
   }
@@ -109,9 +117,7 @@ Future<void> main() async {
     if (Firebase.apps.isNotEmpty) {
       debugPrint('Firebase ja estava inicializado nativamente.');
     } else {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await Firebase.initializeApp();
       debugPrint('Firebase inicializado com sucesso.');
     }
   } catch (e) {
@@ -119,10 +125,14 @@ Future<void> main() async {
   }
 
   try {
-    await Supabase.initialize(
-      url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
-      publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
-    );
+    if (AppConfig.hasSupabaseConfig) {
+      await Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        publishableKey: AppConfig.supabaseAnonKey,
+      );
+    } else {
+      debugPrint('Supabase nao configurado. Use --dart-define.');
+    }
   } catch (e) {
     debugPrint('Erro Supabase: $e');
   }
@@ -174,6 +184,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/orders': (_) => const OrdersPage(),
+          '/addresses': (_) => const AddressesPage(),
           '/profile': (_) => ProfilePage(),
         },
         onGenerateRoute: (settings) {

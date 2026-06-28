@@ -1,4 +1,5 @@
 import 'package:growstore/features/cart/models/cart_item_model.dart';
+import 'package:growstore/shared/utils/price_utils.dart';
 
 class OrderItemModel {
   const OrderItemModel({
@@ -35,7 +36,7 @@ class OrderItemModel {
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? 'Produto',
       variation: json['variation']?.toString() ?? '',
-      price: _parseDouble(json['price']),
+      price: parseGrowPrice(json['price']),
       imageUrl: json['imageUrl']?.toString() ?? '',
       quantity: _parseInt(json['quantity']),
     );
@@ -50,11 +51,6 @@ class OrderItemModel {
       'imageUrl': imageUrl,
       'quantity': quantity,
     };
-  }
-
-  static double _parseDouble(Object? value) {
-    if (value is num) return value.toDouble();
-    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   static int _parseInt(Object? value) {
