@@ -12,6 +12,8 @@ import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
+import 'package:growstore/features/profile/models/address_model.dart';
+import 'package:growstore/features/profile/repositories/address_repository.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -28,11 +30,27 @@ class _CartPageState extends State<CartPage> {
       GetIt.I.isRegistered<OrderRepository>()
       ? GetIt.I<OrderRepository>()
       : OrderRepository();
+  final AddressRepository _addressRepository =
+      GetIt.I.isRegistered<AddressRepository>()
+      ? GetIt.I<AddressRepository>()
+      : AddressRepository();
+  AddressModel? _defaultAddress;
 
   @override
   void initState() {
     super.initState();
     _cartStore.loadCart();
+    _loadDefaultAddress();
+  }
+
+  Future<void> _loadDefaultAddress() async {
+    final address = await _addressRepository.getDefaultAddress();
+
+    if (!mounted) return;
+
+    setState(() {
+      _defaultAddress = address;
+    });
   }
 
   void _handleRemove(CartItemModel item) {
@@ -46,12 +64,35 @@ class _CartPageState extends State<CartPage> {
     final cartItems = _cartStore.items.toList();
     if (cartItems.isEmpty) return;
 
+    final address =
+        _defaultAddress ?? await _addressRepository.getDefaultAddress();
+
+    if (address == null) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Cadastre um endereco para finalizar a compra.'),
+          action: SnackBarAction(
+            label: 'ENDERECOS',
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).pushNamed('/addresses').then((_) => _loadDefaultAddress());
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
     final order = await _orderRepository.createOrder(
       cartItems: cartItems,
       subtotal: _cartStore.subtotal,
       shipping: _cartStore.shipping,
       discount: _cartStore.discount,
       total: _cartStore.total,
+      shippingAddress: address.summary,
     );
 
     _cartStore.clearCart();

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
+import 'package:growstore/shared/utils/app_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HttpTestOverrides extends HttpOverrides {
@@ -18,9 +19,11 @@ void main() {
   HttpOverrides.global = HttpTestOverrides();
 
   setUpAll(() async {
+    if (!AppConfig.hasSupabaseConfig) return;
+
     await Supabase.initialize(
-      url: 'https://ucdecpenkxmuuwpmmbgt.supabase.co',
-      publishableKey: 'sb_publishable_N_m5Da8h_8SVTl-jOKBLxw_FqTa90VV',
+      url: AppConfig.supabaseUrl,
+      publishableKey: AppConfig.supabaseAnonKey,
       authOptions: FlutterAuthClientOptions(
         localStorage: const EmptyLocalStorage(),
         pkceAsyncStorage: _MemoryGotrueAsyncStorage(),
@@ -28,23 +31,35 @@ void main() {
     );
   });
 
-  test('ProductService busca produtos normalizados com sucesso', () async {
-    final produtos = await ProductService().fetchAllProducts();
-    final primeiroProduto = produtos.first;
+  test(
+    'ProductService busca produtos normalizados com sucesso',
+    () async {
+      final produtos = await ProductService().fetchAllProducts();
+      final primeiroProduto = produtos.first;
 
-    expect(produtos, isNotEmpty);
-    expect(primeiroProduto['title'].toString(), isNotEmpty);
-    expect(primeiroProduto['image'].toString(), isNotEmpty);
-    expect(primeiroProduto['category'].toString(), isNotEmpty);
-    expect(primeiroProduto['price'], isNotNull);
-  });
+      expect(produtos, isNotEmpty);
+      expect(primeiroProduto['title'].toString(), isNotEmpty);
+      expect(primeiroProduto['image'].toString(), isNotEmpty);
+      expect(primeiroProduto['category'].toString(), isNotEmpty);
+      expect(primeiroProduto['price'], isNotNull);
+    },
+    skip: AppConfig.hasSupabaseConfig
+        ? false
+        : 'Defina SUPABASE_URL e SUPABASE_ANON_KEY para rodar este teste.',
+  );
 
-  test('ProductService busca categorias com imagens com sucesso', () async {
-    final categorias = await ProductService().fetchCategoriesWithQuantity();
+  test(
+    'ProductService busca categorias com imagens com sucesso',
+    () async {
+      final categorias = await ProductService().fetchCategoriesWithQuantity();
 
-    expect(categorias, isNotEmpty);
-    expect(categorias.first['category_images'], isA<List>());
-  });
+      expect(categorias, isNotEmpty);
+      expect(categorias.first['category_images'], isA<List>());
+    },
+    skip: AppConfig.hasSupabaseConfig
+        ? false
+        : 'Defina SUPABASE_URL e SUPABASE_ANON_KEY para rodar este teste.',
+  );
 }
 
 class _MemoryGotrueAsyncStorage extends GotrueAsyncStorage {

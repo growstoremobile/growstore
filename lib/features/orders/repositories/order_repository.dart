@@ -39,6 +39,7 @@ class OrderRepository {
     required double shipping,
     required double discount,
     required double total,
+    String? shippingAddress,
   }) async {
     final now = DateTime.now();
     final order = OrderModel(
@@ -50,6 +51,7 @@ class OrderRepository {
       shipping: shipping,
       discount: discount,
       total: total,
+      shippingAddress: shippingAddress,
     );
 
     final orders = await getOrders();

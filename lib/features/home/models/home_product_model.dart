@@ -1,3 +1,5 @@
+import 'package:growstore/shared/utils/price_utils.dart';
+
 class HomeProductModel {
   const HomeProductModel({
     required this.id,
@@ -16,7 +18,7 @@ class HomeProductModel {
   final String asset;
 
   factory HomeProductModel.fromJson(Map<String, dynamic> json) {
-    final priceValue = _parsePrice(json['price'] ?? json['price_product']);
+    final priceValue = parseGrowPrice(json['price'] ?? json['price_product']);
     final rawCategory = json['categorias'];
     final category = rawCategory is Map
         ? rawCategory['name_category']
@@ -49,14 +51,7 @@ class HomeProductModel {
     return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
-  static double _parsePrice(Object? value) {
-    if (value is num) return value.toDouble();
-
-    final normalized = value?.toString().replaceAll(',', '.') ?? '';
-    return double.tryParse(normalized) ?? 0;
-  }
-
   static String _formatPrice(double value) {
-    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+    return formatGrowCurrency(value);
   }
 }

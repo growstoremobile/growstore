@@ -57,6 +57,9 @@ class ProfilePage extends StatelessWidget {
       case 'Minhas Compras':
         Navigator.of(context).pushNamed('/orders');
         break;
+      case 'Endereços':
+        Navigator.of(context).pushNamed('/addresses');
+        break;
       case 'Sair':
         _handleLogout(context);
         break;
@@ -352,6 +355,7 @@ class _ProfileMenu extends StatelessWidget {
     (Icons.favorite_rounded, 'Favoritos'),
     (Icons.shopping_basket_rounded, 'Minhas Compras'),
     (Icons.shopping_cart_rounded, 'Carrinho'),
+    (Icons.location_on_rounded, 'Endereços'),
   ];
 
   static const _secondaryItems = [
@@ -364,8 +368,8 @@ class _ProfileMenu extends StatelessWidget {
     return Container(
       color: colors.page,
       padding: const EdgeInsets.fromLTRB(29, 30, 22, 22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
           for (final item in _mainItems)
             _ProfileMenuItem(
@@ -375,7 +379,7 @@ class _ProfileMenu extends StatelessWidget {
               active: item.$2 == 'Início',
               onTap: () => onTap(item.$2),
             ),
-          const Spacer(),
+          const SizedBox(height: 24),
           for (final item in _secondaryItems)
             _ProfileMenuItem(
               icon: item.$1,
