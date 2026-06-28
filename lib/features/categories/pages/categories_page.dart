@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:growstore/features/categories/pages/detail_categories_page.dart';
 import 'package:growstore/features/categories/repositories/categories_repository.dart';
-import 'package:growstore/features/categories/stores/category_store.dart';
+import 'package:growstore/features/categories/stores/categories_store.dart';
 import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:growstore/shared/widgets/app_error_dialog.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 import 'package:mobx/mobx.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -101,8 +103,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
                               final category = filteredList[index];
 
                               return InkWell(
-                                onTap: () =>
-                                    Navigator.of(context).pushNamed('/search'),
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => DetailCategoriesPage(
+                                      category: category,
+                                    ),
+                                  ),
+                                ),
                                 child: Card(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -110,7 +117,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Image.asset('assets/images/icon_0.png'),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 44,
+                                          child: GrowCachedProductImage(
+                                            imageUrl: category.imageUrl,
+                                            backgroundColor: Colors.transparent,
+                                            iconColor: colors.primary,
+                                          ),
+                                        ),
                                         Text(
                                           category.title,
                                           maxLines: 1,
@@ -121,7 +136,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                           ).textTheme.titleLarge,
                                         ),
                                         Text(
-                                          '1',
+                                          '${category.productQtn} produtos',
                                           style: Theme.of(
                                             context,
                                           ).textTheme.bodyMedium,

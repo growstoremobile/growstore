@@ -1,16 +1,16 @@
-import 'package:growstore/features/categories/models/categories_model.dart';
+import 'package:growstore/features/categories/models/category_model.dart';
 import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:mobx/mobx.dart';
 
 // Include generated file
-part 'category_store.g.dart';
+part 'categories_store.g.dart';
 
 // This is the class used by rest of your codebase
 class CategoryStore = CategoryStoreBase with _$CategoryStore;
 
 // The store-class
 abstract class CategoryStoreBase with Store {
-  final _repository;
+  final CategoriesRepository _repository;
 
   CategoryStoreBase({required CategoriesRepository repository})
     : _repository = repository;
@@ -52,10 +52,13 @@ abstract class CategoryStoreBase with Store {
   Future<void> loadCategories() async {
     try {
       _isLoading = true;
+      errorMessage = null;
 
       final responseCategories = await _repository.getCategories();
 
-      _categories.addAll(responseCategories);
+      _categories
+        ..clear()
+        ..addAll(responseCategories);
     } catch (error) {
       errorMessage = error.toString();
     } finally {
