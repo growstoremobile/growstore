@@ -1,35 +1,33 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
-  Future<Map<String, dynamic>> fetchAllProducts() async {
+  // 1. Método existente (tabela produtos)
+  Future<List<Map<String, dynamic>>> fetchAllProducts() async {
     try {
-      final resultados = await Future.wait([
-        Supabase.instance.client
-            .from('produtos')
-            .select('*, categorias(id_category, name_category)'),
-
-        Supabase.instance.client
-            .from('categorias')
-            .select('id_category, name_category, produtos(id)'),
-      ]);
-
-      final todosOsProdutos = List<Map<String, dynamic>>.from(resultados[0]);
-
-      final listaCategorias = List<Map<String, dynamic>>.from(
-        (resultados[1] as List).map((item) => Map<String, dynamic>.from(item)),
+      // O primeiro '*' traz tudo de 'produtos'
+      // O 'product_details(*)' faz o JOIN e traz todas as colunas da tabela de detalhes
+      final response = await Supabase.instance.client.from('produtos').select(
+        '''
+            *, 
+            product_details(*)
+          ''',
       );
 
-      for (var categoria in listaCategorias) {
-        final listaProdutosRelacionados = categoria['produtos'] as List? ?? [];
-        categoria['product_qtd'] = listaProdutosRelacionados.length;
+      return List<Map<String, dynamic>>.from(response);
+    } catch (_) {
+      rethrow;
+    }
+  }
 
-        categoria.remove('produtos');
-      }
+  // 2. NOVO MÉTODO: Consumindo a View que você criou
+  Future<List<Map<String, dynamic>>> fetchCategoriesWithQuantity() async {
+    try {
+      // Basta trocar o nome da tabela pelo nome exato da sua view
+      final response = await Supabase.instance.client
+          .from('view_categories')
+          .select();
 
-      return {
-        'produtos_geral': todosOsProdutos,
-        'categorias_menu': listaCategorias,
-      };
+      return List<Map<String, dynamic>>.from(response);
     } catch (_) {
       rethrow;
     }
