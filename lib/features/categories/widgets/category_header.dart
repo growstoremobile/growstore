@@ -27,6 +27,7 @@ class CategoryHeader extends StatelessWidget {
     final topInset = MediaQuery.paddingOf(context).top;
 
     return Container(
+      width: double.infinity,
       height: topInset + 113,
       decoration: BoxDecoration(
         color: colors.header,

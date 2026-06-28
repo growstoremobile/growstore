@@ -22,6 +22,9 @@ import 'package:growstore/features/favorites/stores/favority/favority_products_s
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
+import 'package:growstore/features/orders/pages/order_detail_page.dart';
+import 'package:growstore/features/orders/pages/orders_page.dart';
+import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
 import 'package:growstore/features/splash/pages/splash_page.dart';
@@ -40,6 +43,7 @@ Future<void> initHive() async {
 Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
+  final ordersBox = await Hive.openBox(OrderRepository.boxName);
 
   GetIt.I.registerSingleton<FavorityService>(FavorityService());
   final authStore = AuthStore();
@@ -78,6 +82,9 @@ Future<void> initServiceLocator() async {
     ),
   );
   GetIt.I.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  if (!GetIt.I.isRegistered<OrderRepository>()) {
+    GetIt.I.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
+  }
   if (!GetIt.I.isRegistered<CartStore>()) {
     GetIt.I.registerSingleton<CartStore>(CartStore());
   }
@@ -154,6 +161,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/categories': (_) => const CategoryPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
+          '/orders': (_) => const OrdersPage(),
           '/profile': (_) => ProfilePage(),
         },
         onGenerateRoute: (settings) {
@@ -185,6 +193,21 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
                 }
 
                 return CategoryDetailPage(categoryName: categoryName);
+              },
+            );
+          }
+
+          if (settings.name == '/orderDetail') {
+            final orderId = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (orderId == null || orderId.isEmpty) {
+                  return const OrdersPage();
+                }
+
+                return OrderDetailPage(orderId: orderId);
               },
             );
           }

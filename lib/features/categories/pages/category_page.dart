@@ -82,9 +82,7 @@ class _CategoryPageState extends State<CategoryPage> {
         Navigator.of(context).pushNamed('/favorites');
         break;
       case 'Pedidos':
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Pedidos em breve.')));
+        Navigator.of(context).pushNamed('/orders');
         break;
     }
   }

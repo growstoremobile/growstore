@@ -21,10 +21,13 @@ class HomeSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topInset = MediaQuery.paddingOf(context).top;
+
     return Container(
-      height: isDark ? 68 : 67,
+      width: double.infinity,
+      height: topInset + (isDark ? 68 : 67),
       color: colors.searchBar,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 16),
       child: Row(
         children: [
           Expanded(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
@@ -8,6 +9,8 @@ import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
+import 'package:growstore/features/orders/widgets/order_header.dart';
+import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -45,105 +48,128 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Detalhes'),
-        centerTitle: true,
-        actions: [
-          Observer(
-            builder: (_) => Badge(
-              isLabelVisible: _cartStore.totalItems > 0,
-              label: Text('${_cartStore.totalItems}'),
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () => Navigator.pushNamed(context, '/cart'),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+    final colors = OrderLayoutColors.resolve(
+      Theme.of(context).brightness == Brightness.dark,
+    );
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: colors.statusBar,
+        statusBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: colors.isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: colors.page,
+        systemNavigationBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
-      body: Observer(
-        builder: (_) {
-          if (_store.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: GrowColors.primary),
-            );
-          }
-
-          if (_store.error != null) {
-            return Center(
-              child: Text(
-                _store.error!,
-                style: const TextStyle(color: GrowColors.error),
-              ),
-            );
-          }
-
-          final product = _store.product;
-          if (product == null) return const SizedBox();
-
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                ProductDetailImageWidget(pathImages: product.galleryUrls),
-                const SizedBox(height: 24),
-                ProductDetailInfoWidget(
-                  name: product.name,
-                  price: product.price,
-                ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ProductDetailVariantsWidget(store: _store),
-                ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ExpandableDescriptionWidget(
-                    description: product.description,
+      child: Scaffold(
+        backgroundColor: colors.page,
+        body: Column(
+          children: [
+            OrderHeader(
+              title: 'Detalhes',
+              colors: colors,
+              onBack: () => Navigator.of(context).pop(),
+              trailing: Observer(
+                builder: (_) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Badge(
+                    isLabelVisible: _cartStore.totalItems > 0,
+                    label: Text('${_cartStore.totalItems}'),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.shopping_cart_outlined,
+                        color: colors.textPrimary,
+                      ),
+                      onPressed: () => Navigator.pushNamed(context, '/cart'),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 100),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Observer(
-            builder: (_) => ElevatedButton(
-              onPressed: _store.isLoading || _store.product == null
-                  ? null
-                  : _handleAddToCart,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: GrowColors.primary,
-                minimumSize: const Size.fromHeight(50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
-              child: const Text(
-                'ADICIONAR AO CARRINHO',
-                style: TextStyle(
-                  color: GrowColors.darkTextPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+            ),
+            Expanded(child: _buildContent()),
+          ],
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Observer(
+              builder: (_) => ElevatedButton(
+                onPressed: _store.isLoading || _store.product == null
+                    ? null
+                    : _handleAddToCart,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: GrowColors.primary,
+                  minimumSize: const Size.fromHeight(50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'ADICIONAR AO CARRINHO',
+                  style: TextStyle(
+                    color: GrowColors.darkTextPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Observer(
+      builder: (_) {
+        if (_store.isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: GrowColors.primary),
+          );
+        }
+
+        if (_store.error != null) {
+          return Center(
+            child: Text(
+              _store.error!,
+              style: const TextStyle(color: GrowColors.error),
+            ),
+          );
+        }
+
+        final product = _store.product;
+        if (product == null) return const SizedBox();
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              ProductDetailImageWidget(pathImages: product.galleryUrls),
+              const SizedBox(height: 24),
+              ProductDetailInfoWidget(name: product.name, price: product.price),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ProductDetailVariantsWidget(store: _store),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ExpandableDescriptionWidget(
+                  description: product.description,
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
+        );
+      },
     );
   }
 }
