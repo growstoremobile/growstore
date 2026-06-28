@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+// IMPORTANTE: Lembre-se de importar o seu ProductService aqui!
+// import 'package:seu_projeto/services/product_service.dart';
 
 class HttpTestOverrides extends HttpOverrides {
   @override
@@ -26,19 +29,31 @@ void main() {
     );
   });
 
-  test('Deve buscar a lista de produtos do Supabase com sucesso', () async {
-    final supabase = Supabase.instance.client;
+  test(
+    'Deve buscar a lista de produtos com detalhes e categorias com sucesso',
+    () async {
+      // 1. Instancia o seu service real
+      final productService = ProductService();
 
-    // Executa a busca real no seu banco de dados
-    final response = await supabase.from('produtos').select();
+      // 2. Testa o método que faz o JOIN com os detalhes (e traz o preço!)
+      final produtos = await productService.fetchAllProducts();
 
-    // Validações
-    expect(response, isNotNull);
-    expect(response, isNotEmpty);
-    expect(response.length, greaterThan(0));
+      expect(produtos, isNotNull);
+      expect(produtos, isNotEmpty);
 
-    print('Produtos retornados: $response');
-  });
+      print('--- PRODUTOS E DETALHES (DEVE TRAZER PRODUCT_DETAILS) ---');
+      print(produtos);
+
+      // 3. Testa o método que consome a sua View de categorias
+      final categorias = await productService.fetchCategoriesWithQuantity();
+
+      expect(categorias, isNotNull);
+      expect(categorias, isNotEmpty);
+
+      print('\n--- MENU DE CATEGORIAS (VIEW DO SUPABASE) ---');
+      print(categorias);
+    },
+  );
 }
 
 class _MemoryGotrueAsyncStorage extends GotrueAsyncStorage {
