@@ -25,11 +25,22 @@ class FavorityModel {
     return FavorityModel(
       id: json['id'] as int,
       titleProduct:
-          json['title'] ??
-          json['title'] ??
-          '', // Ajuste as chaves conforme seu banco
-      priceProduct: (json['price'] ?? json['price'] ?? 0.0).toDouble(),
-      pathImage: json['image'] ?? json['imagem'],
+          (json['title'] ?? json['title_product'] ?? json['name'] ?? '')
+              .toString(),
+      priceProduct: _parsePrice(json['price'] ?? json['price_product']),
+      pathImage:
+          (json['image'] ??
+                  json['imagem'] ??
+                  json['path_image'] ??
+                  json['imageUrl'])
+              ?.toString(),
     );
+  }
+
+  static double _parsePrice(Object? value) {
+    if (value is num) return value.toDouble();
+
+    final normalized = value?.toString().replaceAll(',', '.') ?? '';
+    return double.tryParse(normalized) ?? 0;
   }
 }

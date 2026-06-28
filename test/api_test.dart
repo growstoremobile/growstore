@@ -1,9 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// IMPORTANTE: Lembre-se de importar o seu ProductService aqui!
-// import 'package:seu_projeto/services/product_service.dart';
 
 class HttpTestOverrides extends HttpOverrides {
   @override
@@ -29,31 +28,23 @@ void main() {
     );
   });
 
-  test(
-    'Deve buscar a lista de produtos com detalhes e categorias com sucesso',
-    () async {
-      // 1. Instancia o seu service real
-      final productService = ProductService();
+  test('ProductService busca produtos normalizados com sucesso', () async {
+    final produtos = await ProductService().fetchAllProducts();
+    final primeiroProduto = produtos.first;
 
-      // 2. Testa o método que faz o JOIN com os detalhes (e traz o preço!)
-      final produtos = await productService.fetchAllProducts();
+    expect(produtos, isNotEmpty);
+    expect(primeiroProduto['title'].toString(), isNotEmpty);
+    expect(primeiroProduto['image'].toString(), isNotEmpty);
+    expect(primeiroProduto['category'].toString(), isNotEmpty);
+    expect(primeiroProduto['price'], isNotNull);
+  });
 
-      expect(produtos, isNotNull);
-      expect(produtos, isNotEmpty);
+  test('ProductService busca categorias com imagens com sucesso', () async {
+    final categorias = await ProductService().fetchCategoriesWithQuantity();
 
-      print('--- PRODUTOS E DETALHES (DEVE TRAZER PRODUCT_DETAILS) ---');
-      print(produtos);
-
-      // 3. Testa o método que consome a sua View de categorias
-      final categorias = await productService.fetchCategoriesWithQuantity();
-
-      expect(categorias, isNotNull);
-      expect(categorias, isNotEmpty);
-
-      print('\n--- MENU DE CATEGORIAS (VIEW DO SUPABASE) ---');
-      print(categorias);
-    },
-  );
+    expect(categorias, isNotEmpty);
+    expect(categorias.first['category_images'], isA<List>());
+  });
 }
 
 class _MemoryGotrueAsyncStorage extends GotrueAsyncStorage {

@@ -1,26 +1,22 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
-  // 1. Método de produtos - Trazendo tudo com os detalhes corretos
   Future<List<Map<String, dynamic>>> fetchAllProducts() async {
     try {
-      final response = await Supabase.instance.client.from('produtos').select(
-        '''
-            *,
-            product_details(*)
-          ''',
-      );
+      final response = await Supabase.instance.client
+          .from('produtos')
+          .select('*,categorias(id_category,name_category),product_details(*)');
 
-      return List<Map<String, dynamic>>.from(response);
+      return List<Map<String, dynamic>>.from(
+        response.map((product) => _normalizeProduct(product)),
+      );
     } catch (_) {
       rethrow;
     }
   }
 
-  // 2. Método de Categorias Modificado: Agora cruza os dados para embutir as imagens
   Future<List<Map<String, dynamic>>> fetchCategoriesWithQuantity() async {
     try {
-      // Busca a lista de categorias através da sua View do Supabase
       final responseCategorias = await Supabase.instance.client
           .from('view_categorias')
           .select();
@@ -28,30 +24,25 @@ class ProductService {
       final listaCategorias = List<Map<String, dynamic>>.from(
         responseCategorias,
       );
-
-      // Busca os produtos para capturar as imagens correspondentes
       final listaProdutos = await fetchAllProducts();
 
-      // Mapeia as categorias inserindo os links de imagens dos produtos vinculados a elas
-      for (var categoria in listaCategorias) {
+      for (final categoria in listaCategorias) {
         final idCategoriaAtual = categoria['id_category'];
-
-        // Filtra os produtos que pertencem a esta categoria específica
         final produtosDaCategoria = listaProdutos.where(
-          (produto) => produto['id_categoria'] == idCategoriaAtual,
+          (produto) =>
+              produto['id_categoria']?.toString() ==
+              idCategoriaAtual?.toString(),
         );
 
-        // Extrai as imagens ('main_image') dos detalhes desses produtos filtrados
-        final List<String> imagensDaCategoria = produtosDaCategoria
+        final imagensDaCategoria = produtosDaCategoria
             .map((produto) {
-              final detalhes =
-                  produto['product_details'] as Map<String, dynamic>?;
-              return detalhes?['main_image'] as String? ?? '';
+              final detalhes = _firstProductDetail(produto['product_details']);
+              final detailImage = detalhes?['main_image'];
+              return (detailImage ?? produto['image'] ?? '').toString();
             })
-            .where((url) => url.isNotEmpty) // Remove campos vazios se houverem
+            .where((url) => url.isNotEmpty)
             .toList();
 
-        // Adiciona a nova chave com a lista de imagens correspondentes
         categoria['category_images'] = imagensDaCategoria;
       }
 
@@ -59,5 +50,45 @@ class ProductService {
     } catch (_) {
       rethrow;
     }
+  }
+
+  Map<String, dynamic> _normalizeProduct(Map<String, dynamic> product) {
+    final rawCategory = product['categorias'];
+    final category = rawCategory is Map
+        ? rawCategory['name_category']
+        : product['category'] ?? product['categoria'];
+    final categoryName = category?.toString().trim();
+    final title = product['title'] ?? product['title_product'];
+    final detail = _firstProductDetail(product['product_details']);
+    final image =
+        product['image'] ??
+        product['imageUrl'] ??
+        product['path_image'] ??
+        detail?['main_image'];
+    final detailPrice = detail?['price'];
+    final price =
+        product['price'] ?? product['price_product'] ?? detailPrice ?? 0;
+
+    return {
+      ...product,
+      'title': title?.toString().trim().isNotEmpty == true ? title : 'Produto',
+      'image': image ?? '',
+      'price': price,
+      'category': categoryName == null || categoryName.isEmpty
+          ? 'Produto'
+          : categoryName,
+    };
+  }
+
+  Map<String, dynamic>? _firstProductDetail(Object? details) {
+    if (details is Map) {
+      return Map<String, dynamic>.from(details);
+    }
+
+    if (details is List && details.isNotEmpty && details.first is Map) {
+      return Map<String, dynamic>.from(details.first as Map);
+    }
+
+    return null;
   }
 }
