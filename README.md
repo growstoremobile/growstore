@@ -40,7 +40,7 @@ macos/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
 ```
 
-Configure o Supabase por variáveis de compilação:
+O app já vem configurado com o ambiente padrão do Supabase do projeto. Para trocar de ambiente, use variáveis de compilação:
 
 ```bash
 flutter run \
@@ -56,15 +56,13 @@ flutter test \
   --dart-define=SUPABASE_ANON_KEY=sua-chave-publica-anon
 ```
 
-Sem essas variáveis, os testes de API são ignorados e os demais testes continuam rodando.
+Sem essas variáveis, os testes de API usam o ambiente padrão do projeto.
 
 ## Execução
 
 ```bash
 flutter pub get
-flutter run \
-  --dart-define=SUPABASE_URL=https://seu-projeto.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=sua-chave-publica-anon
+flutter run
 ```
 
 ## Testes
@@ -96,5 +94,5 @@ lib/
 ## Observações de entrega
 
 - Não versionar chaves reais, tokens ou arquivos Firebase gerados.
-- Para avaliação com catálogo real, fornecer `SUPABASE_URL` e `SUPABASE_ANON_KEY`.
+- Para avaliação em outro ambiente, fornecer `SUPABASE_URL` e `SUPABASE_ANON_KEY`.
 - Adicionar screenshots ou vídeo demonstrativo antes da entrega final no GitHub.
