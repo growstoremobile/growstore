@@ -11,8 +11,7 @@ import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
-import 'package:growstore/features/categories/pages/category_detail_page.dart';
-import 'package:growstore/features/categories/pages/category_page.dart';
+import 'package:growstore/features/categories/pages/categories_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
@@ -180,8 +179,8 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/home': (_) => const HomePage(),
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
+          '/categories': (_) => const CategoriesPage(),
           '/search': (_) => const SearchPage(),
-          '/categories': (_) => const CategoryPage(),
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/orders': (_) => const OrdersPage(),
@@ -202,21 +201,6 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
                 }
 
                 return ProductDetailPage(productId: productId);
-              },
-            );
-          }
-
-          if (settings.name == '/categoryDetail') {
-            final categoryName = settings.arguments?.toString();
-
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (_) {
-                if (categoryName == null || categoryName.isEmpty) {
-                  return const CategoryPage();
-                }
-
-                return CategoryDetailPage(categoryName: categoryName);
               },
             );
           }

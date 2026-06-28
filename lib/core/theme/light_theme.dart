@@ -27,7 +27,7 @@ final ThemeData growLightTheme = ThemeData(
   scaffoldBackgroundColor: GrowColors.lightBg,
 
   appBarTheme: AppBarTheme(
-    backgroundColor: GrowColors.lightSurface,
+    backgroundColor: GrowColors.lightBg,
     foregroundColor: GrowColors.lightTextPrimary,
     elevation: 0,
     scrolledUnderElevation: 1,
