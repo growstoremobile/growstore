@@ -10,11 +10,8 @@ class FavorityService {
     try {
       final response = await _supabase
           .from('produtos')
-          .select()
-          .inFilter(
-            'id',
-            ids,
-          ); // Filtra trazendo apenas os produtos favoritados
+          .select('*,product_details(*)')
+          .inFilter('id', ids);
 
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {

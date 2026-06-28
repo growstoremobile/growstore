@@ -5,13 +5,48 @@ class ProductService {
     try {
       final response = await Supabase.instance.client
           .from('produtos')
-          .select(
-            '*,categorias(id_category,name_category),product_details(price)',
-          );
+          .select('*,categorias(id_category,name_category),product_details(*)');
 
       return List<Map<String, dynamic>>.from(
         response.map((product) => _normalizeProduct(product)),
       );
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCategoriesWithQuantity() async {
+    try {
+      final responseCategorias = await Supabase.instance.client
+          .from('view_categorias')
+          .select();
+
+      final listaCategorias = List<Map<String, dynamic>>.from(
+        responseCategorias,
+      );
+      final listaProdutos = await fetchAllProducts();
+
+      for (final categoria in listaCategorias) {
+        final idCategoriaAtual = categoria['id_category'];
+        final produtosDaCategoria = listaProdutos.where(
+          (produto) =>
+              produto['id_categoria']?.toString() ==
+              idCategoriaAtual?.toString(),
+        );
+
+        final imagensDaCategoria = produtosDaCategoria
+            .map((produto) {
+              final detalhes = _firstProductDetail(produto['product_details']);
+              final detailImage = detalhes?['main_image'];
+              return (detailImage ?? produto['image'] ?? '').toString();
+            })
+            .where((url) => url.isNotEmpty)
+            .toList();
+
+        categoria['category_images'] = imagensDaCategoria;
+      }
+
+      return listaCategorias;
     } catch (_) {
       rethrow;
     }
@@ -24,13 +59,13 @@ class ProductService {
         : product['category'] ?? product['categoria'];
     final categoryName = category?.toString().trim();
     final title = product['title'] ?? product['title_product'];
+    final detail = _firstProductDetail(product['product_details']);
     final image =
-        product['image'] ?? product['imageUrl'] ?? product['path_image'];
-    final rawDetails = product['product_details'];
-    final detail = rawDetails is List && rawDetails.isNotEmpty
-        ? rawDetails.first
-        : rawDetails;
-    final detailPrice = detail is Map ? detail['price'] : null;
+        product['image'] ??
+        product['imageUrl'] ??
+        product['path_image'] ??
+        detail?['main_image'];
+    final detailPrice = detail?['price'];
     final price =
         product['price'] ?? product['price_product'] ?? detailPrice ?? 0;
 
@@ -43,5 +78,17 @@ class ProductService {
           ? 'Produto'
           : categoryName,
     };
+  }
+
+  Map<String, dynamic>? _firstProductDetail(Object? details) {
+    if (details is Map) {
+      return Map<String, dynamic>.from(details);
+    }
+
+    if (details is List && details.isNotEmpty && details.first is Map) {
+      return Map<String, dynamic>.from(details.first as Map);
+    }
+
+    return null;
   }
 }

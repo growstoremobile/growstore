@@ -20,7 +20,10 @@ class CategoryDetailPage extends StatefulWidget {
 }
 
 class _CategoryDetailPageState extends State<CategoryDetailPage> {
+  static const _pageSize = 8;
+
   final _controller = TextEditingController();
+  final _scrollController = ScrollController();
   final _productService = ProductService();
   final CartStore? _cartStore = GetIt.I.isRegistered<CartStore>()
       ? GetIt.I<CartStore>()
@@ -34,11 +37,14 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
   List<Map<String, dynamic>> _filteredProducts = [];
   bool _isLoading = true;
   String? _errorMessage;
+  int _visibleCount = _pageSize;
+  _ProductListMode _viewMode = _ProductListMode.grid;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(_filterProducts);
+    _scrollController.addListener(_handleScroll);
     _loadProducts();
   }
 
@@ -47,7 +53,35 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     _controller
       ..removeListener(_filterProducts)
       ..dispose();
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
     super.dispose();
+  }
+
+  List<Map<String, dynamic>> get _visibleProducts {
+    return _filteredProducts.take(_visibleCount).toList();
+  }
+
+  bool get _canLoadMore => _visibleCount < _filteredProducts.length;
+
+  void _handleScroll() {
+    if (!_scrollController.hasClients || !_canLoadMore) return;
+
+    if (_scrollController.position.extentAfter < 420) {
+      _loadMoreProducts();
+    }
+  }
+
+  void _loadMoreProducts() {
+    if (!_canLoadMore) return;
+
+    setState(() {
+      final nextCount = _visibleCount + _pageSize;
+      _visibleCount = nextCount > _filteredProducts.length
+          ? _filteredProducts.length
+          : nextCount;
+    });
   }
 
   Future<void> _loadProducts() async {
@@ -61,6 +95,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
       setState(() {
         _products = categoryProducts;
         _filteredProducts = categoryProducts;
+        _visibleCount = _pageSize;
         _isLoading = false;
       });
     } catch (_) {
@@ -78,6 +113,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
     setState(() {
       if (query.isEmpty) {
         _filteredProducts = _products;
+        _visibleCount = _pageSize;
         return;
       }
 
@@ -89,6 +125,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
 
         return title.contains(query) || description.contains(query);
       }).toList();
+      _visibleCount = _pageSize;
     });
   }
 
@@ -207,10 +244,56 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
       );
     }
 
+    return Column(
+      children: [
+        _ProductListToolbar(
+          total: _filteredProducts.length,
+          visible: _visibleProducts.length,
+          viewMode: _viewMode,
+          colors: colors,
+          onViewModeChanged: (mode) {
+            setState(() {
+              _viewMode = mode;
+              _visibleCount = _pageSize;
+            });
+          },
+        ),
+        Expanded(child: _buildProductList(colors)),
+      ],
+    );
+  }
+
+  Widget _buildProductList(CategoryLayoutColors colors) {
+    final products = _visibleProducts;
+
+    if (_viewMode == _ProductListMode.list) {
+      return ListView.separated(
+        controller: _scrollController,
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        cacheExtent: 420,
+        itemCount: products.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
+        itemBuilder: (context, index) {
+          final product = products[index];
+
+          return CategoryProductListTile(
+            product: product,
+            colors: colors,
+            isFavorite: _isFavorite(product),
+            onFavorite: () => _toggleFavorite(product),
+            onTap: () => Navigator.of(
+              context,
+            ).pushNamed('/productDetail', arguments: product['id'].toString()),
+          );
+        },
+      );
+    }
+
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      cacheExtent: 360,
-      itemCount: _filteredProducts.length,
+      controller: _scrollController,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      cacheExtent: 420,
+      itemCount: products.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 177 / 250,
@@ -218,7 +301,7 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
         mainAxisSpacing: 16,
       ),
       itemBuilder: (context, index) {
-        final product = _filteredProducts[index];
+        final product = products[index];
 
         return CategoryProductCard(
           product: product,
@@ -230,6 +313,102 @@ class _CategoryDetailPageState extends State<CategoryDetailPage> {
           ).pushNamed('/productDetail', arguments: product['id'].toString()),
         );
       },
+    );
+  }
+}
+
+enum _ProductListMode { grid, list }
+
+class _ProductListToolbar extends StatelessWidget {
+  const _ProductListToolbar({
+    required this.total,
+    required this.visible,
+    required this.viewMode,
+    required this.colors,
+    required this.onViewModeChanged,
+  });
+
+  final int total;
+  final int visible;
+  final _ProductListMode viewMode;
+  final CategoryLayoutColors colors;
+  final ValueChanged<_ProductListMode> onViewModeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: colors.page,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '$visible de $total produtos',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colors.categoryMeta,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          _ViewModeButton(
+            tooltip: 'Grade',
+            icon: Icons.grid_view_rounded,
+            selected: viewMode == _ProductListMode.grid,
+            colors: colors,
+            onTap: () => onViewModeChanged(_ProductListMode.grid),
+          ),
+          const SizedBox(width: 6),
+          _ViewModeButton(
+            tooltip: 'Lista',
+            icon: Icons.view_agenda_outlined,
+            selected: viewMode == _ProductListMode.list,
+            colors: colors,
+            onTap: () => onViewModeChanged(_ProductListMode.list),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ViewModeButton extends StatelessWidget {
+  const _ViewModeButton({
+    required this.tooltip,
+    required this.icon,
+    required this.selected,
+    required this.colors,
+    required this.onTap,
+  });
+
+  final String tooltip;
+  final IconData icon;
+  final bool selected;
+  final CategoryLayoutColors colors;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: SizedBox.square(
+        dimension: 36,
+        child: IconButton(
+          onPressed: selected ? null : onTap,
+          icon: Icon(icon, size: 20),
+          color: selected ? Colors.white : colors.primary,
+          disabledColor: Colors.white,
+          style: IconButton.styleFrom(
+            backgroundColor: selected ? colors.primary : colors.page,
+            side: BorderSide(color: colors.categoryBorder),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(9),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

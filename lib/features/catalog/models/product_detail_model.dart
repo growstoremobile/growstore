@@ -1,4 +1,5 @@
 import 'product_option_model.dart';
+import 'package:growstore/shared/utils/price_utils.dart';
 
 class ProductDetailsModel {
   final String uid;
@@ -22,9 +23,14 @@ class ProductDetailsModel {
   bool get hasOptions => options.isNotEmpty;
 
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) {
-    final galleryUrls = _parseGalleryUrls(json);
+    final detail = _firstProductDetail(json['product_details']);
+    final galleryUrls = _parseGalleryUrls(json, detail);
     final mainImageUrl = _parseString(
-      json['image'] ?? json['imageUrl'] ?? json['path_image'] ?? json['asset'],
+      json['image'] ??
+          json['imageUrl'] ??
+          json['path_image'] ??
+          json['asset'] ??
+          detail?['main_image'],
     );
 
     return ProductDetailsModel(
@@ -34,13 +40,17 @@ class ProductDetailsModel {
         fallback: 'Produto',
       ),
       description: _parseString(
-        json['description'] ?? json['description_product'],
+        json['description'] ??
+            json['description_product'] ??
+            detail?['description'],
       ),
       mainImageUrl: mainImageUrl.isNotEmpty
           ? mainImageUrl
           : (galleryUrls.isNotEmpty ? galleryUrls.first : ''),
       galleryUrls: galleryUrls,
-      price: _parsePrice(json['price'] ?? json['price_product']),
+      price: parseGrowPrice(
+        json['price'] ?? json['price_product'] ?? detail?['price'],
+      ),
       options: const [
         ProductOption(
           name: 'Tamanho',
@@ -56,23 +66,16 @@ class ProductDetailsModel {
     return parsed.isEmpty ? fallback : parsed;
   }
 
-  static double _parsePrice(Object? value) {
-    if (value is num) return value.toDouble();
-
-    var normalized = value?.toString().trim() ?? '';
-    normalized = normalized.replaceAll(RegExp(r'[^0-9,.-]'), '');
-
-    if (normalized.contains(',') && normalized.contains('.')) {
-      normalized = normalized.replaceAll('.', '').replaceAll(',', '.');
-    } else {
-      normalized = normalized.replaceAll(',', '.');
-    }
-
-    return double.tryParse(normalized) ?? 0;
-  }
-
-  static List<String> _parseGalleryUrls(Map<String, dynamic> json) {
-    final rawGallery = json['galleryUrls'] ?? json['images'] ?? json['gallery'];
+  static List<String> _parseGalleryUrls(
+    Map<String, dynamic> json,
+    Map<String, dynamic>? detail,
+  ) {
+    final rawGallery =
+        json['galleryUrls'] ??
+        json['images'] ??
+        json['gallery'] ??
+        detail?['gallery'] ??
+        detail?['images'];
 
     if (rawGallery is List) {
       final urls = rawGallery
@@ -84,8 +87,24 @@ class ProductDetailsModel {
     }
 
     final image = _parseString(
-      json['image'] ?? json['imageUrl'] ?? json['path_image'] ?? json['asset'],
+      json['image'] ??
+          json['imageUrl'] ??
+          json['path_image'] ??
+          json['asset'] ??
+          detail?['main_image'],
     );
     return image.isEmpty ? const [] : [image];
+  }
+
+  static Map<String, dynamic>? _firstProductDetail(Object? details) {
+    if (details is Map) {
+      return Map<String, dynamic>.from(details);
+    }
+
+    if (details is List && details.isNotEmpty && details.first is Map) {
+      return Map<String, dynamic>.from(details.first as Map);
+    }
+
+    return null;
   }
 }

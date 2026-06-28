@@ -145,6 +145,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
             _OrderSummaryCard(order: order, colors: colors),
+            if (order.shippingAddress?.trim().isNotEmpty == true) ...[
+              const SizedBox(height: 14),
+              _DeliveryAddressCard(
+                address: order.shippingAddress!.trim(),
+                colors: colors,
+              ),
+            ],
             const SizedBox(height: 14),
             _OrderStatusTracker(status: order.status, colors: colors),
             const SizedBox(height: 18),
@@ -159,6 +166,57 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class _DeliveryAddressCard extends StatelessWidget {
+  const _DeliveryAddressCard({required this.address, required this.colors});
+
+  final String address;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.location_on_outlined, color: colors.primary, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Endereco de entrega',
+                  style: GoogleFonts.syne(
+                    color: colors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    height: 22 / 18,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  address,
+                  style: GoogleFonts.inter(
+                    color: colors.textSecondary,
+                    fontSize: 13,
+                    height: 18 / 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
