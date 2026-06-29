@@ -30,10 +30,6 @@ class DefaultProductCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Card(
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.circular(16),
-      //   side: const BorderSide(color: Colors.green, width: 1),
-      // ),
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         width: 180,
@@ -71,7 +67,7 @@ class DefaultProductCard extends StatelessWidget {
                           iconFavority ?? Icons.favorite_border,
                           color: iconFavority == Icons.favorite
                               ? colors.primary
-                              : theme.hintColor,
+                              : theme.primaryColorLight,
                         ),
                       ),
                     ),

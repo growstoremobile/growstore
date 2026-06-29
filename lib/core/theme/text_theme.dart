@@ -4,9 +4,7 @@ import 'colors_theme.dart';
 import 'typography_theme.dart';
 
 TextTheme buildGrowTextTheme(Color primary, Color secondary) {
-  // Fonte Inter
   return TextTheme(
-    // Títulos principais
     displayLarge: TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -17,7 +15,6 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
       color: primary,
     ),
 
-    // Títulos da secção
     displayMedium: TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -28,7 +25,6 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
       color: primary,
     ),
 
-    // Nome do produto
     titleLarge: TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -46,7 +42,6 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
       color: primary,
     ),
 
-    // Texto principal
     bodyLarge: TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -64,7 +59,6 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
       color: secondary,
     ),
 
-    // Buttons
     labelLarge: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -74,7 +68,6 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
       color: GrowColors.darkBg,
     ),
 
-    // Etiquetas
     labelSmall: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,
@@ -86,9 +79,7 @@ TextTheme buildGrowTextTheme(Color primary, Color secondary) {
   );
 }
 
-// Fonte Syne
 extension GrowTextStyles on TextTheme {
-  // "R$ 499,00" – preço do produto
   TextStyle get priceStyle => const TextStyle(
     fontFamily: GrowTypography.fontFamilyPrice,
     fontFamilyFallback: GrowTypography.fontFamilyPriceFallback,
@@ -98,7 +89,6 @@ extension GrowTextStyles on TextTheme {
     letterSpacing: -0.5,
   );
 
-  // "R$ 797,30" – Total do carrinho (extra grande)
   TextStyle get priceTotalStyle => const TextStyle(
     fontFamily: GrowTypography.fontFamilyPrice,
     fontFamilyFallback: GrowTypography.fontFamilyPriceFallback,
