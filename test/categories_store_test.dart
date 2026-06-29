@@ -40,12 +40,7 @@ void main() {
     test('deve filtrar categorias pelo título ignorando maiúsculas', () async {
       final repository = _RepositorioCategoriasFake(
         categoriesResult: const [
-          CategoryModel(
-            id: 1,
-            title: 'Vestuário',
-            productQtn: 2,
-            imageUrl: '',
-          ),
+          CategoryModel(id: 1, title: 'Vestuário', productQtn: 2, imageUrl: ''),
           CategoryModel(
             id: 2,
             title: 'Eletrônicos',
