@@ -88,7 +88,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
-                            childAspectRatio: 1,
+                            childAspectRatio: 0.8,
                             mainAxisSpacing: 16,
                             crossAxisSpacing: 19,
                           ),
@@ -119,12 +119,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                   ),
                                   Text(
                                     category.title,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleLarge,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontSize: 14),
                                   ),
                                   Text(
                                     '${category.productQtn} produtos',
