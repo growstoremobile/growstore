@@ -20,12 +20,9 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final OrderRepository _repository = GetIt.I.isRegistered<OrderRepository>()
-      ? GetIt.I<OrderRepository>()
-      : OrderRepository();
-  final CartStore? _cartStore = GetIt.I.isRegistered<CartStore>()
-      ? GetIt.I<CartStore>()
-      : null;
+  final _repository = GetIt.I<OrderRepository>();
+
+  final _cartStore = GetIt.I<CartStore>();
 
   late Future<List<OrderModel>> _ordersFuture;
 

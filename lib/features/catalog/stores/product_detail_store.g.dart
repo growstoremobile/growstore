@@ -161,6 +161,28 @@ mixin _$ProductDetailStore on ProductDetailStoreBase, Store {
   }
 
   @override
+  void incrementQuantity() {
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.incrementQuantity');
+    try {
+      return super.incrementQuantity();
+    } finally {
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void decrementQuantity() {
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.decrementQuantity');
+    try {
+      return super.decrementQuantity();
+    } finally {
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   bool addToCart() {
     final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
         name: 'ProductDetailStoreBase.addToCart');

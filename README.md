@@ -74,6 +74,82 @@ flutter test
 
 ## Estrutura
 
+Fluxos implementados:
+
+- Login com conta Google
+- Logout utilizando Firebase Authentication
+- Tratamento de sucesso na autenticação
+- Tratamento de cancelamento do login
+- Tratamento de erros de autenticação
+
+## Intruções de configuração do Login com Google (Firebase)
+
+Para que a autenticação com Google funcione corretamente em ambiente de desenvolvimento, cada membro da equipe deve cadastrar sua própria chave SHA-1 no Firebase.
+
+### Obtendo a SHA-1
+
+No terminal, acesse a pasta `android` do projeto:
+
+```bash
+cd android
+```
+
+Execute o comando:
+
+```bash
+gradlew signingReport
+```
+
+No Windows (PowerShell):
+
+```powershell
+.\gradlew signingReport
+```
+
+Procure pela seção `debug` e copie o valor de `SHA1`:
+
+```text
+Variant: debug
+SHA1: XX:XX:XX:XX:XX:XX:XX:XX:XX
+```
+
+### Adicionando a SHA-1 ao Firebase
+
+1. Acesse o console do Firebase.
+2. Abra o projeto.
+3. Vá em **Configurações do Projeto**.
+4. Selecione o aplicativo Android.
+5. Adicione a nova chave SHA-1.
+6. Faça o download do arquivo `google-services.json` atualizado.
+7. Substitua o arquivo em:
+
+```text
+android/app/google-services.json
+```
+
+### Atualizando o projeto
+
+Após substituir o arquivo, execute:
+
+```bash
+flutter clean
+flutter pub get
+```
+
+### Observações
+
+- Cada desenvolvedor possui sua própria chave SHA-1.
+- É possível cadastrar múltiplas chaves SHA-1 no mesmo projeto Firebase.
+- O cadastro de uma nova chave não afeta os demais membros da equipe.
+- Caso o login Google apresente erros como `ApiException: 10` ou `DEVELOPER_ERROR`, verifique se a SHA-1 utilizada está cadastrada no Firebase.
+
+## Plataformas Suportadas
+
+- Android
+- iOS
+## Estrutura do Projeto
+
+```txt
 ```text
 lib/
   core/

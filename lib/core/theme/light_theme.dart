@@ -162,6 +162,7 @@ final ThemeData growLightTheme = ThemeData(
     backgroundColor: Colors.transparent,
     selectedColor: GrowColors.primary,
     disabledColor: GrowColors.lightBorder,
+
     labelStyle: const TextStyle(
       fontFamily: GrowTypography.fontFamily,
       fontFamilyFallback: GrowTypography.fontFamilyFallback,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:growstore/core/routing/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
@@ -14,6 +15,7 @@ import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/profile/models/address_model.dart';
 import 'package:growstore/features/profile/repositories/address_repository.dart';
+import 'package:growstore/features/cart/widgets/cart/cart_checkout_button_widget.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -23,27 +25,20 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
+  final _cartStore = GetIt.I<CartStore>();
+
+  /*final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
       ? GetIt.I<CartStore>()
-      : CartStore();
-  final OrderRepository _orderRepository =
-      GetIt.I.isRegistered<OrderRepository>()
-      ? GetIt.I<OrderRepository>()
-      : OrderRepository();
-  final AddressRepository _addressRepository =
-      GetIt.I.isRegistered<AddressRepository>()
-      ? GetIt.I<AddressRepository>()
-      : AddressRepository();
-  AddressModel? _defaultAddress;
+      : CartStore();*/
 
   @override
   void initState() {
     super.initState();
     _cartStore.loadCart();
-    _loadDefaultAddress();
+    //_loadDefaultAddress();
   }
 
-  Future<void> _loadDefaultAddress() async {
+  /*Future<void> _loadDefaultAddress() async {
     final address = await _addressRepository.getDefaultAddress();
 
     if (!mounted) return;
@@ -51,59 +46,7 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       _defaultAddress = address;
     });
-  }
-
-  void _handleRemove(CartItemModel item) {
-    _cartStore.removeItem(item);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${item.name} removido do carrinho')),
-    );
-  }
-
-  Future<void> _handleCheckout() async {
-    final cartItems = _cartStore.items.toList();
-    if (cartItems.isEmpty) return;
-
-    final address =
-        _defaultAddress ?? await _addressRepository.getDefaultAddress();
-
-    if (address == null) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Cadastre um endereco para finalizar a compra.'),
-          action: SnackBarAction(
-            label: 'ENDERECOS',
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).pushNamed('/addresses').then((_) => _loadDefaultAddress());
-            },
-          ),
-        ),
-      );
-      return;
-    }
-
-    final order = await _orderRepository.createOrder(
-      cartItems: cartItems,
-      subtotal: _cartStore.subtotal,
-      shipping: _cartStore.shipping,
-      discount: _cartStore.discount,
-      total: _cartStore.total,
-      shippingAddress: address.summary,
-    );
-
-    _cartStore.clearCart();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Pedido criado com sucesso!')));
-    Navigator.of(context).pushNamed('/orderDetail', arguments: order.id);
-  }
+  }  */
 
   void _handleBottomNavigation(BuildContext context, String label) {
     switch (label) {
@@ -124,6 +67,17 @@ class _CartPageState extends State<CartPage> {
         Navigator.of(context).pushNamed('/orders');
         break;
     }
+  }
+
+  void _handleRemove(CartItemModel item) {
+    _cartStore.removeItem(item);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.name} removido do carrinho')),
+    );
+  }
+
+  void _handleCheckout() {
+    Navigator.pushNamed(context, AppRoutes.checkout);
   }
 
   @override
@@ -157,11 +111,7 @@ class _CartPageState extends State<CartPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_cartStore.items.isNotEmpty)
-                _CartCheckoutPanel(
-                  colors: colors,
-                  total: _cartStore.total,
-                  onCheckout: _handleCheckout,
-                ),
+                CartCheckoutButtonWidget(onPressed: _handleCheckout),
               HomeBottomNavigation(
                 selectedLabel: 'Carrinho',
                 cartItemCount: _cartStore.totalItems,
@@ -216,7 +166,7 @@ class _CartPageState extends State<CartPage> {
   }
 }
 
-class _CartCheckoutPanel extends StatelessWidget {
+/*class _CartCheckoutPanel extends StatelessWidget {
   const _CartCheckoutPanel({
     required this.colors,
     required this.total,
@@ -225,7 +175,7 @@ class _CartCheckoutPanel extends StatelessWidget {
 
   final CartLayoutColors colors;
   final double total;
-  final Future<void> Function() onCheckout;
+  final VoidCallback onCheckout;
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +246,7 @@ class _CartCheckoutPanel extends StatelessWidget {
     );
   }
 }
-
+*/
 class _CartEmptyState extends StatelessWidget {
   const _CartEmptyState({required this.colors});
 

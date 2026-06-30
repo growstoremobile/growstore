@@ -1,15 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:growstore/core/routing/app_routes.dart';
 import 'package:growstore/core/di/injection.dart';
-import 'package:growstore/core/theme/dark_theme.dart';
+import 'package:growstore/core/theme/growstore_theme.dart';
 import 'package:growstore/core/theme/light_theme.dart';
+import 'package:growstore/features/address/pages/address_form_page.dart';
+import 'package:growstore/features/address/pages/address_list_page.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
+import 'package:growstore/features/cart/pages/cart_page.dart';
+import 'package:growstore/features/checkout/pages/checkout_page.dart';
+import 'package:growstore/features/orders/pages/order_detail_page.dart';
+import 'firebase_options.dart';
+
+import 'package:get_it/get_it.dart';
+
 import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
-import 'package:growstore/features/auth/pages/login_page.dart';
+
 import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
-import 'package:growstore/features/cart/pages/cart_page.dart';
+
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/pages/categories_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
@@ -24,9 +34,9 @@ import 'package:growstore/features/favorites/stores/favority/favority_products_s
 import 'package:growstore/features/home/pages/home_page.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
-import 'package:growstore/features/orders/pages/order_detail_page.dart';
+
 import 'package:growstore/features/orders/pages/orders_page.dart';
-import 'package:growstore/features/orders/repositories/order_repository.dart';
+
 import 'package:growstore/features/profile/pages/addresses_page.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/profile/repositories/address_repository.dart';
@@ -36,6 +46,7 @@ import 'package:growstore/shared/utils/app_config.dart';
 import 'package:growstore/shared/utils/constants.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:growstore/features/orders/pages/order_success_page.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
@@ -47,7 +58,7 @@ Future<void> initHive() async {
 Future<void> initServiceLocator() async {
   final favorityBox = await Hive.openBox('favorities');
   final authBox = await Hive.openBox('auth');
-  final ordersBox = await Hive.openBox(OrderRepository.boxName);
+  //final ordersBox = await Hive.openBox(OrderRepository.boxName);
   final addressesBox = await Hive.openBox(AddressRepository.boxName);
   final locator = GetIt.I;
 
@@ -100,9 +111,9 @@ Future<void> initServiceLocator() async {
   if (!locator.isRegistered<FavorityProductsStore>()) {
     locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
   }
-  if (!locator.isRegistered<OrderRepository>()) {
+  /*if (!locator.isRegistered<OrderRepository>()) {
     locator.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
-  }
+  }*/
   if (!locator.isRegistered<AddressRepository>()) {
     locator.registerSingleton<AddressRepository>(
       AddressRepository(box: addressesBox),
@@ -139,7 +150,10 @@ Future<void> main() async {
     if (Firebase.apps.isNotEmpty) {
       debugPrint('Firebase ja estava inicializado nativamente.');
     } else {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
       debugPrint('Firebase inicializado com sucesso.');
     }
   } catch (e) {
@@ -206,8 +220,12 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
           '/cart': (_) => const CartPage(),
           '/favorites': (_) => const FavorityPage(),
           '/orders': (_) => const OrdersPage(),
-          '/addresses': (_) => const AddressesPage(),
+          '/addresses': (_) => const AddressListPage(),
           '/profile': (_) => ProfilePage(),
+          '/address-list': (_) => const AddressListPage(),
+          '/address-form': (_) => const AddressFormPage(),
+          '/checkout': (_) => const CheckoutPage(),
+          '/order-success': (_) => const OrderSuccessPage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/productDetail') {

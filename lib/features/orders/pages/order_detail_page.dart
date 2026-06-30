@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
@@ -9,6 +10,7 @@ import 'package:growstore/features/orders/models/order_item_model.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
+import 'package:growstore/features/orders/stores/order_store.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/shared/widgets/cached_product_image.dart';
@@ -23,33 +25,33 @@ class OrderDetailPage extends StatefulWidget {
 }
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
-  final OrderRepository _repository = GetIt.I.isRegistered<OrderRepository>()
-      ? GetIt.I<OrderRepository>()
-      : OrderRepository();
-  final CartStore? _cartStore = GetIt.I.isRegistered<CartStore>()
-      ? GetIt.I<CartStore>()
-      : null;
-
-  late Future<OrderModel?> _orderFuture;
+  final _cartStore = GetIt.I<CartStore>();
+  final _orderStore = GetIt.I<OrderStore>();
 
   @override
   void initState() {
     super.initState();
-    _orderFuture = _repository.getOrderById(widget.orderId);
+    _orderStore.loadOrders();
+  }
+
+  OrderModel? get _order {
+    try {
+      return _orderStore.orders.firstWhere(
+        (o) => o.id == widget.orderId,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   void _reload() {
-    setState(() {
-      _orderFuture = _repository.getOrderById(widget.orderId);
-    });
+    _orderStore.loadOrders();
   }
 
   void _handleBottomNavigation(String label) {
     switch (label) {
       case 'Inicio':
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/home', (route) => false);
+        Navigator.of(context).pushNamedAndRemoveUntil('/home', (r) => false);
         break;
       case 'Categorias':
         Navigator.of(context).pushNamed('/categories');
@@ -75,97 +77,78 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       Theme.of(context).brightness == Brightness.dark,
     );
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: colors.statusBar,
-        statusBarIconBrightness: colors.isDark
-            ? Brightness.light
-            : Brightness.dark,
-        statusBarBrightness: colors.isDark ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor: colors.bottomBar,
-        systemNavigationBarIconBrightness: colors.isDark
-            ? Brightness.light
-            : Brightness.dark,
-      ),
-      child: Scaffold(
-        backgroundColor: colors.page,
-        body: Column(
-          children: [
-            OrderHeader(
-              title: 'Detalhe do Pedido',
-              colors: colors,
-              onBack: () => Navigator.of(context).pop(),
+    return Scaffold(
+      backgroundColor: colors.page,
+      body: Column(
+        children: [
+          OrderHeader(
+            title: 'Detalhe do Pedido',
+            colors: colors,
+            onBack: () => Navigator.of(context).pop(),
+          ),
+          Expanded(
+            child: Observer(
+             
+              builder: (_) {
+                final order = _order;
+
+                if (_orderStore.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(color: colors.primary),
+                  );
+                }
+
+                if (order == null) {
+                  return _OrderDetailState(
+                    colors: colors,
+                    icon: Icons.receipt_long_outlined,
+                    title: 'Pedido não encontrado',
+                    description: 'Este pedido não está disponível.',
+                    onRetry: _reload,
+                  );
+                }
+
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  children: [
+                    _OrderSummaryCard(order: order, colors: colors),
+                    if (order.shippingAddress?.trim().isNotEmpty == true) ...[
+                      const SizedBox(height: 14),
+                      _DeliveryAddressCard(
+                        address: order.shippingAddress!.trim(),
+                        colors: colors,
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    _OrderStatusTracker(
+                      status: order.status,
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 18),
+                    _SectionTitle(
+                      title: 'Itens do pedido',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 10),
+                    for (final item in order.items) ...[
+                      _OrderItemCard(item: item, colors: colors),
+                      const SizedBox(height: 10),
+                    ],
+                    const SizedBox(height: 4),
+                    _OrderTotalsCard(order: order, colors: colors),
+                  ],
+                );
+              },
             ),
-            Expanded(child: _buildBody(colors)),
-          ],
-        ),
-        bottomNavigationBar: HomeBottomNavigation(
-          selectedLabel: 'Pedidos',
-          cartItemCount: _cartStore?.totalItems ?? 0,
-          showCartBadge: false,
-          onTap: _handleBottomNavigation,
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildBody(OrderLayoutColors colors) {
-    return FutureBuilder<OrderModel?>(
-      future: _orderFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return Center(
-            child: CircularProgressIndicator(color: colors.primary),
-          );
-        }
-
-        if (snapshot.hasError) {
-          return _OrderDetailState(
-            colors: colors,
-            icon: Icons.wifi_off_rounded,
-            title: 'Erro ao carregar pedido',
-            description: 'Tente novamente em alguns instantes.',
-            onRetry: _reload,
-          );
-        }
-
-        final order = snapshot.data;
-
-        if (order == null) {
-          return _OrderDetailState(
-            colors: colors,
-            icon: Icons.receipt_long_outlined,
-            title: 'Pedido nao encontrado',
-            description: 'O pedido selecionado nao esta salvo neste aparelho.',
-            onRetry: _reload,
-          );
-        }
-
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          children: [
-            _OrderSummaryCard(order: order, colors: colors),
-            if (order.shippingAddress?.trim().isNotEmpty == true) ...[
-              const SizedBox(height: 14),
-              _DeliveryAddressCard(
-                address: order.shippingAddress!.trim(),
-                colors: colors,
-              ),
-            ],
-            const SizedBox(height: 14),
-            _OrderStatusTracker(status: order.status, colors: colors),
-            const SizedBox(height: 18),
-            _SectionTitle(title: 'Itens do pedido', colors: colors),
-            const SizedBox(height: 10),
-            for (final item in order.items) ...[
-              _OrderItemCard(item: item, colors: colors),
-              const SizedBox(height: 10),
-            ],
-            const SizedBox(height: 4),
-            _OrderTotalsCard(order: order, colors: colors),
-          ],
-        );
-      },
+      bottomNavigationBar: HomeBottomNavigation(
+        selectedLabel: 'Pedidos',
+        cartItemCount: _cartStore.totalItems,
+        showCartBadge: false,
+        onTap: _handleBottomNavigation,
+      ),
     );
   }
 }

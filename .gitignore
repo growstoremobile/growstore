@@ -54,6 +54,7 @@ lib/firebase_options.dart
 # Firebase CLI
 .firebase/
 firebase-debug.log
+firebase-debug.log  
 
 
 # Flutter Generated Plugin Registrants (Desktop & Platforms)
