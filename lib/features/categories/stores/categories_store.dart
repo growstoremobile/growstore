@@ -2,13 +2,10 @@ import 'package:growstore/features/categories/models/category_model.dart';
 import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:mobx/mobx.dart';
 
-// Include generated file
 part 'categories_store.g.dart';
 
-// This is the class used by rest of your codebase
 class CategoryStore = CategoryStoreBase with _$CategoryStore;
 
-// The store-class
 abstract class CategoryStoreBase with Store {
   final CategoriesRepository _repository;
 
