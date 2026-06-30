@@ -11,6 +11,7 @@ import 'package:growstore/features/catalog/widgets/product_detail_info_widget.da
 import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
+import 'package:growstore/core/theme/widgets/quantity_stepper_widget.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -150,7 +151,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              ProductDetailImageWidget(pathImages: product.galleryUrls),
+
+              // Usa currentGallery da store — já converte hex para nome
+              // e retorna a imagem correta para a cor selecionada
+              Observer(
+                builder: (_) => ProductDetailImageWidget(
+                  pathImages: _store.currentGallery,
+                  selectedColor: _store.selectedColor,
+                ),
+              ),
+
               const SizedBox(height: 24),
               ProductDetailInfoWidget(name: product.name, price: product.price),
               const SizedBox(height: 24),
@@ -188,23 +198,25 @@ class _ProductQuantitySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            'Quantidade',
-            style: textTheme.bodyMedium?.copyWith(
-              color: GrowColors.darkTextSecondary,
-              fontWeight: GrowTypography.bold,
+    return Observer(
+      builder: (_) => Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Quantidade',
+              style: textTheme.bodyMedium?.copyWith(
+                color: GrowColors.darkTextSecondary,
+                fontWeight: GrowTypography.bold,
+              ),
             ),
           ),
-        ),
-        GrowQuantityStepper(
-          quantity: store.quantity,
-          onDecrement: store.decrementQuantity,
-          onIncrement: store.incrementQuantity,
-        ),
-      ],
+          GrowQuantityStepper(
+            quantity: store.quantity,
+            onDecrement: store.decrementQuantity,
+            onIncrement: store.incrementQuantity,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -231,7 +243,7 @@ class _ExpandableDescriptionWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descricao do produto',
+          'Descrição do produto',
           style: textTheme.bodyMedium?.copyWith(
             color: GrowColors.darkTextPrimary,
             fontWeight: GrowTypography.bold,

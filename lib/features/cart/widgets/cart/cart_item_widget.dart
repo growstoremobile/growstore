@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/utils/cart_currency.dart';
@@ -22,107 +23,130 @@ class CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isNetworkImage = item.imageUrl.startsWith('http');
+    return Observer(
+      builder: (_) {
+        final isNetworkImage =
+            item.imageUrl.startsWith('http') ||
+            (item.imageUrl.contains('/') &&
+                !item.imageUrl.startsWith('assets'));
 
-    return SizedBox(
-      height: 115,
-      child: Container(
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: colors.cardBorder),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                width: 100,
-                height: 100,
-                color: Colors.white,
-                child: isNetworkImage
-                    ? CachedNetworkImage(
-                        imageUrl: item.imageUrl,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => const Icon(
-                          Icons.shopping_bag_outlined,
-                          color: AppColors.outline,
-                        ),
-                      )
-                    : Image.asset(
-                        item.imageUrl,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
+        return SizedBox(
+          height: 115,
+          child: Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: colors.card,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: colors.cardBorder),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.white,
+                    child: isNetworkImage
+                        ? CachedNetworkImage(
+                            imageUrl: item.imageUrl,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
                               Icons.shopping_bag_outlined,
                               color: AppColors.outline,
                             ),
+                          )
+                        : Image.asset(
+                            item.imageUrl,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.shopping_bag_outlined,
+                                  color: AppColors.outline,
+                                ),
+                          ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 17 / 14,
+                          color: colors.textPrimary,
+                        ),
                       ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 17 / 14,
-                      color: colors.textPrimary,
-                    ),
+                      // Pequeno bônus visual: Mostra a variação selecionada abaixo do nome (Ex: Branco / G)
+                      if (item.variation != 'Padrão') ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          item.variation,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: colors.textPrimary.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      Text(
+                        cartCurrency(item.totalPrice),
+                        maxLines: 1,
+                        style: GoogleFonts.syne(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          height: 29 / 24,
+                          color: colors.primary,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 15),
-                  Text(
-                    cartCurrency(item.totalPrice),
-                    maxLines: 1,
-                    style: GoogleFonts.syne(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      height: 29 / 24,
-                      color: colors.primary,
-                      letterSpacing: 0,
-                    ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 78,
+                  child: _CartItemControls(
+                    colors: colors,
+                    selectedSize: _selectedSize(item.variation),
+                    quantity: item.quantity,
+                    onIncrement: onIncrement,
+                    onDecrement: onDecrement,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 78,
-              child: _CartItemControls(
-                colors: colors,
-                selectedSize: _selectedSize(item.variation),
-                quantity: item.quantity,
-                onIncrement: onIncrement,
-                onDecrement: onDecrement,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   String _selectedSize(String variation) {
-    final normalized = variation.contains('/')
-        ? variation.split('/').last.trim().toUpperCase()
-        : variation.trim().toUpperCase();
+    if (!variation.contains('/')) return 'G';
+    final normalized = variation.split('/').last.trim().toUpperCase();
 
-    if (normalized == 'P' || normalized == 'M' || normalized == 'G') {
+    if (normalized == 'P' ||
+        normalized == 'M' ||
+        normalized == 'G' ||
+        normalized == 'GG' ||
+        normalized == 'XG') {
       return normalized;
     }
 
