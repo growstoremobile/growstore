@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/features/categories/models/category_model.dart';
-import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:growstore/features/categories/stores/detail_categories_store.dart';
 import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
+import 'package:growstore/features/favorites/models/favority_model.dart';
+import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
+import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
-import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:growstore/shared/widgets/default_product_card_widget.dart';
 
 class DetailCategoriesPage extends StatefulWidget {
@@ -21,16 +23,38 @@ class DetailCategoriesPage extends StatefulWidget {
 
 class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
   late final DetailCategoriesStore _store;
+  final FavorityProductsStore? _favorityStore =
+      GetIt.I.isRegistered<FavorityProductsStore>()
+      ? GetIt.I<FavorityProductsStore>()
+      : null;
 
   @override
   void initState() {
     super.initState();
-    _store = DetailCategoriesStore(
-      repository: CategoriesRepository(productService: ProductService()),
-      categoryId: widget.category.id,
-    );
+    _store = GetIt.I<DetailCategoriesStore>(param1: widget.category.id);
 
     _store.loadProducts();
+  }
+
+  Future<void> _toggleFavorite(HomeProductModel product) async {
+    final favorityStore = _favorityStore;
+    if (favorityStore == null) return;
+
+    await favorityStore.toggleFavority(
+      FavorityModel(
+        id: product.id,
+        titleProduct: product.name,
+        priceProduct: product.priceValue,
+        pathImage: product.asset,
+      ),
+    );
+
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  bool _isFavorite(int productId) {
+    return _favorityStore?.isFavorite(productId) ?? false;
   }
 
   void _handleBottomNavigation(String label) {
@@ -108,15 +132,24 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
                     itemBuilder: (context, index) {
                       final product = products[index];
 
-                      return DefaultProductCard(
-                        titleProduct: product.name,
-                        price: product.priceValue,
-                        pathImage: product.asset,
-                        iconButton: Icons.visibility_outlined,
-                        textButton: 'Ver produto',
-                        onPressed: () => Navigator.of(context).pushNamed(
-                          '/productDetail',
-                          arguments: product.id.toString(),
+                      return TooltipVisibility(
+                        visible: false,
+                        child: DefaultProductCard(
+                          titleProduct: product.name,
+                          price: product.priceValue,
+                          pathImage: product.asset,
+                          iconFavority: _isFavorite(product.id)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          onFavoritePressed: _favorityStore == null
+                              ? null
+                              : () => _toggleFavorite(product),
+                          iconButton: Icons.visibility_outlined,
+                          textButton: 'Ver produto',
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            '/productDetail',
+                            arguments: product.id.toString(),
+                          ),
                         ),
                       );
                     },
