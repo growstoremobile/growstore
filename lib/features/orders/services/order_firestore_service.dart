@@ -39,4 +39,13 @@ class OrderFirestoreService implements OrderService {
       return OrderModel.fromJson(doc.data(), doc.id);
     }).toList();
   }
+
+  @override
+  Future<OrderModel?> getOrderById(String id) async {
+    final doc = await _collection.doc(id).get();
+
+    if (!doc.exists) return null;
+
+    return OrderModel.fromJson(doc.data()!, doc.id);
+  }
 }

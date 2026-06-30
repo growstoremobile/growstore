@@ -3,9 +3,10 @@ import 'package:growstore/features/orders/models/order_model.dart';
 abstract class OrderService {
   Future<OrderModel> createOrder(OrderModel order);
   Future<List<OrderModel>> getOrders();
+  Future<OrderModel?> getOrderById(String id);
 }
 
-class OrderServiceMock implements OrderService {
+/*class OrderServiceMock implements OrderService {
   static final List<OrderModel> _orders = [];
 
   @override
@@ -19,3 +20,4 @@ class OrderServiceMock implements OrderService {
     return _orders;
   }
 }
+*/

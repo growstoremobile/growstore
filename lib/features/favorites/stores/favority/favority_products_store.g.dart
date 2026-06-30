@@ -13,13 +13,13 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
       Atom(name: 'FavorityProductsStoreBase.favorities', context: context);
 
   @override
-  ObservableList<Map<String, dynamic>> get favorities {
+  ObservableList<FavorityModel> get favorities {
     _$favoritiesAtom.reportRead();
     return super.favorities;
   }
 
   @override
-  set favorities(ObservableList<Map<String, dynamic>> value) {
+  set favorities(ObservableList<FavorityModel> value) {
     _$favoritiesAtom.reportWrite(value, super.favorities, () {
       super.favorities = value;
     });
@@ -69,7 +69,7 @@ mixin _$FavorityProductsStore on FavorityProductsStoreBase, Store {
       AsyncAction('FavorityProductsStoreBase.toggleFavority', context: context);
 
   @override
-  Future<void> toggleFavority(Map<String, dynamic> product) {
+  Future<void> toggleFavority(FavorityModel product) {
     return _$toggleFavorityAsyncAction.run(() => super.toggleFavority(product));
   }
 

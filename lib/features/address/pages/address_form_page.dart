@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/features/address/models/address_model.dart';
 import 'package:growstore/features/address/stores/address_store.dart';
 import 'package:growstore/features/address/widgets/address_form_fields_widget.dart';
 import 'package:growstore/features/checkout/stores/checkout_store.dart';
+import 'package:growstore/features/orders/widgets/order_header.dart';
+import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 
 class AddressFormPage extends StatefulWidget {
   const AddressFormPage({super.key});
@@ -104,58 +107,86 @@ class _AddressFormPageState extends State<AddressFormPage> {
     }
   }
 
+  Widget _buildBody(OrderLayoutColors colors) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: AddressFormFieldsWidget(
+                nameController: _nameController,
+                cepController: _cepController,
+                streetController: _streetController,
+                numberController: _numberController,
+                complementController: _complementController,
+                neighborhoodController: _neighborhoodController,
+                cityController: _cityController,
+                stateController: _stateController,
+                onCepChanged: _searchCep,
+              ),
+            ),
+            const SizedBox(height: 16),
+            CheckboxListTile(
+              value: _isDefault,
+              onChanged: (value) {
+                setState(() {
+                  _isDefault = value ?? false;
+                });
+              },
+              title: const Text('Definir como endereço principal'),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _saveAddress,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.location_on_rounded),
+                    SizedBox(width: 15),
+                    Text("Salvar endereço"),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Endereço')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Form(
-                  key: _formKey,
-                  child: AddressFormFieldsWidget(
-                    nameController: _nameController,
-                    cepController: _cepController,
-                    streetController: _streetController,
-                    numberController: _numberController,
-                    complementController: _complementController,
-                    neighborhoodController: _neighborhoodController,
-                    cityController: _cityController,
-                    stateController: _stateController,
-                    onCepChanged: _searchCep,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                CheckboxListTile(
-                  value: _isDefault,
-                  onChanged: (value) {
-                    setState(() {
-                      _isDefault = value ?? false;
-                    });
-                  },
-                  title: const Text('Definir como endereço principal'),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _saveAddress,
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.location_on_rounded),
-                        SizedBox(width: 15),
-                        Text("Salvar endereço"),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+    final colors = OrderLayoutColors.resolve(
+      Theme.of(context).brightness == Brightness.dark,
+    );
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: colors.statusBar,
+        statusBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
+        statusBarBrightness: colors.isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: colors.bottomBar,
+        systemNavigationBarIconBrightness: colors.isDark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: Scaffold(
+        backgroundColor: colors.page,
+        body: Column(
+          children: [
+            OrderHeader(
+              title: "Adicionar endereço",
+              colors: colors,
+              onBack: () => Navigator.of(context).pop(),
             ),
-          ),
+            Expanded(child: _buildBody(colors)),
+          ],
         ),
       ),
     );

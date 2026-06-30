@@ -2,7 +2,6 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 class AddressFormFieldsWidget extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController cepController;
@@ -29,118 +28,174 @@ class AddressFormFieldsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'Nome do endereço',
-            hintText: 'Ex: Casa, Trabalho',
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            controller: nameController,
+            decoration: const InputDecoration(
+              labelText: 'Nome do endereço',
+              hintText: 'Casa, Trabalho...',
+              prefixIcon: Icon(Icons.home_outlined),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Informe o nome do endereço';
+              }
+              return null;
+            },
           ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe o nome do endereço';
-            }
-            return null;
-          },
-        ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 25),
 
-        TextFormField(
-          controller: cepController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'CEP'),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            CepInputFormatter(ponto: false),
-          ],
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe o CEP';
-            }
-            return null;
-          },
-          onChanged: (value) {
-            if (value.replaceAll(RegExp(r'[^0-9]'), '').length == 8) {
-              onCepChanged();
-            }
-          },
-        ),
+          TextFormField(
+            controller: cepController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'CEP',
+              hintText: '00000-000',
 
-        const SizedBox(height: 16),
+              prefixIcon: Icon(Icons.share_location_sharp),
+            ),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CepInputFormatter(ponto: false),
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Informe o CEP';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              if (value.replaceAll(RegExp(r'[^0-9]'), '').length == 8) {
+                onCepChanged();
+              }
+            },
+          ),
 
-        TextFormField(
-          controller: streetController,
-          decoration: const InputDecoration(labelText: 'Rua'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe a rua';
-            }
-            return null;
-          },
-        ),
+          const SizedBox(height: 25),
 
-        const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextFormField(
+                  controller: streetController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Rua',
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                    filled: true,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Informe a rua';
+                    }
+                    return null;
+                  },
+                ),
+              ),
 
-        TextFormField(
-          controller: numberController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Número'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe o número';
-            }
-            return null;
-          },
-        ),
+              const SizedBox(width: 12),
 
-        const SizedBox(height: 16),
+              Expanded(
+                flex: 1,
+                child: TextFormField(
+                  controller: numberController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Nº'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Obrigatório';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 25),
+          TextFormField(
+            controller: complementController,
+            decoration: const InputDecoration(
+              labelText: 'Complemento',
+              hintText: 'Opcional',
+              prefixIcon: Icon(Icons.apartment_outlined),
+            ),
+          ),
 
-        TextFormField(
-          controller: complementController,
-          decoration: const InputDecoration(labelText: 'Complemento'),
-        ),
+          const SizedBox(height: 25),
 
-        const SizedBox(height: 16),
+          TextFormField(
+            controller: neighborhoodController,
+            readOnly: true,
+            decoration: const InputDecoration(
+              labelText: 'Bairro',
+              prefixIcon: Icon(Icons.map_outlined),
+              filled: true,
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Informe o bairro';
+              }
+              return null;
+            },
+          ),
 
-        TextFormField(
-          controller: neighborhoodController,
-          decoration: const InputDecoration(labelText: 'Bairro'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe o bairro';
-            }
-            return null;
-          },
-        ),
+          const SizedBox(height: 25),
 
-        const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextFormField(
+                  controller: cityController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Cidade',
+                    prefixIcon: Icon(Icons.location_city_outlined),
+                    filled: true,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Informe a cidade';
+                    }
+                    return null;
+                  },
+                ),
+              ),
 
-        TextFormField(
-          controller: cityController,
-          decoration: const InputDecoration(labelText: 'Cidade'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe a cidade';
-            }
-            return null;
-          },
-        ),
+              const SizedBox(width: 12),
 
-        const SizedBox(height: 16),
+              Expanded(
+                child: TextFormField(
+                  controller: stateController,
+                  readOnly: true,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    labelText: 'UF',
 
-        TextFormField(
-          controller: stateController,
-          decoration: const InputDecoration(labelText: 'Estado'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Informe o estado';
-            }
-            return null;
-          },
-        ),
-      ],
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withValues(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'UF';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,16 +1,16 @@
+import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:hive/hive.dart';
 
 class FavorityRepository {
   final Box boxFavoritiesProducts;
-  final FavoriteService _favoriteService;
+  final FavorityService _favoriteService;
 
   FavorityRepository({
     required this.boxFavoritiesProducts,
-    required FavoriteService favoriteService,
+    required FavorityService favoriteService,
   }) : _favoriteService = favoriteService;
 
-  // 1. Pega apenas a lista bruta de IDs salvos no dispositivo
   List<int> getSavedIds() {
     final List<dynamic> ids = boxFavoritiesProducts.get(
       "favorities_ids",
@@ -19,13 +19,17 @@ class FavorityRepository {
     return ids.cast<int>();
   }
 
-  // 2. Orquestra: Pega os IDs locais e busca os detalhes completos no Supabase
-  Future<List<Map<String, dynamic>>> getAllFavorities() async {
+  Future<List<FavorityModel>> getAllFavorites() async {
     final List<int> ids = getSavedIds();
-    return await _favoriteService.fetchProductsByIds(ids);
+    if (ids.isEmpty) return [];
+
+    final List<Map<String, dynamic>> rawProducts = await _favoriteService
+        .fetchProductsByIds(ids);
+
+    // Converte a lista de Maps em uma lista de objetos FavorityModel
+    return rawProducts.map((json) => FavorityModel.fromJson(json)).toList();
   }
 
-  // 3. Salva um novo ID no Hive
   Future<void> addNewFavority(int productId) async {
     final ids = getSavedIds();
     if (!ids.contains(productId)) {
@@ -34,7 +38,6 @@ class FavorityRepository {
     }
   }
 
-  // 4. Remove um ID do Hive
   Future<void> removeFavority(int productId) async {
     final ids = getSavedIds();
     ids.remove(productId);

@@ -72,6 +72,22 @@ mixin _$OrderStore on OrderStoreBase, Store {
     });
   }
 
+  late final _$hasLoadedAtom =
+      Atom(name: 'OrderStoreBase.hasLoaded', context: context);
+
+  @override
+  bool get hasLoaded {
+    _$hasLoadedAtom.reportRead();
+    return super.hasLoaded;
+  }
+
+  @override
+  set hasLoaded(bool value) {
+    _$hasLoadedAtom.reportWrite(value, super.hasLoaded, () {
+      super.hasLoaded = value;
+    });
+  }
+
   late final _$createOrderAsyncAction =
       AsyncAction('OrderStoreBase.createOrder', context: context);
 
@@ -88,13 +104,22 @@ mixin _$OrderStore on OrderStoreBase, Store {
     return _$loadOrdersAsyncAction.run(() => super.loadOrders());
   }
 
+  late final _$refreshOrdersAsyncAction =
+      AsyncAction('OrderStoreBase.refreshOrders', context: context);
+
+  @override
+  Future<void> refreshOrders() {
+    return _$refreshOrdersAsyncAction.run(() => super.refreshOrders());
+  }
+
   @override
   String toString() {
     return '''
 isLoading: ${isLoading},
 error: ${error},
 lastOrder: ${lastOrder},
-orders: ${orders}
+orders: ${orders},
+hasLoaded: ${hasLoaded}
     ''';
   }
 }

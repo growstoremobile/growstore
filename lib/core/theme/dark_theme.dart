@@ -70,7 +70,7 @@ final ThemeData growDarkTheme = ThemeData(
     elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
-      side: const BorderSide(color: GrowColors.darkBorder, width: 1),
+      side: const BorderSide(color: GrowColors.darkBorderHighlight, width: 1),
     ),
     margin: EdgeInsets.zero,
   ),

@@ -24,14 +24,19 @@ abstract class OrderStoreBase with Store {
   ObservableList<OrderModel> orders =
       ObservableList<OrderModel>();
 
+  @observable
+  bool hasLoaded = false;
+
+  // -------------------------
+  // CREATE ORDER
+  // -------------------------
   @action
   Future<void> createOrder(OrderModel order) async {
     try {
-      error = null;
       isLoading = true;
+      error = null;
 
-      final createdOrder =
-          await _repository.createOrder(order);
+      final createdOrder = await _repository.createOrder(order);
 
       lastOrder = createdOrder;
 
@@ -43,17 +48,54 @@ abstract class OrderStoreBase with Store {
     }
   }
 
+  // -------------------------
+  // LOAD ORDERS (Firestore)
+  // -------------------------
   @action
   Future<void> loadOrders() async {
+    if (hasLoaded) return;
+
     try {
-      error = null;
       isLoading = true;
+      error = null;
 
       final result = await _repository.getOrders();
 
-      orders = ObservableList.of(result);
+      orders = ObservableList<OrderModel>.of(result);
+
+      hasLoaded = true;
     } catch (e) {
       error = 'Erro ao carregar pedidos.';
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  // -------------------------
+  // GET BY ID
+  // -------------------------
+  OrderModel? getOrderById(String id) {
+    try {
+      return orders.firstWhere((o) => o.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // -------------------------
+  // REFRESH
+  // -------------------------
+  @action
+  Future<void> refreshOrders() async {
+    try {
+      isLoading = true;
+      error = null;
+
+      final result = await _repository.getOrders();
+
+      orders = ObservableList<OrderModel>.of(result);
+    } catch (e) {
+      error = 'Erro ao atualizar pedidos.';
     } finally {
       isLoading = false;
     }

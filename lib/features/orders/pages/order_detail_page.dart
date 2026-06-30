@@ -1,141 +1,725 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/cart/utils/cart_currency.dart';
+import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
+import 'package:growstore/features/orders/models/order_item_model.dart';
+import 'package:growstore/features/orders/models/order_model.dart';
+import 'package:growstore/features/orders/models/order_status.dart';
+import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/orders/stores/order_store.dart';
+import 'package:growstore/features/orders/widgets/order_header.dart';
+import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
-class OrderDetailPage extends StatelessWidget {
-  const OrderDetailPage({super.key});
+class OrderDetailPage extends StatefulWidget {
+  const OrderDetailPage({super.key, required this.orderId});
+
+  final String orderId;
+
+  @override
+  State<OrderDetailPage> createState() => _OrderDetailPageState();
+}
+
+class _OrderDetailPageState extends State<OrderDetailPage> {
+  final _cartStore = GetIt.I<CartStore>();
+  final _orderStore = GetIt.I<OrderStore>();
+
+  @override
+  void initState() {
+    super.initState();
+    _orderStore.loadOrders();
+  }
+
+  OrderModel? get _order {
+    try {
+      return _orderStore.orders.firstWhere(
+        (o) => o.id == widget.orderId,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _reload() {
+    _orderStore.loadOrders();
+  }
+
+  void _handleBottomNavigation(String label) {
+    switch (label) {
+      case 'Inicio':
+        Navigator.of(context).pushNamedAndRemoveUntil('/home', (r) => false);
+        break;
+      case 'Categorias':
+        Navigator.of(context).pushNamed('/categories');
+        break;
+      case 'Carrinho':
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      case 'Favoritos':
+        Navigator.of(context).pushNamed('/favorites');
+        break;
+      case 'Pedidos':
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/orders',
+          (route) => route.settings.name == '/home',
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final order = GetIt.I<OrderStore>().lastOrder;
-
-    if (order == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Pedido')),
-        body: const Center(child: Text('Pedido não encontrado')),
-      );
-    }
+    final colors = OrderLayoutColors.resolve(
+      Theme.of(context).brightness == Brightness.dark,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pedido realizado')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Center(
-              child: Icon(Icons.check_circle, color: Colors.green, size: 80),
-            ),
+      backgroundColor: colors.page,
+      body: Column(
+        children: [
+          OrderHeader(
+            title: 'Detalhe do Pedido',
+            colors: colors,
+            onBack: () => Navigator.of(context).pop(),
+          ),
+          Expanded(
+            child: Observer(
+             
+              builder: (_) {
+                final order = _order;
 
-            const SizedBox(height: 16),
+                if (_orderStore.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(color: colors.primary),
+                  );
+                }
 
-            Center(
-              child: Text(
-                'Pedido realizado com sucesso!',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
+                if (order == null) {
+                  return _OrderDetailState(
+                    colors: colors,
+                    icon: Icons.receipt_long_outlined,
+                    title: 'Pedido não encontrado',
+                    description: 'Este pedido não está disponível.',
+                    onRetry: _reload,
+                  );
+                }
 
-            const SizedBox(height: 8),
-
-            Center(child: Text('Pedido #${order.id}')),
-
-            const SizedBox(height: 32),
-
-            Text(
-              'Endereço de entrega',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            const SizedBox(height: 12),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   children: [
-                    Text(order.address.name),
-                    Text('${order.address.street}, ${order.address.number}'),
-                    Text(order.address.neighborhood),
-                    Text('${order.address.city} - ${order.address.state}'),
+                    _OrderSummaryCard(order: order, colors: colors),
+                    if (order.shippingAddress?.trim().isNotEmpty == true) ...[
+                      const SizedBox(height: 14),
+                      _DeliveryAddressCard(
+                        address: order.shippingAddress!.trim(),
+                        colors: colors,
+                      ),
+                    ],
+                    const SizedBox(height: 14),
+                    _OrderStatusTracker(
+                      status: order.status,
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 18),
+                    _SectionTitle(
+                      title: 'Itens do pedido',
+                      colors: colors,
+                    ),
+                    const SizedBox(height: 10),
+                    for (final item in order.items) ...[
+                      _OrderItemCard(item: item, colors: colors),
+                      const SizedBox(height: 10),
+                    ],
+                    const SizedBox(height: 4),
+                    _OrderTotalsCard(order: order, colors: colors),
                   ],
-                ),
-              ),
+                );
+              },
             ),
-
-            const SizedBox(height: 24),
-
-            Text(
-              'Itens do pedido',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            const SizedBox(height: 12),
-
-            ...order.items.map(
-              (item) => ListTile(
-                title: Text(item.name),
-                subtitle: Text(item.variation),
-                trailing: Text('x${item.quantity}'),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildRow('Subtotal', order.subtotal),
-                    _buildRow('Frete', order.shipping),
-                    _buildRow('Desconto', -order.discount),
-                    const Divider(),
-                    _buildRow('Total', order.total, bold: true),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.popUntil(context, (route) => route.isFirst);
-                },
-                child: const Text('Voltar para a loja'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: HomeBottomNavigation(
+        selectedLabel: 'Pedidos',
+        cartItemCount: _cartStore.totalItems,
+        showCartBadge: false,
+        onTap: _handleBottomNavigation,
       ),
     );
   }
+}
 
-  static Widget _buildRow(String label, double value, {bool bold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+class _DeliveryAddressCard extends StatelessWidget {
+  const _DeliveryAddressCard({required this.address, required this.colors});
+
+  final String address;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Icon(Icons.location_on_outlined, color: colors.primary, size: 22),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
-          Text(
-            'R\$ ${value.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Endereco de entrega',
+                  style: GoogleFonts.syne(
+                    color: colors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    height: 22 / 18,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  address,
+                  style: GoogleFonts.inter(
+                    color: colors.textSecondary,
+                    fontSize: 13,
+                    height: 18 / 13,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _OrderSummaryCard extends StatelessWidget {
+  const _OrderSummaryCard({required this.order, required this.colors});
+
+  final OrderModel order;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Pedido #${_shortId(order.id)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.syne(
+                    color: colors.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    height: 27 / 22,
+                  ),
+                ),
+              ),
+              _StatusChip(status: order.status, colors: colors),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _SummaryLine(
+            icon: Icons.calendar_today_rounded,
+            label: _formatDate(order.createdAt),
+            colors: colors,
+          ),
+          const SizedBox(height: 8),
+          _SummaryLine(
+            icon: Icons.shopping_bag_outlined,
+            label: '${order.totalItems} itens',
+            colors: colors,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            cartCurrency(order.total),
+            style: GoogleFonts.syne(
+              color: colors.primary,
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              height: 34 / 28,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryLine extends StatelessWidget {
+  const _SummaryLine({
+    required this.icon,
+    required this.label,
+    required this.colors,
+  });
+
+  final IconData icon;
+  final String label;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: colors.textSecondary, size: 18),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.inter(
+              color: colors.textSecondary,
+              fontSize: 14,
+              height: 18 / 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OrderStatusTracker extends StatelessWidget {
+  const _OrderStatusTracker({required this.status, required this.colors});
+
+  final OrderStatus status;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentIndex = OrderStatus.values.indexOf(status);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
+      child: Row(
+        children: [
+          for (var index = 0; index < OrderStatus.values.length; index++) ...[
+            Expanded(
+              child: _StatusStep(
+                status: OrderStatus.values[index],
+                active: index <= currentIndex,
+                colors: colors,
+              ),
+            ),
+            if (index < OrderStatus.values.length - 1)
+              Container(
+                width: 16,
+                height: 2,
+                margin: const EdgeInsets.only(bottom: 22),
+                color: index < currentIndex
+                    ? colors.primary
+                    : colors.chipBackground,
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusStep extends StatelessWidget {
+  const _StatusStep({
+    required this.status,
+    required this.active,
+    required this.colors,
+  });
+
+  final OrderStatus status;
+  final bool active;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? colors.primary : colors.textSecondary;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: active ? colors.primary : colors.chipBackground,
+          ),
+          child: Icon(
+            active ? Icons.check_rounded : Icons.circle_outlined,
+            size: 15,
+            color: active ? Colors.white : colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 7),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            status.label,
+            maxLines: 1,
+            style: GoogleFonts.jetBrainsMono(
+              color: color,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              height: 11 / 9,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OrderItemCard extends StatelessWidget {
+  const _OrderItemCard({required this.item, required this.colors});
+
+  final OrderItemModel item;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 102),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox(
+              width: 76,
+              height: 76,
+              child: GrowCachedProductImage(
+                imageUrl: item.imageUrl,
+                backgroundColor: colors.imageBackground,
+                iconColor: colors.primary,
+                padding: const EdgeInsets.all(8),
+                cacheWidth: 180,
+                cacheHeight: 180,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  item.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.syne(
+                    color: colors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 20 / 16,
+                  ),
+                ),
+                if (item.variation.trim().isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    item.variation,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      color: colors.textSecondary,
+                      fontSize: 12,
+                      height: 15 / 12,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.chipBackground,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Qtd ${item.quantity}',
+                        style: GoogleFonts.jetBrainsMono(
+                          color: colors.primary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          height: 12 / 10,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          cartCurrency(item.total),
+                          style: GoogleFonts.syne(
+                            color: colors.textPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            height: 22 / 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OrderTotalsCard extends StatelessWidget {
+  const _OrderTotalsCard({required this.order, required this.colors});
+
+  final OrderModel order;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.cardBorder),
+      ),
+      child: Column(
+        children: [
+          _TotalLine(label: 'Subtotal', value: order.subtotal, colors: colors),
+          const SizedBox(height: 10),
+          _TotalLine(label: 'Frete', value: order.shipping, colors: colors),
+          if (order.discount > 0) ...[
+            const SizedBox(height: 10),
+            _TotalLine(
+              label: 'Desconto',
+              value: -order.discount,
+              colors: colors,
+            ),
+          ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Divider(height: 1, thickness: 1, color: colors.cardBorder),
+          ),
+          _TotalLine(
+            label: 'Total',
+            value: order.total,
+            colors: colors,
+            highlight: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TotalLine extends StatelessWidget {
+  const _TotalLine({
+    required this.label,
+    required this.value,
+    required this.colors,
+    this.highlight = false,
+  });
+
+  final String label;
+  final double value;
+  final OrderLayoutColors colors;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = highlight ? colors.textPrimary : colors.textSecondary;
+    final valueColor = highlight ? colors.primary : colors.textPrimary;
+    final amount = value < 0
+        ? '- ${cartCurrency(value.abs())}'
+        : cartCurrency(value);
+
+    return Row(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            color: textColor,
+            fontSize: highlight ? 16 : 14,
+            fontWeight: highlight ? FontWeight.w700 : FontWeight.w500,
+            height: 20 / 16,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          amount,
+          style: GoogleFonts.syne(
+            color: valueColor,
+            fontSize: highlight ? 22 : 16,
+            fontWeight: FontWeight.w700,
+            height: highlight ? 27 / 22 : 20 / 16,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status, required this.colors});
+
+  final OrderStatus status;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: colors.chipBackground,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        status.label,
+        style: GoogleFonts.jetBrainsMono(
+          color: colors.primary,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          height: 12 / 10,
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, required this.colors});
+
+  final String title;
+  final OrderLayoutColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: GoogleFonts.syne(
+        color: colors.textPrimary,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        height: 24 / 20,
+      ),
+    );
+  }
+}
+
+class _OrderDetailState extends StatelessWidget {
+  const _OrderDetailState({
+    required this.colors,
+    required this.icon,
+    required this.title,
+    required this.description,
+    this.onRetry,
+  });
+
+  final OrderLayoutColors colors;
+  final IconData icon;
+  final String title;
+  final String description;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: colors.primary, size: 52),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.syne(
+                color: colors.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                height: 28 / 22,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: colors.textSecondary,
+                fontSize: 14,
+                height: 20 / 14,
+              ),
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: onRetry,
+                style: FilledButton.styleFrom(
+                  backgroundColor: colors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Tentar novamente'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _shortId(String id) {
+  if (id.length <= 6) return id;
+  return id.substring(id.length - 6);
+}
+
+String _formatDate(DateTime date) {
+  final day = date.day.toString().padLeft(2, '0');
+  final month = date.month.toString().padLeft(2, '0');
+  final year = date.year.toString();
+  final hour = date.hour.toString().padLeft(2, '0');
+  final minute = date.minute.toString().padLeft(2, '0');
+
+  return '$day/$month/$year as $hour:$minute';
 }

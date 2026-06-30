@@ -13,4 +13,8 @@ class OrderRepository {
   Future<List<OrderModel>> getOrders() {
     return _service.getOrders();
   }
+
+  Future<OrderModel?> getOrderById(String id) {
+    return _service.getOrderById(id);
+  }
 }
