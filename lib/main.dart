@@ -13,6 +13,9 @@ import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/pages/categories_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
+import 'package:growstore/features/catalog/stores/product_detail_store.dart';
+import 'package:growstore/features/catalog/services/product_detail_service.dart';
+import 'package:growstore/features/catalog/repositories/product_detail_repository.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
@@ -36,7 +39,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
-  if (!Hive.isAdapterRegistered(1)) {
+  if (!Hive.isAdapterRegistered(FavorityModelAdapter().typeId)) {
     Hive.registerAdapter(FavorityModelAdapter());
   }
 }
@@ -107,6 +110,25 @@ Future<void> initServiceLocator() async {
   }
   if (!locator.isRegistered<CartStore>()) {
     locator.registerSingleton<CartStore>(CartStore());
+  }
+
+  if (!locator.isRegistered<ProductDetailService>()) {
+    locator.registerSingleton<ProductDetailService>(ProductDetailService());
+  }
+
+  if (!locator.isRegistered<ProductDetailRepository>()) {
+    locator.registerSingleton<ProductDetailRepository>(
+      ProductDetailRepository(service: locator<ProductDetailService>()),
+    );
+  }
+
+  if (!locator.isRegistered<ProductDetailStore>()) {
+    locator.registerFactory<ProductDetailStore>(
+      () => ProductDetailStore(
+        repository: locator<ProductDetailRepository>(),
+        cartStore: locator<CartStore>(),
+      ),
+    );
   }
 }
 

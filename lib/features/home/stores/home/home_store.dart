@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:mobx/mobx.dart';
@@ -59,8 +60,11 @@ abstract class HomeStoreBase with Store {
       if (!categories.contains(selectedCategory)) {
         selectedCategory = 'Todas';
       }
-    } catch (_) {
-      errorMessage = 'Nao foi possivel carregar os produtos.';
+    } catch (exception, stack) {
+      final message = exception.toString();
+      debugPrint('[HomeStore] loadProducts falhou: $message');
+      debugPrint('$stack');
+      errorMessage = 'Nao foi possivel carregar os produtos: $message';
     } finally {
       isLoading = false;
     }

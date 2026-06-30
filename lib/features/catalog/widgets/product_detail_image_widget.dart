@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
-import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class ProductDetailImageWidget extends StatefulWidget {
   final List<String> pathImages;
+  final String? selectedColor;
 
-  const ProductDetailImageWidget({super.key, required this.pathImages});
+  const ProductDetailImageWidget({
+    super.key,
+    required this.pathImages,
+    this.selectedColor,
+  });
 
   @override
   State<ProductDetailImageWidget> createState() =>
@@ -17,12 +21,9 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final images = widget.pathImages
-        .map((image) => image.trim())
-        .where((image) => image.isNotEmpty)
-        .toList();
+    final resolvedImages = _resolveImages();
 
-    if (images.isEmpty) {
+    if (resolvedImages.isEmpty) {
       return _buildPlaceholder();
     }
 
@@ -39,18 +40,37 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
             child: SizedBox(
               height: 345,
               child: PageView.builder(
-                itemCount: images.length,
+                itemCount: resolvedImages.length,
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
                 },
                 itemBuilder: (context, index) {
-                  return GrowCachedProductImage(
-                    imageUrl: images[index],
-                    backgroundColor: GrowColors.darkSurface,
-                    iconColor: GrowColors.darkTextSecondary,
-                    fit: BoxFit.contain,
-                    cacheWidth: 900,
-                    cacheHeight: 900,
+                  final imagePath = resolvedImages[index];
+
+                  if (imagePath.startsWith('assets/')) {
+                    return Image.asset(
+                      imagePath,
+                      fit: BoxFit.fitWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholder();
+                      },
+                    );
+                  }
+
+                  return Image.network(
+                    imagePath,
+                    fit: BoxFit.fitWidth,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: GrowColors.primary,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildPlaceholder();
+                    },
                   );
                 },
               ),
@@ -58,11 +78,12 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
           ),
         ),
         const SizedBox(height: 12),
-        if (images.length > 1)
+
+        if (resolvedImages.length > 1)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              images.length,
+              resolvedImages.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -79,6 +100,39 @@ class _ProductDetailImageWidgetState extends State<ProductDetailImageWidget> {
           ),
       ],
     );
+  }
+
+  List<String> _resolveImages() {
+    final color = widget.selectedColor?.toLowerCase();
+    final gallery = widget.pathImages;
+
+    if (gallery.isEmpty) return gallery;
+
+    if (color == '#ffffff' || color == '#fff' || color == 'branco') {
+      final candidates = gallery
+          .where(
+            (p) =>
+                p.toLowerCase().contains('branc') ||
+                p.toLowerCase().contains('white'),
+          )
+          .toList();
+
+      if (candidates.isNotEmpty) return candidates;
+    }
+
+    if (color == '#0a0a0a' || color == '#000' || color == 'preto') {
+      final candidates = gallery
+          .where(
+            (p) =>
+                p.toLowerCase().contains('preto') ||
+                p.toLowerCase().contains('black'),
+          )
+          .toList();
+
+      if (candidates.isNotEmpty) return candidates;
+    }
+
+    return gallery;
   }
 
   Widget _buildPlaceholder() {

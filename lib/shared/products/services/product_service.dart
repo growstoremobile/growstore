@@ -1,16 +1,38 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
 
 class ProductService {
   Future<List<Map<String, dynamic>>> fetchAllProducts() async {
     try {
+      debugPrint('[ProductService] iniciando fetchAllProducts()');
       final response = await Supabase.instance.client
           .from('produtos')
           .select('*,categorias(id_category,name_category),product_details(*)');
 
-      return List<Map<String, dynamic>>.from(
-        response.map((product) => _normalizeProduct(product)),
-      );
-    } catch (_) {
+      try {
+        final list = List<Map<String, dynamic>>.from(response);
+        debugPrint('[ProductService] produtos retornados: ${list.length}');
+        if (list.isNotEmpty) {
+          debugPrint(
+            '[ProductService] amostra primeira product keys: ${list.first.keys.toList()}',
+          );
+          final detalhes = _firstProductDetail(list.first['product_details']);
+          debugPrint(
+            '[ProductService] primeira product_details keys: ${detalhes?.keys.toList()}',
+          );
+        }
+        return list.map((product) => _normalizeProduct(product)).toList();
+      } catch (e, s) {
+        debugPrint(
+          '[ProductService] erro ao converter response para lista: $e',
+        );
+        debugPrint('$s');
+        rethrow;
+      }
+    } catch (e, s) {
+      debugPrint('[ProductService] excecao ao buscar produtos: $e');
+      debugPrint('$s');
       rethrow;
     }
   }
@@ -60,12 +82,16 @@ class ProductService {
     final categoryName = category?.toString().trim();
     final title = product['title'] ?? product['title_product'];
     final detail = _firstProductDetail(product['product_details']);
-    final image =
-        product['image'] ??
-        product['imageUrl'] ??
-        product['path_image'] ??
-        detail?['main_image'];
-    final detailPrice = detail?['price'];
+
+    // tenta encontrar imagens em várias chaves possíveis (compatibilidade)
+    String? image =
+        product['image'] ?? product['imageUrl'] ?? product['path_image'];
+
+    if ((image == null || image.toString().isEmpty) && detail != null) {
+      image =
+          detail['main_image'] ?? detail['mainImage'] ?? detail['path_image'];
+    }
+    final detailPrice = detail?['price'] ?? detail?['price_product'];
     final price =
         product['price'] ?? product['price_product'] ?? detailPrice ?? 0;
 
@@ -81,6 +107,23 @@ class ProductService {
   }
 
   Map<String, dynamic>? _firstProductDetail(Object? details) {
+    if (details == null) return null;
+
+    // Se o banco retornar o detalhe como String (JSON em formato de texto), fazemos o decode!
+    if (details is String && details.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(details);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+        if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
+          return Map<String, dynamic>.from(decoded.first as Map);
+        }
+      } catch (e) {
+        debugPrint(
+          '[ProductService] Erro ao decodificar String de details: $e',
+        );
+      }
+    }
+
     if (details is Map) {
       return Map<String, dynamic>.from(details);
     }

@@ -28,6 +28,7 @@ Future<void> setupDependencies() async {
   if (!locator.isRegistered<ProductDetailStore>()) {
     locator.registerFactory<ProductDetailStore>(
       () => ProductDetailStore(
+        // 🛠️ Corrigido: Removido o "Base" para retornar o tipo exato exigido!
         repository: locator<ProductDetailRepository>(),
         cartStore: locator<CartStore>(),
       ),

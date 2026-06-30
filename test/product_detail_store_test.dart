@@ -19,6 +19,7 @@ void main() {
       mainImageUrl: 'assets/images/figma_home_product_tshirt.png',
       galleryUrls: ['assets/images/figma_home_product_tshirt.png'],
       price: 79.90,
+      categoryId: 21,
     );
     store.selectColor('Preto');
     store.selectSize('M');
@@ -46,6 +47,7 @@ void main() {
       mainImageUrl: 'assets/images/figma_home_product_tshirt.png',
       galleryUrls: ['assets/images/figma_home_product_tshirt.png'],
       price: 79.90,
+      categoryId: 21,
     );
 
     expect(store.addToCart(), isFalse);

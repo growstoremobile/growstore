@@ -89,12 +89,28 @@ mixin _$ProductDetailStore on ProductDetailStoreBase, Store {
     });
   }
 
+  late final _$quantityAtom =
+      Atom(name: 'ProductDetailStoreBase.quantity', context: context);
+
+  @override
+  int get quantity {
+    _$quantityAtom.reportRead();
+    return super.quantity;
+  }
+
+  @override
+  set quantity(int value) {
+    _$quantityAtom.reportWrite(value, super.quantity, () {
+      super.quantity = value;
+    });
+  }
+
   late final _$loadProductAsyncAction =
       AsyncAction('ProductDetailStoreBase.loadProduct', context: context);
 
   @override
-  Future<void> loadProduct(String id) {
-    return _$loadProductAsyncAction.run(() => super.loadProduct(id));
+  Future<void> loadProduct(String productId) {
+    return _$loadProductAsyncAction.run(() => super.loadProduct(productId));
   }
 
   late final _$ProductDetailStoreBaseActionController =
@@ -112,11 +128,33 @@ mixin _$ProductDetailStore on ProductDetailStoreBase, Store {
   }
 
   @override
-  void selectColor(String color) {
+  void selectColor(String colorHex) {
     final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
         name: 'ProductDetailStoreBase.selectColor');
     try {
-      return super.selectColor(color);
+      return super.selectColor(colorHex);
+    } finally {
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void incrementQuantity() {
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.incrementQuantity');
+    try {
+      return super.incrementQuantity();
+    } finally {
+      _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void decrementQuantity() {
+    final _$actionInfo = _$ProductDetailStoreBaseActionController.startAction(
+        name: 'ProductDetailStoreBase.decrementQuantity');
+    try {
+      return super.decrementQuantity();
     } finally {
       _$ProductDetailStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -140,7 +178,8 @@ product: ${product},
 isLoading: ${isLoading},
 error: ${error},
 selectedSize: ${selectedSize},
-selectedColor: ${selectedColor}
+selectedColor: ${selectedColor},
+quantity: ${quantity}
     ''';
   }
 }
