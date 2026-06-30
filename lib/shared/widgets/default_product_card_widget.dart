@@ -67,7 +67,7 @@ class DefaultProductCard extends StatelessWidget {
                           iconFavority ?? Icons.favorite_border,
                           color: iconFavority == Icons.favorite
                               ? colors.primary
-                              : theme.primaryColorLight,
+                              : theme.primaryColor,
                         ),
                       ),
                     ),
