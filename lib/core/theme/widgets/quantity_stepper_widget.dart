@@ -1,18 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../colors_theme.dart';
 import '../typography_theme.dart';
 
-/// Widget de incremento de quantidade — o controle "− 1 +" exibido no carrinho.
-
-/// Uso:
-/// ```dart
-/// GrowQuantityStepper(
-/// quantity: _qty,
-/// onDecrement: () => setState(() => _qty--),
-/// onIncrement: () => setState(() => _qty++),
-/// )
-/// ```
 class GrowQuantityStepper extends StatelessWidget {
   final int quantity;
   final VoidCallback onDecrement;

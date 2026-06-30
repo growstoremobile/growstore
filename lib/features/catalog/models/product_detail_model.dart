@@ -3,12 +3,12 @@ import 'product_option_model.dart';
 class ColorVariation {
   final String colorName;
   final String? colorHex;
-  final List<String> galleryImages;
+  final String imageUrl;
 
   const ColorVariation({
     required this.colorName,
     this.colorHex,
-    required this.galleryImages,
+    required this.imageUrl,
   });
 }
 
@@ -45,9 +45,12 @@ class ProductDetailsModel {
   }
 
   factory ProductDetailsModel.fromJson(Map<String, dynamic> json) {
-    final detail = _firstProductDetail(json['product_details']);
+    final detail = _extractDetail(json['product_details']);
     final gallery = _parseGalleryUrls(json, detail);
-    final colorVars = _parseColorVariations(json['product_details']);
+    final colorVars = _parseColorVariations(
+      gallery,
+      json['title_product'] ?? json['title'] ?? '',
+    );
 
     return ProductDetailsModel(
       uid: json['id'].toString(),
@@ -75,149 +78,129 @@ class ProductDetailsModel {
     );
   }
 
-  List<String> getGalleryForColor(String colorName) {
-    final variation = colorVariations.firstWhere(
-      (v) => v.colorName.toLowerCase() == colorName.toLowerCase(),
-      orElse: () => colorVariations.isNotEmpty
-          ? colorVariations.first
-          : const ColorVariation(colorName: '', galleryImages: []),
+  /// Retorna a imagem para a cor solicitada.
+  /// Busca por correspondência exata primeiro, depois parcial.
+  /// Se não encontrar, retorna a imagem principal.
+  String getImageForColor(String colorName) {
+    if (colorVariations.isEmpty) return mainImageUrl;
+
+    final normalizedRequest = colorName.toLowerCase().trim();
+
+    final exact = colorVariations.where(
+      (v) => v.colorName.toLowerCase().trim() == normalizedRequest,
     );
-    return variation.galleryImages.isNotEmpty
-        ? variation.galleryImages
-        : galleryUrls;
+    if (exact.isNotEmpty) return exact.first.imageUrl;
+
+    final partial = colorVariations.where(
+      (v) =>
+          v.colorName.toLowerCase().contains(normalizedRequest) ||
+          normalizedRequest.contains(v.colorName.toLowerCase()),
+    );
+    if (partial.isNotEmpty) return partial.first.imageUrl;
+
+    return mainImageUrl;
   }
 
+  /// Mantido para compatibilidade — retorna lista com a imagem da cor
+  List<String> getGalleryForColor(String colorName) {
+    final image = getImageForColor(colorName);
+    return [image];
+  }
+
+  static Map<String, dynamic>? _extractDetail(Object? details) {
+    if (details is Map) {
+      return Map<String, dynamic>.from(details);
+    }
+    if (details is List && details.isNotEmpty && details.first is Map) {
+      return Map<String, dynamic>.from(details.first as Map);
+    }
+    return null;
+  }
+
+  /// Parseia gallery_image que pode ser String ou List
   static List<String> _parseGalleryUrls(
     Map<String, dynamic> json,
     Map<String, dynamic>? detail,
   ) {
-    final rawGallery =
-        json['galleryUrls'] ??
-        json['gallery'] ??
-        json['gallery_image'] ??
-        json['gallery_Image'] ??
-        detail?['gallery'] ??
-        detail?['gallery_image'] ??
-        detail?['gallery_Image'];
-
-    if (rawGallery is String && rawGallery.isNotEmpty) {
-      return [rawGallery];
+    // Tenta pegar do gallery_image do detail primeiro
+    if (detail != null) {
+      final raw =
+          detail['gallery_image'] ??
+          detail['gallery_Image'] ??
+          detail['gallery'];
+      if (raw is List) {
+        final urls = raw
+            .map((e) => e?.toString() ?? '')
+            .where((s) => s.isNotEmpty)
+            .toList();
+        if (urls.isNotEmpty) return urls;
+      }
+      if (raw is String && raw.isNotEmpty) return [raw];
     }
 
-    if (rawGallery is List) {
-      return rawGallery
-          .map((e) => e?.toString() ?? '')
-          .where((s) => s.isNotEmpty)
-          .toList();
-    }
-
-    // Fallbacks to potential image fields
-    final candidates = <String>[];
+    // Fallback: imagem principal
     final main =
-        json['path_image'] ??
-        json['image'] ??
-        detail?['main_image'] ??
-        detail?['mainImage'];
-    if (main is String && main.isNotEmpty) candidates.add(main);
+        json['path_image'] ?? json['image'] ?? detail?['main_image'] ?? '';
+    if (main is String && main.isNotEmpty) return [main];
 
-    return candidates;
+    return [];
   }
 
-  static Map<String, dynamic>? _firstProductDetail(Object? details) {
-    if (details is Map) {
-      return Map<String, dynamic>.from(details);
-    }
-
-    if (details is List && details.isNotEmpty && details.first is Map) {
-      return Map<String, dynamic>.from(details.first as Map);
-    }
-
-    return null;
-  }
-
-  static List<ColorVariation> _parseColorVariations(Object? details) {
-    if (details is! List || details.isEmpty) return [];
+  /// Cria variações de cor baseado nas URLs da galeria.
+  /// A convenção do banco é:
+  ///   gallery_image[0] = cor padrão (preta)
+  ///   gallery_image[1] = cor alternativa (branca)
+  /// O nome da cor é detectado pela URL da imagem.
+  static List<ColorVariation> _parseColorVariations(
+    List<String> galleryUrls,
+    String productName,
+  ) {
+    if (galleryUrls.length < 2) return [];
 
     final variations = <ColorVariation>[];
-    for (final item in details) {
-      if (item is! Map<String, dynamic>) continue;
 
-      final colorName = _extractColorName(item);
-      final gallery = _parseDetailGallery(item);
+    for (final url in galleryUrls) {
+      final normalized = url.toLowerCase();
+      String colorName;
+      String colorHex;
+
+      if (normalized.contains('branca') ||
+          normalized.contains('branco') ||
+          normalized.contains('white')) {
+        colorName = 'Branco';
+        colorHex = '#FFFFFF';
+      } else if (normalized.contains('preto') ||
+          normalized.contains('preta') ||
+          normalized.contains('black')) {
+        colorName = 'Preto';
+        colorHex = '#0A0A0A';
+      } else {
+        // Primeira imagem sem identificador = cor padrão (preta)
+        colorName = variations.isEmpty ? 'Preto' : 'Branco';
+        colorHex = variations.isEmpty ? '#0A0A0A' : '#FFFFFF';
+      }
 
       variations.add(
-        ColorVariation(
-          colorName: colorName,
-          colorHex: _extractColorHex(item),
-          galleryImages: gallery,
-        ),
+        ColorVariation(colorName: colorName, colorHex: colorHex, imageUrl: url),
       );
     }
 
     return variations;
   }
 
-  static String _extractColorName(Map<String, dynamic> detail) {
-    final titleProduct = (detail['title_product'] ?? '')
-        .toString()
-        .toLowerCase();
-    if (titleProduct.contains('branca') || titleProduct.contains('white')) {
-      return 'Branco';
-    }
-    if (titleProduct.contains('preto') || titleProduct.contains('black')) {
-      return 'Preto';
-    }
-    return 'Padrão';
-  }
-
-  static String? _extractColorHex(Map<String, dynamic> detail) {
-    final colorName = _extractColorName(detail);
-    if (colorName == 'Branco') return '#FFFFFF';
-    if (colorName == 'Preto') return '#0A0A0A';
-    return null;
-  }
-
-  static List<String> _parseDetailGallery(Map<String, dynamic> detail) {
-    final rawGallery =
-        detail['gallery_image'] ?? detail['gallery_Image'] ?? detail['gallery'];
-
-    if (rawGallery is String && rawGallery.isNotEmpty) {
-      return [rawGallery];
-    }
-
-    if (rawGallery is List) {
-      return rawGallery
-          .map((e) => e?.toString() ?? '')
-          .where((s) => s.isNotEmpty)
-          .toList();
-    }
-
-    final mainImage = detail['main_image'];
-    if (mainImage is String && mainImage.isNotEmpty) {
-      return [mainImage];
-    }
-
-    return [];
-  }
-
   static double _parsePrice(Object? value) {
     if (value == null) return 0.0;
-
     if (value is num) return value.toDouble();
 
     if (value is String) {
-      // Remove currency symbols and spaces
       final cleaned = value.replaceAll(RegExp(r'[^0-9,\.]'), '').trim();
-
       if (cleaned.isEmpty) return 0.0;
 
-      // Handle formats like 1.234,56 (Brazilian) -> 1234.56
       if (cleaned.contains(',') && cleaned.contains('.')) {
         final normalized = cleaned.replaceAll('.', '').replaceAll(',', '.');
         return double.tryParse(normalized) ?? 0.0;
       }
 
-      // Handle comma as decimal separator
       if (cleaned.contains(',') && !cleaned.contains('.')) {
         final normalized = cleaned.replaceAll(',', '.');
         return double.tryParse(normalized) ?? 0.0;

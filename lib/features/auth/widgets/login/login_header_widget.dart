@@ -22,7 +22,6 @@ class LoginHeaderWidget extends StatelessWidget {
               ),
             ],
           ),
-          // TODO: Alterar icon para o padrão da GrowStore
           child: const Icon(
             Icons.eco,
             color: AppColors.onPrimaryContainer,
@@ -43,10 +42,7 @@ class LoginHeaderWidget extends StatelessWidget {
         const Text(
           'Produtos exclusivos e customizados das marcas Growdev e Growlabs. Para quem vive e respira tecnologia.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.onSurfaceVariant,
-          ),
+          style: TextStyle(fontSize: 14, color: AppColors.onSurfaceVariant),
         ),
       ],
     );
