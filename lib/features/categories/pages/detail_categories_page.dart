@@ -132,21 +132,24 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
                     itemBuilder: (context, index) {
                       final product = products[index];
 
-                      return DefaultProductCard(
-                        titleProduct: product.name,
-                        price: product.priceValue,
-                        pathImage: product.asset,
-                        iconFavority: _isFavorite(product.id)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        onFavoritePressed: _favorityStore == null
-                            ? null
-                            : () => _toggleFavorite(product),
-                        iconButton: Icons.visibility_outlined,
-                        textButton: 'Ver produto',
-                        onPressed: () => Navigator.of(context).pushNamed(
-                          '/productDetail',
-                          arguments: product.id.toString(),
+                      return TooltipVisibility(
+                        visible: false,
+                        child: DefaultProductCard(
+                          titleProduct: product.name,
+                          price: product.priceValue,
+                          pathImage: product.asset,
+                          iconFavority: _isFavorite(product.id)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          onFavoritePressed: _favorityStore == null
+                              ? null
+                              : () => _toggleFavorite(product),
+                          iconButton: Icons.visibility_outlined,
+                          textButton: 'Ver produto',
+                          onPressed: () => Navigator.of(context).pushNamed(
+                            '/productDetail',
+                            arguments: product.id.toString(),
+                          ),
                         ),
                       );
                     },
