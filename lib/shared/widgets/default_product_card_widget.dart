@@ -28,6 +28,7 @@ class DefaultProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -65,9 +66,7 @@ class DefaultProductCard extends StatelessWidget {
                         tooltip: 'Remover dos favoritos',
                         icon: Icon(
                           iconFavority ?? Icons.favorite_border,
-                          color: iconFavority == Icons.favorite
-                              ? colors.primary
-                              : theme.primaryColor,
+                          color: isDark ? colors.primary : theme.primaryColor,
                         ),
                       ),
                     ),

@@ -95,6 +95,9 @@ class _HomeProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final defaultColors = theme.colorScheme;
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final buttonSurface = isDark
         ? const Color(0xDD0F1B2A)
@@ -136,9 +139,11 @@ class _HomeProductCard extends StatelessWidget {
                           icon: isFavorite
                               ? Icons.favorite_rounded
                               : Icons.favorite_border_rounded,
-                          iconColor: isFavorite ? colors.primary : mutedText,
+                          iconColor: isFavorite
+                              ? defaultColors.primary
+                              : defaultColors.primary,
                           backgroundColor: buttonSurface,
-                          borderColor: colors.productBorder,
+                          borderColor: defaultColors.primary,
                           onPressed: onFavoriteToggle,
                         ),
                       ),
