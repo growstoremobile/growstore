@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,7 +8,6 @@ import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/models/order_item_model.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
-import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/orders/stores/order_store.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
@@ -36,9 +34,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   OrderModel? get _order {
     try {
-      return _orderStore.orders.firstWhere(
-        (o) => o.id == widget.orderId,
-      );
+      return _orderStore.orders.firstWhere((o) => o.id == widget.orderId);
     } catch (_) {
       return null;
     }
@@ -88,7 +84,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           Expanded(
             child: Observer(
-             
               builder: (_) {
                 final order = _order;
 
@@ -120,15 +115,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       ),
                     ],
                     const SizedBox(height: 14),
-                    _OrderStatusTracker(
-                      status: order.status,
-                      colors: colors,
-                    ),
+                    _OrderStatusTracker(status: order.status, colors: colors),
                     const SizedBox(height: 18),
-                    _SectionTitle(
-                      title: 'Itens do pedido',
-                      colors: colors,
-                    ),
+                    _SectionTitle(title: 'Itens do pedido', colors: colors),
                     const SizedBox(height: 10),
                     for (final item in order.items) ...[
                       _OrderItemCard(item: item, colors: colors),
