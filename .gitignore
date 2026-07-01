@@ -62,3 +62,8 @@ firebase-debug.log
 /windows/flutter/ephemeral/
 /linux/flutter/ephemeral/
 /macos/Flutter/GeneratedPluginRegistrant.swift
+
+
+# Envs
+.env**
+!.env.example
