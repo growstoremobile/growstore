@@ -111,7 +111,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 child: const Text(
                   'ADICIONAR AO CARRINHO',
                   style: TextStyle(
-                    color: GrowColors.darkTextPrimary,
+                    color: GrowColors.lightBg,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
@@ -152,8 +152,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             children: [
               const SizedBox(height: 16),
 
-              // Usa currentGallery da store — já converte hex para nome
-              // e retorna a imagem correta para a cor selecionada
               Observer(
                 builder: (_) => ProductDetailImageWidget(
                   pathImages: _store.currentGallery,
@@ -205,7 +203,7 @@ class _ProductQuantitySelector extends StatelessWidget {
             child: Text(
               'Quantidade',
               style: textTheme.bodyMedium?.copyWith(
-                color: GrowColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: GrowTypography.bold,
               ),
             ),
@@ -245,7 +243,7 @@ class _ExpandableDescriptionWidgetState
         Text(
           'Descrição do produto',
           style: textTheme.bodyMedium?.copyWith(
-            color: GrowColors.darkTextPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: GrowTypography.bold,
           ),
         ),
@@ -253,7 +251,7 @@ class _ExpandableDescriptionWidgetState
         Text(
           widget.description,
           style: textTheme.bodyLarge?.copyWith(
-            color: GrowColors.darkTextSecondary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           maxLines: isExpanded ? null : 2,
           overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
