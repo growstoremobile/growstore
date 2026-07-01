@@ -1,9 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:growstore/core/routing/app_routes.dart';
 import 'package:growstore/core/di/injection.dart';
 import 'package:growstore/core/theme/growstore_theme.dart';
-import 'package:growstore/core/theme/light_theme.dart';
 import 'package:growstore/features/address/pages/address_form_page.dart';
 import 'package:growstore/features/address/pages/address_list_page.dart';
 import 'package:growstore/features/auth/pages/login_page.dart';
@@ -37,7 +35,6 @@ import 'package:growstore/features/home/stores/home/home_store.dart';
 
 import 'package:growstore/features/orders/pages/orders_page.dart';
 
-import 'package:growstore/features/profile/pages/addresses_page.dart';
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/profile/repositories/address_repository.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
