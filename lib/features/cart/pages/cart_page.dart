@@ -6,15 +6,11 @@ import 'package:growstore/core/routing/app_routes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
-import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_item_widget.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
 import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
-import 'package:growstore/features/orders/repositories/order_repository.dart';
-import 'package:growstore/features/profile/models/address_model.dart';
-import 'package:growstore/features/profile/repositories/address_repository.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_checkout_button_widget.dart';
 
 class CartPage extends StatefulWidget {
@@ -27,26 +23,11 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   final _cartStore = GetIt.I<CartStore>();
 
-  /*final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
-      ? GetIt.I<CartStore>()
-      : CartStore();*/
-
   @override
   void initState() {
     super.initState();
     _cartStore.loadCart();
-    //_loadDefaultAddress();
   }
-
-  /*Future<void> _loadDefaultAddress() async {
-    final address = await _addressRepository.getDefaultAddress();
-
-    if (!mounted) return;
-
-    setState(() {
-      _defaultAddress = address;
-    });
-  }  */
 
   void _handleBottomNavigation(BuildContext context, String label) {
     switch (label) {
@@ -166,87 +147,6 @@ class _CartPageState extends State<CartPage> {
   }
 }
 
-/*class _CartCheckoutPanel extends StatelessWidget {
-  const _CartCheckoutPanel({
-    required this.colors,
-    required this.total,
-    required this.onCheckout,
-  });
-
-  final CartLayoutColors colors;
-  final double total;
-  final VoidCallback onCheckout;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: colors.page,
-      padding: const EdgeInsets.fromLTRB(15, 13, 15, 15),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Total:',
-                style: GoogleFonts.syne(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w400,
-                  height: 26 / 22,
-                  color: colors.textPrimary,
-                ),
-              ),
-              const Spacer(),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'US\$: ${cartCurrencyValue(total)}',
-                    maxLines: 1,
-                    style: GoogleFonts.syne(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      height: 29 / 24,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              onPressed: () => onCheckout(),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: colors.primary,
-                foregroundColor: colors.buttonText,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(13),
-                ),
-              ),
-              child: Text(
-                'Finalizar a compra',
-                style: GoogleFonts.syne(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
-                  height: 28 / 23,
-                  color: colors.buttonText,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-*/
 class _CartEmptyState extends StatelessWidget {
   const _CartEmptyState({required this.colors});
 
