@@ -10,6 +10,8 @@ import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_product_model.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
+import 'package:growstore/features/orders/widgets/order_header.dart';
+import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/shared/widgets/default_product_card_widget.dart';
 
 class DetailCategoriesPage extends StatefulWidget {
@@ -57,6 +59,12 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
     return _favorityStore?.isFavorite(productId) ?? false;
   }
 
+  void _openProduct(HomeProductModel product) {
+    Navigator.of(
+      context,
+    ).pushNamed('/productDetail', arguments: product.id.toString());
+  }
+
   void _handleBottomNavigation(String label) {
     switch (label) {
       case 'Inicio':
@@ -81,66 +89,63 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colors = HomeLayoutColors.resolve(isDark);
+    final headerColors = OrderLayoutColors.resolve(isDark);
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios),
-        ),
-        title: Text(widget.category.title),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        top: false,
-        bottom: false,
-        child: Column(
-          children: [
-            CategorySearchBar(
-              colors: colors,
-              isDark: isDark,
-              onSearchChanged: _store.setSearch,
-              onProfile: () => Navigator.of(context).pushNamed('/profile'),
-            ),
-            Divider(height: 1, thickness: 1, color: colors.divider),
-            Expanded(
-              child: Observer(
-                builder: (_) {
-                  if (_store.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+      body: Column(
+        children: [
+          OrderHeader(
+            title: widget.category.title,
+            colors: headerColors,
+            onBack: () => Navigator.of(context).pop(),
+          ),
+          CategorySearchBar(
+            colors: colors,
+            isDark: isDark,
+            onSearchChanged: _store.setSearch,
+            onProfile: () => Navigator.of(context).pushNamed('/profile'),
+          ),
+          Divider(height: 1, thickness: 1, color: colors.divider),
+          Expanded(
+            child: Observer(
+              builder: (_) {
+                if (_store.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                  if (_store.errorMessage != null) {
-                    return GrowErrorState(
-                      type: GrowErrorType.custom,
-                      title: 'Erro ao carregar produtos',
-                      description: 'Não foi possível carregar os produtos.',
-                      onRetry: _store.loadProducts,
-                    );
-                  }
+                if (_store.errorMessage != null) {
+                  return GrowErrorState(
+                    type: GrowErrorType.custom,
+                    title: 'Erro ao carregar produtos',
+                    description: 'Não foi possível carregar os produtos.',
+                    onRetry: _store.loadProducts,
+                  );
+                }
 
-                  final products = _store.filteredProducts;
-                  if (products.isEmpty) {
-                    return const Center(
-                      child: Text('Nenhum produto encontrado.'),
-                    );
-                  }
+                final products = _store.filteredProducts;
+                if (products.isEmpty) {
+                  return const Center(
+                    child: Text('Nenhum produto encontrado.'),
+                  );
+                }
 
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: products.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.58,
-                        ),
-                    itemBuilder: (context, index) {
-                      final product = products[index];
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: products.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.58,
+                  ),
+                  itemBuilder: (context, index) {
+                    final product = products[index];
 
-                      return TooltipVisibility(
-                        visible: false,
+                    return TooltipVisibility(
+                      visible: false,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => _openProduct(product),
                         child: DefaultProductCard(
                           titleProduct: product.name,
                           price: product.priceValue,
@@ -153,19 +158,16 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
                               : () => _toggleFavorite(product),
                           iconButton: Icons.visibility_outlined,
                           textButton: 'Ver produto',
-                          onPressed: () => Navigator.of(context).pushNamed(
-                            '/productDetail',
-                            arguments: product.id.toString(),
-                          ),
+                          onPressed: () => _openProduct(product),
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: CategoryBottomNavigation(
         onTap: _handleBottomNavigation,
