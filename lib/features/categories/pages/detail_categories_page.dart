@@ -83,7 +83,14 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
     final colors = HomeLayoutColors.resolve(isDark);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.category.title), centerTitle: true),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
+        title: Text(widget.category.title),
+        centerTitle: true,
+      ),
       body: SafeArea(
         top: false,
         bottom: false,
