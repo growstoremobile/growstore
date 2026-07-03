@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/features/categories/models/category_model.dart';
 import 'package:growstore/features/categories/stores/detail_categories_store.dart';
-import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
+
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
@@ -55,26 +55,6 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
 
   bool _isFavorite(int productId) {
     return _favorityStore?.isFavorite(productId) ?? false;
-  }
-
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pop();
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
   }
 
   @override
@@ -159,9 +139,6 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: CategoryBottomNavigation(
-        onTap: _handleBottomNavigation,
       ),
     );
   }

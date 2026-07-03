@@ -85,22 +85,8 @@ class _CartPageState extends State<CartPage> {
             Expanded(
               child: Observer(builder: (_) => _buildCartContent(colors)),
             ),
+            CartCheckoutButtonWidget(onPressed: _handleCheckout),
           ],
-        ),
-        bottomNavigationBar: Observer(
-          builder: (_) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_cartStore.items.isNotEmpty)
-                CartCheckoutButtonWidget(onPressed: _handleCheckout),
-              HomeBottomNavigation(
-                selectedLabel: 'Carrinho',
-                cartItemCount: _cartStore.totalItems,
-                showCartBadge: false,
-                onTap: (label) => _handleBottomNavigation(context, label),
-              ),
-            ],
-          ),
         ),
       ),
     );

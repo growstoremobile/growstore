@@ -38,28 +38,6 @@ class _OrdersPageState extends State<OrdersPage> {
     });
   }
 
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/home', (route) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pushNamed('/categories');
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        _reload();
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = OrderLayoutColors.resolve(
@@ -85,12 +63,6 @@ class _OrdersPageState extends State<OrdersPage> {
             OrderHeader(title: 'Pedidos', colors: colors),
             Expanded(child: _buildBody(colors)),
           ],
-        ),
-        bottomNavigationBar: HomeBottomNavigation(
-          selectedLabel: 'Pedidos',
-          cartItemCount: _cartStore?.totalItems ?? 0,
-          showCartBadge: false,
-          onTap: _handleBottomNavigation,
         ),
       ),
     );
