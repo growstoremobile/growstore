@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/utils/cart_currency.dart';
-import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
