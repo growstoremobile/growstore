@@ -28,27 +28,6 @@ class _CartPageState extends State<CartPage> {
     _cartStore.loadCart();
   }
 
-  void _handleBottomNavigation(BuildContext context, String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/home', (route) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pushNamed('/categories');
-        break;
-      case 'Carrinho':
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
-  }
-
   void _handleRemove(CartItemModel item) {
     _cartStore.removeItem(item);
     ScaffoldMessenger.of(context).showSnackBar(
