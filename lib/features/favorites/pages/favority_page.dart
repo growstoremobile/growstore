@@ -9,7 +9,6 @@ import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/shared/widgets/cached_product_image.dart';
