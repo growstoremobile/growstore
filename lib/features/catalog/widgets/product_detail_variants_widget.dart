@@ -13,21 +13,21 @@ class ProductDetailVariantsWidget extends StatelessWidget {
     required this.store,
     this.sizes = const ['P', 'M', 'G', 'GG', 'XG'],
     this.colors = const [
-      {'hex': '#0A0A0A', 'name': 'Preto'},
-      {'hex': '#FFFFFF', 'name': 'Branco'},
+      {'hex': '#0A0A0A', 'name': 'Preta'},
+      {'hex': '#FFFFFF', 'name': 'Branca'},
     ],
   });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Observer(
       builder: (_) {
         final product = store.product;
         if (product == null) return const SizedBox();
 
-        // Usa o getter da Store para consistência com addToCart
         final hasColorOptions = store.hasColorOptions;
         final hasSizeOptions = product.hasSizeOptions;
 
@@ -39,7 +39,7 @@ class ProductDetailVariantsWidget extends StatelessWidget {
               Text(
                 'Cor',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: GrowColors.darkTextSecondary,
+                  color: colorScheme.onSurface,
                   fontWeight: GrowTypography.bold,
                 ),
               ),
@@ -68,7 +68,7 @@ class ProductDetailVariantsWidget extends StatelessWidget {
                             border: Border.all(
                               color: isSelected
                                   ? GrowColors.primary
-                                  : GrowColors.darkBorder,
+                                  : colorScheme.onSurface,
                               width: isSelected ? 2 : 1.5,
                             ),
                           ),
@@ -78,10 +78,12 @@ class ProductDetailVariantsWidget extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: color,
                               shape: BoxShape.circle,
+                              // Borda sutil só na bolinha branca
+                              // para ela não sumir no fundo claro
                               border: colorHex == '#FFFFFF'
                                   ? Border.all(
-                                      color: GrowColors.darkBorder,
-                                      width: 0.5,
+                                      color: colorScheme.outline,
+                                      width: 0.8,
                                     )
                                   : null,
                             ),
@@ -92,9 +94,7 @@ class ProductDetailVariantsWidget extends StatelessWidget {
                           colorName,
                           style: textTheme.bodyMedium?.copyWith(
                             fontSize: 12,
-                            color: isSelected
-                                ? GrowColors.darkTextPrimary
-                                : GrowColors.darkTextSecondary,
+                            color: colorScheme.onSurface,
                             fontWeight: isSelected
                                 ? GrowTypography.bold
                                 : GrowTypography.regular,
@@ -113,7 +113,7 @@ class ProductDetailVariantsWidget extends StatelessWidget {
               Text(
                 'Tamanho',
                 style: textTheme.bodyMedium?.copyWith(
-                  color: GrowColors.darkTextSecondary,
+                  color: colorScheme.onSurface,
                   fontWeight: GrowTypography.bold,
                 ),
               ),
@@ -131,13 +131,13 @@ class ProductDetailVariantsWidget extends StatelessWidget {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? GrowColors.primary.withValues(alpha: 0.1)
+                              ? GrowColors.primary
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isSelected
-                                ? GrowColors.darkBorderHighlight
-                                : GrowColors.darkBorder,
+                                ? GrowColors.primary
+                                : colorScheme.onSurface,
                             width: 1.5,
                           ),
                         ),
@@ -145,8 +145,8 @@ class ProductDetailVariantsWidget extends StatelessWidget {
                           size,
                           style: textTheme.bodyMedium?.copyWith(
                             color: isSelected
-                                ? GrowColors.darkTextPrimary
-                                : GrowColors.darkTextSecondary,
+                                ? GrowColors.darkBg
+                                : colorScheme.onSurface,
                             fontWeight: GrowTypography.bold,
                           ),
                         ),
