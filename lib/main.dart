@@ -7,8 +7,9 @@ import 'package:growstore/features/address/pages/address_list_page.dart';
 import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/checkout/pages/checkout_page.dart';
+import 'package:growstore/features/navigation/pages/main_navigation_page.dart';
 import 'package:growstore/features/orders/pages/order_detail_page.dart';
-
+import 'package:growstore/firebase_options.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:growstore/core/theme/theme_mode_controller.dart';
@@ -206,7 +207,7 @@ class _GrowStoreAppState extends State<GrowStoreApp> {
         routes: {
           '/': (_) => const SplashPage(),
           '/splash': (_) => const SplashPage(),
-          '/home': (_) => const HomePage(),
+          '/home': (_) => MainNavigationPage(),
           '/login': (_) => const LoginPage(),
           '/register': (_) => const RegisterPage(),
           '/categories': (_) => const CategoriesPage(),

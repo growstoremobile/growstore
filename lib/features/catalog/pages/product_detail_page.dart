@@ -9,6 +9,7 @@ import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
+import 'package:growstore/features/navigation/store/navigation_store.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/core/theme/widgets/quantity_stepper_widget.dart';
@@ -25,13 +26,21 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late final ProductDetailStore _store;
   late final CartStore _cartStore;
+  late final NavigationStore _navigationStore;
 
   @override
   void initState() {
     super.initState();
     _store = GetIt.I<ProductDetailStore>();
+    _navigationStore = GetIt.I<NavigationStore>();
     _cartStore = GetIt.I<CartStore>();
     _store.loadProduct(widget.productId);
+  }
+
+  void _goToCart() {
+    _navigationStore.changePage(2);
+
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   void _handleAddToCart() {
@@ -43,7 +52,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       title: added ? 'Adicionado ao carrinho' : 'Selecione tamanho e cor',
       subtitle: added ? productName : null,
       isError: !added,
-      onViewCart: added ? () => Navigator.pushNamed(context, '/cart') : null,
+      onViewCart: added ? _goToCart : null,
     );
   }
 
@@ -84,7 +93,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         Icons.shopping_cart_outlined,
                         color: colors.textPrimary,
                       ),
-                      onPressed: () => Navigator.pushNamed(context, '/cart'),
+                      onPressed: _goToCart,
                     ),
                   ),
                 ),
@@ -111,7 +120,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 child: const Text(
                   'ADICIONAR AO CARRINHO',
                   style: TextStyle(
-                    color: GrowColors.darkTextPrimary,
+                    color: GrowColors.lightBg,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
@@ -152,8 +161,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             children: [
               const SizedBox(height: 16),
 
-              // Usa currentGallery da store — já converte hex para nome
-              // e retorna a imagem correta para a cor selecionada
               Observer(
                 builder: (_) => ProductDetailImageWidget(
                   pathImages: _store.currentGallery,
@@ -205,7 +212,7 @@ class _ProductQuantitySelector extends StatelessWidget {
             child: Text(
               'Quantidade',
               style: textTheme.bodyMedium?.copyWith(
-                color: GrowColors.darkTextSecondary,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: GrowTypography.bold,
               ),
             ),
@@ -245,7 +252,7 @@ class _ExpandableDescriptionWidgetState
         Text(
           'Descrição do produto',
           style: textTheme.bodyMedium?.copyWith(
-            color: GrowColors.darkTextPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: GrowTypography.bold,
           ),
         ),
@@ -253,7 +260,7 @@ class _ExpandableDescriptionWidgetState
         Text(
           widget.description,
           style: textTheme.bodyLarge?.copyWith(
-            color: GrowColors.darkTextSecondary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           maxLines: isExpanded ? null : 2,
           overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,

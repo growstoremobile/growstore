@@ -33,27 +33,6 @@ class _FavorityPageState extends State<FavorityPage> {
     favorityStore.getFavorities();
   }
 
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil('/home', (route) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pushNamed('/categories');
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = OrderLayoutColors.resolve(
@@ -79,14 +58,6 @@ class _FavorityPageState extends State<FavorityPage> {
             OrderHeader(title: 'Favoritos', colors: colors),
             Expanded(child: _buildBody(colors)),
           ],
-        ),
-        bottomNavigationBar: Observer(
-          builder: (_) => HomeBottomNavigation(
-            selectedLabel: 'Favoritos',
-            showCartBadge: false,
-            cartItemCount: _cartStore.totalItems,
-            onTap: _handleBottomNavigation,
-          ),
         ),
       ),
     );

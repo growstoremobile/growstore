@@ -44,6 +44,11 @@ final ThemeData growLightTheme = ThemeData(
     iconTheme: const IconThemeData(color: GrowColors.lightTextPrimary),
   ),
 
+  navigationBarTheme: const NavigationBarThemeData(
+    backgroundColor: GrowColors.lightSurfaceElevated,
+    indicatorColor: GrowColors.primary,
+  ),
+
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
     backgroundColor: GrowColors.lightSurface,
     selectedItemColor: GrowColors.primary,

@@ -5,7 +5,7 @@ import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/pages/detail_categories_page.dart';
 import 'package:growstore/features/categories/stores/categories_store.dart';
-import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
+
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
 import 'package:growstore/shared/widgets/cached_product_image.dart';
@@ -25,25 +25,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void initState() {
     super.initState();
     _store.loadCategories();
-  }
-
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
-        break;
-      case 'Categorias':
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
   }
 
   @override
@@ -145,12 +126,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
               ),
             ),
           ],
-        ),
-      ),
-      bottomNavigationBar: Observer(
-        builder: (_) => CategoryBottomNavigation(
-          cartItemCount: _cartStore.totalItems,
-          onTap: _handleBottomNavigation,
         ),
       ),
     );

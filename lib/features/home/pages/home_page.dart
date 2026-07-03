@@ -62,28 +62,6 @@ class _HomePageState extends State<HomePage> {
     _homeStore.loadProducts();
   }
 
-  void _handleBottomNavigation(BuildContext context, String label) {
-    switch (label) {
-      case 'Inicio':
-        break;
-      case 'Categorias':
-        Navigator.of(context).pushNamed('/categories');
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites').then((_) {
-          if (!mounted) return;
-          setState(() {});
-        });
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
-  }
-
   Future<void> _toggleFavorite(HomeProductModel product) async {
     final favorityStore = _favorityStore;
 
@@ -173,12 +151,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ],
-        ),
-        bottomNavigationBar: Observer(
-          builder: (_) => HomeBottomNavigation(
-            cartItemCount: _cartStore.totalItems,
-            onTap: (label) => _handleBottomNavigation(context, label),
-          ),
         ),
       ),
     );
