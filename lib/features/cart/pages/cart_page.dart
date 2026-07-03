@@ -11,6 +11,7 @@ import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_checkout_button_widget.dart';
+import 'package:mobx/mobx.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -57,14 +58,17 @@ class _CartPageState extends State<CartPage> {
       ),
       child: Scaffold(
         backgroundColor: colors.page,
-        body: Column(
-          children: [
-            OrderHeader(title: 'Carrinho', colors: headerColors),
-            Expanded(
-              child: Observer(builder: (_) => _buildCartContent(colors)),
-            ),
-            CartCheckoutButtonWidget(onPressed: _handleCheckout),
-          ],
+        body: Observer(
+          builder: (context) {
+            return Column(
+              children: [
+                OrderHeader(title: 'Carrinho', colors: headerColors),
+                Expanded(child: _buildCartContent(colors)),
+                if (_cartStore.items.isNotEmpty)
+                  CartCheckoutButtonWidget(onPressed: _handleCheckout),
+              ],
+            );
+          },
         ),
       ),
     );
