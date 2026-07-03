@@ -1,0 +1,65 @@
+import 'package:growstore/features/categories/models/category_model.dart';
+import 'package:growstore/features/categories/repositories/categories_repository.dart';
+import 'package:mobx/mobx.dart';
+
+part 'categories_store.g.dart';
+
+class CategoryStore = CategoryStoreBase with _$CategoryStore;
+
+abstract class CategoryStoreBase with Store {
+  final CategoriesRepository _repository;
+
+  CategoryStoreBase({required CategoriesRepository repository})
+    : _repository = repository;
+
+  @observable
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  @observable
+  // ignore: prefer_final_fields
+  ObservableList<CategoryModel> _categories = <CategoryModel>[].asObservable();
+  ObservableList<CategoryModel> get categories => _categories;
+
+  @observable
+  String? search;
+
+  @observable
+  String? errorMessage;
+
+  @action
+  void setSearch(String? text) => search = text;
+
+  @action
+  void clearError() => errorMessage = null;
+
+  @computed
+  List<CategoryModel> get filteredCategories {
+    if (search == null || search!.isEmpty) return _categories.toList();
+
+    return _categories
+        .where(
+          (category) =>
+              category.title.toLowerCase().contains(search!.toLowerCase()),
+        )
+        .toList();
+  }
+
+  @action
+  Future<void> loadCategories() async {
+    try {
+      _isLoading = true;
+      errorMessage = null;
+
+      final responseCategories = await _repository.getCategories();
+
+      _categories
+        ..clear()
+        ..addAll(responseCategories);
+    } catch (error) {
+      errorMessage = error.toString();
+    } finally {
+      _isLoading = false;
+    }
+  }
+}

@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+/android/build/
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +44,27 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+
+# Firebase CLI
+.firebase/
+firebase-debug.log
+firebase-debug.log  
+
+
+# Flutter Generated Plugin Registrants (Desktop & Platforms)
+**/generated_plugin_registrant.*
+**/generated_plugins.cmake
+/windows/flutter/ephemeral/
+/linux/flutter/ephemeral/
+/macos/Flutter/GeneratedPluginRegistrant.swift
+
+
+# Envs
+.env**
+!.env.example

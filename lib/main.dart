@@ -1,121 +1,255 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:growstore/core/di/injection.dart';
+import 'package:growstore/core/theme/growstore_theme.dart';
+import 'package:growstore/features/address/pages/address_form_page.dart';
+import 'package:growstore/features/address/pages/address_list_page.dart';
+import 'package:growstore/features/auth/pages/login_page.dart';
+import 'package:growstore/features/cart/pages/cart_page.dart';
+import 'package:growstore/features/checkout/pages/checkout_page.dart';
+import 'package:growstore/features/navigation/pages/main_navigation_page.dart';
+import 'package:growstore/features/orders/pages/order_detail_page.dart';
+import 'package:get_it/get_it.dart';
+import 'package:growstore/core/theme/theme_mode_controller.dart';
+import 'package:growstore/features/auth/models/user_model.dart';
+import 'package:growstore/features/auth/pages/register_page.dart';
+import 'package:growstore/features/auth/stores/auth/auth_store.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
+import 'package:growstore/features/categories/pages/categories_page.dart';
+import 'package:growstore/features/catalog/pages/product_detail_page.dart';
+import 'package:growstore/features/catalog/stores/product_detail_store.dart';
+import 'package:growstore/features/catalog/services/product_detail_service.dart';
+import 'package:growstore/features/catalog/repositories/product_detail_repository.dart';
+import 'package:growstore/features/favorites/models/favority_model.dart';
+import 'package:growstore/features/favorites/pages/favority_page.dart';
+import 'package:growstore/features/favorites/repositories/favority_repository.dart';
+import 'package:growstore/features/favorites/services/favority_service.dart';
+import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
+import 'package:growstore/features/home/repositories/home_repository.dart';
+import 'package:growstore/features/home/stores/home/home_store.dart';
+import 'package:growstore/features/orders/pages/orders_page.dart';
+import 'package:growstore/features/profile/pages/profile_page.dart';
+import 'package:growstore/features/profile/repositories/address_repository.dart';
+import 'package:growstore/features/search/pages/search_page.dart';
+import 'package:growstore/features/splash/pages/splash_page.dart';
+import 'package:growstore/shared/utils/app_config.dart';
+import 'package:growstore/shared/utils/constants.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:growstore/features/orders/pages/order_success_page.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> initHive() async {
+  await Hive.initFlutter();
+  if (!Hive.isAdapterRegistered(FavorityModelAdapter().typeId)) {
+    Hive.registerAdapter(FavorityModelAdapter());
+  }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+Future<void> initServiceLocator() async {
+  final favorityBox = await Hive.openBox('favorities');
+  final authBox = await Hive.openBox('auth');
+  //final ordersBox = await Hive.openBox(OrderRepository.boxName);
+  final addressesBox = await Hive.openBox(AddressRepository.boxName);
+  final locator = GetIt.I;
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+  if (!locator.isRegistered<FavorityService>()) {
+    locator.registerSingleton<FavorityService>(FavorityService());
+  }
+
+  final authStore = AuthStore();
+  final savedToken = authBox.get('token_user') as String?;
+  final savedUserId = authBox.get('user_id') as String?;
+  final savedUserName = authBox.get('user_name') as String?;
+  final savedUserEmail = authBox.get('user_email') as String?;
+  final savedUserPhotoUrl = authBox.get('user_photo_url') as String?;
+
+  if (savedToken != null &&
+      savedToken.isNotEmpty &&
+      savedUserId != null &&
+      savedUserName != null &&
+      savedUserEmail != null) {
+    Constants.userToken = savedToken;
+    authStore.setUser(
+      UserModel(
+        id: savedUserId,
+        name: savedUserName,
+        email: savedUserEmail,
+        photoUrl: savedUserPhotoUrl,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+
+  if (!locator.isRegistered<AuthStore>()) {
+    locator.registerSingleton<AuthStore>(authStore);
+  }
+  if (!locator.isRegistered<HomeRepository>()) {
+    locator.registerSingleton<HomeRepository>(HomeRepository());
+  }
+  if (!locator.isRegistered<HomeStore>()) {
+    locator.registerSingleton<HomeStore>(
+      HomeStore(locator.get<HomeRepository>()),
+    );
+  }
+  if (!locator.isRegistered<FavorityRepository>()) {
+    locator.registerSingleton<FavorityRepository>(
+      FavorityRepository(
+        boxFavoritiesProducts: favorityBox,
+        favoriteService: locator.get<FavorityService>(),
+      ),
+    );
+  }
+  if (!locator.isRegistered<FavorityProductsStore>()) {
+    locator.registerSingleton<FavorityProductsStore>(FavorityProductsStore());
+  }
+  /*if (!locator.isRegistered<OrderRepository>()) {
+    locator.registerSingleton<OrderRepository>(OrderRepository(box: ordersBox));
+  }*/
+  if (!locator.isRegistered<AddressRepository>()) {
+    locator.registerSingleton<AddressRepository>(
+      AddressRepository(box: addressesBox),
+    );
+  }
+  if (!locator.isRegistered<CartStore>()) {
+    locator.registerSingleton<CartStore>(CartStore());
+  }
+
+  if (!locator.isRegistered<ProductDetailService>()) {
+    locator.registerSingleton<ProductDetailService>(ProductDetailService());
+  }
+
+  if (!locator.isRegistered<ProductDetailRepository>()) {
+    locator.registerSingleton<ProductDetailRepository>(
+      ProductDetailRepository(service: locator<ProductDetailService>()),
+    );
+  }
+
+  if (!locator.isRegistered<ProductDetailStore>()) {
+    locator.registerFactory<ProductDetailStore>(
+      () => ProductDetailStore(
+        repository: locator<ProductDetailRepository>(),
+        cartStore: locator<CartStore>(),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  try {
+    if (Firebase.apps.isNotEmpty) {
+      debugPrint('Firebase ja estava inicializado nativamente.');
+    } else {
+      await Firebase.initializeApp(options: FirebaseConfig.currentPlatform);
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+      debugPrint('Firebase inicializado com sucesso.');
+    }
+  } catch (e) {
+    debugPrint('Aviso Firebase: $e');
+  }
 
-  final String title;
+  try {
+    if (AppConfig.hasSupabaseConfig) {
+      await Supabase.initialize(
+        url: AppConfig.supabaseUrl,
+        publishableKey: AppConfig.supabaseAnonKey,
+      );
+    } else {
+      debugPrint('Supabase nao configurado. Use --dart-define.');
+    }
+  } catch (e) {
+    debugPrint('Erro Supabase: $e');
+  }
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  await initHive();
+  await initServiceLocator();
+  await setupDependencies();
+
+  runApp(const GrowStoreApp());
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class GrowStoreApp extends StatefulWidget {
+  const GrowStoreApp({super.key});
 
-  void _incrementCounter() {
+  @override
+  State<GrowStoreApp> createState() => _GrowStoreAppState();
+}
+
+class _GrowStoreAppState extends State<GrowStoreApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme(Brightness currentBrightness) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _themeMode = currentBrightness == Brightness.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    return ThemeModeController(
+      themeMode: _themeMode,
+      toggleTheme: _toggleTheme,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Grow Store',
+        theme: growLightTheme,
+        darkTheme: growDarkTheme,
+        themeMode: _themeMode,
+        routes: {
+          '/': (_) => const SplashPage(),
+          '/splash': (_) => const SplashPage(),
+          '/home': (_) => MainNavigationPage(),
+          '/login': (_) => const LoginPage(),
+          '/register': (_) => const RegisterPage(),
+          '/categories': (_) => const CategoriesPage(),
+          '/search': (_) => const SearchPage(),
+          '/cart': (_) => const CartPage(),
+          '/favorites': (_) => const FavorityPage(),
+          '/orders': (_) => const OrdersPage(),
+          '/addresses': (_) => const AddressListPage(),
+          '/profile': (_) => ProfilePage(),
+          '/address-list': (_) => const AddressListPage(),
+          '/address-form': (_) => const AddressFormPage(),
+          '/checkout': (_) => const CheckoutPage(),
+          '/order-success': (_) => const OrderSuccessPage(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/productDetail') {
+            final productId = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (productId == null || productId.isEmpty) {
+                  return const Scaffold(
+                    body: Center(child: Text('Produto nao encontrado.')),
+                  );
+                }
+
+                return ProductDetailPage(productId: productId);
+              },
+            );
+          }
+
+          if (settings.name == '/orderDetail') {
+            final orderId = settings.arguments?.toString();
+
+            return MaterialPageRoute(
+              settings: settings,
+              builder: (_) {
+                if (orderId == null || orderId.isEmpty) {
+                  return const OrdersPage();
+                }
+
+                return OrderDetailPage(orderId: orderId);
+              },
+            );
+          }
+
+          return null;
+        },
       ),
     );
   }
