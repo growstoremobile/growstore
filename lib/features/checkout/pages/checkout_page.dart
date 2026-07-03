@@ -8,9 +8,12 @@ import 'package:growstore/core/routing/app_routes.dart';
 import 'package:growstore/features/address/stores/address_store.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/checkout/stores/checkout_store.dart';
+import 'package:growstore/features/checkout/stores/payment_store.dart';
 import 'package:growstore/features/checkout/widgets/checkout_address_card.dart';
 import 'package:growstore/features/checkout/widgets/checkout_item_card.dart';
 import 'package:growstore/features/checkout/widgets/checkout_summary_card.dart';
+import 'package:growstore/features/checkout/widgets/payment_method_card.dart'
+    hide PaymentMethod;
 import 'package:growstore/features/orders/models/order_item_model.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
@@ -31,6 +34,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final _cartStore = GetIt.I<CartStore>();
   final _orderStore = GetIt.I<OrderStore>();
 
+  final _paymentStore = GetIt.I<PaymentStore>();
   @override
   void initState() {
     super.initState();
@@ -164,6 +168,47 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 shipping: _cartStore.shipping,
                 discount: _cartStore.discount,
                 total: _cartStore.total,
+              ),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Forma de pagamento',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Observer(
+                builder: (_) {
+                  return PaymentMethodCard(
+                    title: 'PIX',
+                    subtitle: 'Pagamento instantâneo',
+                    icon: Icons.pix,
+                    selected: _paymentStore.selectedMethod == PaymentMethod.pix,
+                    onTap: () {
+                      _paymentStore.selectMethod(PaymentMethod.pix);
+                    },
+                  );
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              Observer(
+                builder: (_) {
+                  return PaymentMethodCard(
+                    title: 'Cartão',
+                    subtitle: 'Até 12x',
+                    icon: Icons.credit_card,
+                    selected:
+                        _paymentStore.selectedMethod == PaymentMethod.card,
+                    onTap: () {
+                      _paymentStore.selectMethod(PaymentMethod.card);
+                    },
+                  );
+                },
               ),
 
               const SizedBox(height: 24),

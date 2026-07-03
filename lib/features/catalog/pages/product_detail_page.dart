@@ -9,6 +9,7 @@ import 'package:growstore/features/catalog/stores/product_detail_store.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_image_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_info_widget.dart';
 import 'package:growstore/features/catalog/widgets/product_detail_variants_widget.dart';
+import 'package:growstore/features/navigation/store/navigation_store.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 
@@ -24,13 +25,21 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   late final ProductDetailStore _store;
   late final CartStore _cartStore;
+  late final NavigationStore _navigationStore;
 
   @override
   void initState() {
     super.initState();
     _store = GetIt.I<ProductDetailStore>();
+    _navigationStore = GetIt.I<NavigationStore>();
     _cartStore = GetIt.I<CartStore>();
     _store.loadProduct(widget.productId);
+  }
+
+  void _goToCart() {
+    _navigationStore.changePage(2);
+
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   void _handleAddToCart() {
@@ -42,7 +51,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       title: added ? 'Adicionado ao carrinho' : 'Selecione tamanho e cor',
       subtitle: added ? productName : null,
       isError: !added,
-      onViewCart: added ? () => Navigator.pushNamed(context, '/cart') : null,
+      onViewCart: added ? _goToCart : null,
     );
   }
 
@@ -83,7 +92,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         Icons.shopping_cart_outlined,
                         color: colors.textPrimary,
                       ),
-                      onPressed: () => Navigator.pushNamed(context, '/cart'),
+                      onPressed: _goToCart,
                     ),
                   ),
                 ),

@@ -33,26 +33,6 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
     _store.loadProducts();
   }
 
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pop();
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamed('/orders');
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -126,9 +106,6 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: CategoryBottomNavigation(
-        onTap: _handleBottomNavigation,
       ),
     );
   }
