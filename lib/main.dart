@@ -8,7 +8,6 @@ import 'package:growstore/features/auth/pages/login_page.dart';
 import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/checkout/pages/checkout_page.dart';
 import 'package:growstore/features/orders/pages/order_detail_page.dart';
-import 'firebase_options.dart';
 
 import 'package:get_it/get_it.dart';
 
@@ -147,9 +146,7 @@ Future<void> main() async {
     if (Firebase.apps.isNotEmpty) {
       debugPrint('Firebase ja estava inicializado nativamente.');
     } else {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await Firebase.initializeApp(options: FirebaseConfig.currentPlatform);
 
       debugPrint('Firebase inicializado com sucesso.');
     }
