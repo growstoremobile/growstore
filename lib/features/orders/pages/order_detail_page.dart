@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/utils/cart_currency.dart';
-import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
+
 import 'package:growstore/features/orders/models/order_item_model.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
 import 'package:growstore/features/orders/models/order_status.dart';
@@ -42,29 +42,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   void _reload() {
     _orderStore.loadOrders();
-  }
-
-  void _handleBottomNavigation(String label) {
-    switch (label) {
-      case 'Inicio':
-        Navigator.of(context).pushNamedAndRemoveUntil('/home', (r) => false);
-        break;
-      case 'Categorias':
-        Navigator.of(context).pushNamed('/categories');
-        break;
-      case 'Carrinho':
-        Navigator.of(context).pushNamed('/cart');
-        break;
-      case 'Favoritos':
-        Navigator.of(context).pushNamed('/favorites');
-        break;
-      case 'Pedidos':
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          '/orders',
-          (route) => route.settings.name == '/home',
-        );
-        break;
-    }
   }
 
   @override
@@ -131,12 +108,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: HomeBottomNavigation(
-        selectedLabel: 'Pedidos',
-        cartItemCount: _cartStore.totalItems,
-        showCartBadge: false,
-        onTap: _handleBottomNavigation,
       ),
     );
   }

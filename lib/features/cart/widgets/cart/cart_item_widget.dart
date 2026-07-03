@@ -124,7 +124,6 @@ class CartItemWidget extends StatelessWidget {
                   width: 78,
                   child: _CartItemControls(
                     colors: colors,
-                    selectedSize: _selectedSize(item.variation),
                     quantity: item.quantity,
                     onIncrement: onIncrement,
                     onDecrement: onDecrement,
@@ -137,34 +136,17 @@ class CartItemWidget extends StatelessWidget {
       },
     );
   }
-
-  String _selectedSize(String variation) {
-    if (!variation.contains('/')) return 'G';
-    final normalized = variation.split('/').last.trim().toUpperCase();
-
-    if (normalized == 'P' ||
-        normalized == 'M' ||
-        normalized == 'G' ||
-        normalized == 'GG' ||
-        normalized == 'XG') {
-      return normalized;
-    }
-
-    return 'G';
-  }
 }
 
 class _CartItemControls extends StatelessWidget {
   const _CartItemControls({
     required this.colors,
-    required this.selectedSize,
     required this.quantity,
     required this.onIncrement,
     required this.onDecrement,
   });
 
   final CartLayoutColors colors;
-  final String selectedSize;
   final int quantity;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
@@ -174,20 +156,6 @@ class _CartItemControls extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            for (final size in ['P', 'M', 'G']) ...[
-              if (size != 'P') const SizedBox(width: 4),
-              _CartSizeChip(
-                label: size,
-                selected: size == selectedSize,
-                colors: colors,
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 18),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -217,41 +185,6 @@ class _CartItemControls extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _CartSizeChip extends StatelessWidget {
-  const _CartSizeChip({
-    required this.label,
-    required this.selected,
-    required this.colors,
-  });
-
-  final String label;
-  final bool selected;
-  final CartLayoutColors colors;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 23,
-      height: 23,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? colors.sizeChipSelected : colors.sizeChip,
-        borderRadius: BorderRadius.circular(8),
-        border: selected ? Border.all(color: colors.primary) : null,
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          height: 15 / 12,
-          color: selected ? colors.sizeChipSelectedText : colors.sizeChipText,
-        ),
-      ),
     );
   }
 }

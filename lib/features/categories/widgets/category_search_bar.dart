@@ -8,13 +8,11 @@ class CategorySearchBar extends StatelessWidget {
     required this.colors,
     required this.isDark,
     required this.onSearchChanged,
-    required this.onProfile,
   });
 
   final HomeLayoutColors colors;
   final bool isDark;
   final ValueChanged<String> onSearchChanged;
-  final VoidCallback onProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -63,27 +61,6 @@ class CategorySearchBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: colors.primary),
                   ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Tooltip(
-            message: 'Perfil',
-            child: InkWell(
-              onTap: onProfile,
-              customBorder: const CircleBorder(),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: colors.avatarBorder),
-                ),
-                child: Icon(
-                  Icons.person_outline_rounded,
-                  color: colors.avatarIcon,
-                  size: 20,
                 ),
               ),
             ),

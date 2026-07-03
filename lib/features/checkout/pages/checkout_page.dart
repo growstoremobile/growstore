@@ -57,7 +57,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       final address = _checkoutStore.selectedAddress;
 
-      if (address == null) {
+      if (address == null || _cartStore.items.isEmpty) {
         return false;
       }
 

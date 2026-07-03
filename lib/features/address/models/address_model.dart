@@ -29,8 +29,7 @@ class AddressModel {
       'cep': cep,
       'street': street,
       'number': number,
-      if (complement != null && complement!.isNotEmpty)
-        'complement': complement,
+      if (complement.isNotEmpty) 'complement': complement,
       'neighborhood': neighborhood,
       'city': city,
       'state': state,

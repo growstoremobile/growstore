@@ -73,7 +73,6 @@ class _DetailCategoriesPageState extends State<DetailCategoriesPage> {
               colors: colors,
               isDark: isDark,
               onSearchChanged: _store.setSearch,
-              onProfile: () => Navigator.of(context).pushNamed('/profile'),
             ),
             Divider(height: 1, thickness: 1, color: colors.divider),
             Expanded(

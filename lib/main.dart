@@ -9,7 +9,6 @@ import 'package:growstore/features/cart/pages/cart_page.dart';
 import 'package:growstore/features/checkout/pages/checkout_page.dart';
 import 'package:growstore/features/navigation/pages/main_navigation_page.dart';
 import 'package:growstore/features/orders/pages/order_detail_page.dart';
-import 'package:growstore/firebase_options.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:growstore/core/theme/theme_mode_controller.dart';
@@ -29,7 +28,7 @@ import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-import 'package:growstore/features/home/pages/home_page.dart';
+
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
 

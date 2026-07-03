@@ -3,13 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:growstore/features/cart/models/cart_item_model.dart';
-import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/utils/cart_currency.dart';
-import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/shared/widgets/cached_product_image.dart';
@@ -23,9 +19,6 @@ class FavorityPage extends StatefulWidget {
 
 class _FavorityPageState extends State<FavorityPage> {
   final favorityStore = GetIt.I<FavorityProductsStore>();
-  final CartStore _cartStore = GetIt.I.isRegistered<CartStore>()
-      ? GetIt.I<CartStore>()
-      : CartStore();
 
   @override
   void initState() {
@@ -112,30 +105,10 @@ class _FavorityPageState extends State<FavorityPage> {
               onRemoveFavorite: () async {
                 await favorityStore.toggleFavority(produto);
               },
-              onAddToCart: () => _addToCart(produto),
             );
           },
         );
       },
-    );
-  }
-
-  void _addToCart(FavorityModel product) {
-    _cartStore.addItem(
-      CartItemModel(
-        id: product.id.toString(),
-        name: product.titleProduct,
-        variation: '',
-        price: product.priceProduct,
-        imageUrl: product.pathImage ?? '',
-      ),
-    );
-
-    showCartFeedbackSnackBar(
-      context,
-      title: 'Adicionado ao carrinho',
-      subtitle: product.titleProduct,
-      onViewCart: () => Navigator.of(context).pushNamed('/cart'),
     );
   }
 }
@@ -146,21 +119,15 @@ class _FavoriteProductCard extends StatelessWidget {
     required this.colors,
     required this.onOpen,
     required this.onRemoveFavorite,
-    required this.onAddToCart,
   });
 
   final FavorityModel product;
   final OrderLayoutColors colors;
   final VoidCallback onOpen;
   final VoidCallback onRemoveFavorite;
-  final VoidCallback onAddToCart;
 
   @override
   Widget build(BuildContext context) {
-    final buttonForeground = colors.isDark
-        ? const Color(0xFFE2E3DF)
-        : const Color(0xFF191C1D);
-
     return Material(
       color: colors.isDark ? const Color(0xFF3A4859) : colors.card,
       borderRadius: BorderRadius.circular(12),
@@ -212,59 +179,35 @@ class _FavoriteProductCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          product.titleProduct,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.syne(
-                            color: colors.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            height: 20 / 15,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          cartCurrency(product.priceProduct),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.syne(
-                            color: colors.primary,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            height: 29 / 24,
-                          ),
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 37,
-                          child: ElevatedButton.icon(
-                            onPressed: onAddToCart,
-                            icon: Icon(
-                              Icons.shopping_cart_rounded,
-                              color: buttonForeground,
-                              size: 24,
-                            ),
-                            label: Text(
-                              'adicionar',
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              product.titleProduct,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.syne(
-                                color: buttonForeground,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                height: 24 / 20,
+                                color: colors.textPrimary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                height: 20 / 15,
                               ),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: colors.primary,
-                              foregroundColor: buttonForeground,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7),
-                              ),
+                          ),
+                        ),
+                        Center(
+                          child: Text(
+                            cartCurrency(product.priceProduct),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.syne(
+                              color: colors.primary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              height: 29 / 24,
                             ),
                           ),
                         ),

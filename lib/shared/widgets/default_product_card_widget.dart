@@ -85,7 +85,7 @@ class DefaultProductCard extends StatelessWidget {
                   children: [
                     Text(
                       titleProduct,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleLarge,
                     ),
