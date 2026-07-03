@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/widgets/error_state_widget.dart';
+import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/pages/detail_categories_page.dart';
 import 'package:growstore/features/categories/stores/categories_store.dart';
 import 'package:growstore/features/categories/widgets/category_bottom_navigation.dart';
@@ -18,6 +19,7 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   final CategoryStore _store = GetIt.I<CategoryStore>();
+  final CartStore _cartStore = GetIt.I<CartStore>();
 
   @override
   void initState() {
@@ -144,8 +146,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
           ],
         ),
       ),
-      bottomNavigationBar: CategoryBottomNavigation(
-        onTap: _handleBottomNavigation,
+      bottomNavigationBar: Observer(
+        builder: (_) => CategoryBottomNavigation(
+          cartItemCount: _cartStore.totalItems,
+          onTap: _handleBottomNavigation,
+        ),
       ),
     );
   }
