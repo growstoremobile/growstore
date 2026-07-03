@@ -6,9 +6,7 @@ import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/core/theme/widgets/empty_state_widget.dart';
 import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/core/theme/widgets/loading_widget.dart';
-import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
-import 'package:growstore/features/cart/widgets/cart/cart_feedback_snackbar.dart';
 import 'package:growstore/features/favorites/models/favority_model.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
 import 'package:growstore/features/home/models/home_carousel_item_model.dart';
@@ -106,25 +104,6 @@ class _HomePageState extends State<HomePage> {
 
   bool _isFavorite(int productId) {
     return _favorityStore?.isFavorite(productId) ?? false;
-  }
-
-  void _addToCart(HomeProductModel product) {
-    _cartStore.addItem(
-      CartItemModel(
-        id: product.id.toString(),
-        name: product.name,
-        variation: product.category,
-        price: product.priceValue,
-        imageUrl: product.asset,
-      ),
-    );
-
-    showCartFeedbackSnackBar(
-      context,
-      title: 'Adicionado ao carrinho',
-      subtitle: product.name,
-      onViewCart: () => Navigator.of(context).pushNamed('/cart'),
-    );
   }
 
   @override
@@ -242,7 +221,6 @@ class _HomePageState extends State<HomePage> {
       colors: colors,
       isFavorite: _isFavorite,
       onFavoriteToggle: _toggleFavorite,
-      onAddToCart: _addToCart,
       onTap: (product) => Navigator.of(
         context,
       ).pushNamed('/productDetail', arguments: product.id.toString()),

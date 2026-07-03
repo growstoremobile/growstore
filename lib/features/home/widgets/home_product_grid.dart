@@ -11,7 +11,6 @@ class HomeProductSliverGrid extends StatelessWidget {
     required this.colors,
     required this.isFavorite,
     required this.onFavoriteToggle,
-    required this.onAddToCart,
     required this.onTap,
   });
 
@@ -19,7 +18,6 @@ class HomeProductSliverGrid extends StatelessWidget {
   final HomeLayoutColors colors;
   final bool Function(int productId) isFavorite;
   final ValueChanged<HomeProductModel> onFavoriteToggle;
-  final ValueChanged<HomeProductModel> onAddToCart;
   final ValueChanged<HomeProductModel> onTap;
 
   @override
@@ -66,7 +64,6 @@ class HomeProductSliverGrid extends StatelessWidget {
               colors: colors,
               isFavorite: isFavorite(product.id),
               onFavoriteToggle: () => onFavoriteToggle(product),
-              onAddToCart: () => onAddToCart(product),
               onTap: () => onTap(product),
             );
           }, childCount: products.length),
@@ -82,7 +79,6 @@ class _HomeProductCard extends StatelessWidget {
     required this.colors,
     required this.isFavorite,
     required this.onFavoriteToggle,
-    required this.onAddToCart,
     required this.onTap,
   });
 
@@ -90,7 +86,6 @@ class _HomeProductCard extends StatelessWidget {
   final HomeLayoutColors colors;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
-  final VoidCallback onAddToCart;
   final VoidCallback onTap;
 
   @override
@@ -147,18 +142,6 @@ class _HomeProductCard extends StatelessWidget {
                           onPressed: onFavoriteToggle,
                         ),
                       ),
-                      Positioned(
-                        right: 8,
-                        bottom: 8,
-                        child: _ProductActionButton(
-                          tooltip: 'Comprar',
-                          icon: Icons.add_shopping_cart_rounded,
-                          iconColor: Colors.white,
-                          backgroundColor: colors.primary,
-                          borderColor: colors.primary,
-                          onPressed: onAddToCart,
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -182,7 +165,7 @@ class _HomeProductCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           product.name,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.syne(
                             color: colors.productName,
