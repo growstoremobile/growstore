@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:growstore/core/theme/widgets/error_state_widget.dart';
 import 'package:growstore/features/categories/pages/detail_categories_page.dart';
-import 'package:growstore/features/categories/repositories/categories_repository.dart';
 import 'package:growstore/features/categories/stores/categories_store.dart';
 
 import 'package:growstore/features/categories/widgets/category_search_bar.dart';
 import 'package:growstore/features/home/widgets/home_layout_colors.dart';
-import 'package:growstore/shared/products/services/product_service.dart';
 import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -18,9 +17,7 @@ class CategoriesPage extends StatefulWidget {
 }
 
 class _CategoriesPageState extends State<CategoriesPage> {
-  final CategoryStore _store = CategoryStore(
-    repository: CategoriesRepository(productService: ProductService()),
-  );
+  final CategoryStore _store = GetIt.I<CategoryStore>();
 
   @override
   void initState() {
@@ -69,7 +66,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
-                            childAspectRatio: 1,
+                            childAspectRatio: 0.8,
                             mainAxisSpacing: 16,
                             crossAxisSpacing: 19,
                           ),
@@ -100,12 +97,13 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                   ),
                                   Text(
                                     category.title,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleLarge,
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontSize: 14),
                                   ),
                                   Text(
                                     '${category.productQtn} produtos',

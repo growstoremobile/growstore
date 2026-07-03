@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 class GrowTypography {
   GrowTypography._();
 
-  // Fonte Primária: Inter (Google Fonts)
   static const fontFamily = 'Inter';
   static const fontFamilyFallback = ['sans-serif'];
 
-  // Fonte Secundária: Syne (Google Fonts) - para preços
   static const fontFamilyPrice = 'Syne';
   static const fontFamilyPriceFallback = ['sans-serif'];
 
@@ -20,7 +18,6 @@ class GrowTypography {
   static const labelLarge = 14.0; // button
   static const labelSmall = 11.0;
 
-  // Weights
   static const heavy = FontWeight.w900;
   static const bold = FontWeight.w700;
   static const medium = FontWeight.w500;

@@ -49,7 +49,6 @@ flutter:
 
 
   assets:
-    - assets/mocks/
     - assets/images/
 
 
