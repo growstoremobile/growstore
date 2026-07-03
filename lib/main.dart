@@ -10,13 +10,10 @@ import 'package:growstore/features/checkout/pages/checkout_page.dart';
 import 'package:growstore/features/navigation/pages/main_navigation_page.dart';
 import 'package:growstore/features/orders/pages/order_detail_page.dart';
 import 'package:get_it/get_it.dart';
-
 import 'package:growstore/core/theme/theme_mode_controller.dart';
 import 'package:growstore/features/auth/models/user_model.dart';
-
 import 'package:growstore/features/auth/pages/register_page.dart';
 import 'package:growstore/features/auth/stores/auth/auth_store.dart';
-
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/categories/pages/categories_page.dart';
 import 'package:growstore/features/catalog/pages/product_detail_page.dart';
@@ -28,12 +25,9 @@ import 'package:growstore/features/favorites/pages/favority_page.dart';
 import 'package:growstore/features/favorites/repositories/favority_repository.dart';
 import 'package:growstore/features/favorites/services/favority_service.dart';
 import 'package:growstore/features/favorites/stores/favority/favority_products_store.dart';
-
 import 'package:growstore/features/home/repositories/home_repository.dart';
 import 'package:growstore/features/home/stores/home/home_store.dart';
-
 import 'package:growstore/features/orders/pages/orders_page.dart';
-
 import 'package:growstore/features/profile/pages/profile_page.dart';
 import 'package:growstore/features/profile/repositories/address_repository.dart';
 import 'package:growstore/features/search/pages/search_page.dart';
