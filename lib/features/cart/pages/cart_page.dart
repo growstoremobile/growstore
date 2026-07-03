@@ -8,7 +8,6 @@ import 'package:growstore/features/cart/models/cart_item_model.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_item_widget.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_styles.dart';
-import 'package:growstore/features/home/widgets/home_bottom_navigation.dart';
 import 'package:growstore/features/orders/widgets/order_header.dart';
 import 'package:growstore/features/orders/widgets/order_layout_colors.dart';
 import 'package:growstore/features/cart/widgets/cart/cart_checkout_button_widget.dart';
