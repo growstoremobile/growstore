@@ -17,6 +17,8 @@ import 'package:growstore/features/address/stores/address_store.dart';
 import 'package:growstore/features/cart/repositories/cart_repository.dart';
 import 'package:growstore/features/checkout/storage/checkout_storage.dart';
 import 'package:growstore/features/checkout/stores/checkout_store.dart';
+import 'package:growstore/features/checkout/stores/payment_store.dart';
+import 'package:growstore/features/navigation/store/navigation_store.dart';
 import 'package:growstore/features/orders/repositories/order_repository.dart';
 import 'package:growstore/features/orders/services/order_firestore_service.dart';
 import 'package:growstore/features/orders/services/order_service.dart';
@@ -27,22 +29,18 @@ Future<void> setupDependencies() async {
   final getIt = GetIt.instance;
   final locator = GetIt.I;
 
-  // Dio
   getIt.registerLazySingleton<Dio>(() => Dio());
 
-  //Firebase
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
-  //Checkout
   getIt.registerLazySingleton<CheckoutStore>(
     () => CheckoutStore(getIt<AddressStore>(), getIt<CheckoutStorage>()),
   );
   getIt.registerLazySingleton<CheckoutStorage>(() => CheckoutStorage());
 
-  ///Adddress
   getIt.registerLazySingleton<CepService>(() => ViaCepService(getIt<Dio>()));
   getIt.registerLazySingleton<AddressService>(
     () => AddressFirestoreService(
@@ -57,7 +55,6 @@ Future<void> setupDependencies() async {
     () => AddressStore(getIt<AddressRepository>(), getIt<CepService>()),
   );
 
-  // Orders
   getIt.registerLazySingleton<OrderService>(
     () => OrderFirestoreService(
       getIt<FirebaseFirestore>(),
@@ -71,8 +68,6 @@ Future<void> setupDependencies() async {
   getIt.registerLazySingleton<OrderStore>(
     () => OrderStore(getIt<OrderRepository>()),
   );
-
-  //Cart
 
   if (!locator.isRegistered<CartStore>()) {
     getIt.registerLazySingleton<CartStore>(
@@ -99,6 +94,8 @@ Future<void> setupDependencies() async {
       ),
     );
   }
+  getIt.registerLazySingleton<NavigationStore>(() => NavigationStore());
+  getIt.registerLazySingleton<PaymentStore>(() => PaymentStore());
 
   if (!locator.isRegistered<ProductService>()) {
     locator.registerLazySingleton<ProductService>(() => ProductService());

@@ -64,6 +64,11 @@ final ThemeData growDarkTheme = ThemeData(
     ),
   ),
 
+  navigationBarTheme: const NavigationBarThemeData(
+    backgroundColor: GrowColors.darkSurfaceElevated,
+    indicatorColor: GrowColors.primary,
+  ),
+
   cardTheme: CardThemeData(
     color: GrowColors.darkSurface,
     surfaceTintColor: Colors.transparent,

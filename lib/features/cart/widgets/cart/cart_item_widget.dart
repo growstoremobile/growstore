@@ -100,7 +100,7 @@ class CartItemWidget extends StatelessWidget {
                           item.variation,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: colors.textPrimary.withOpacity(0.6),
+                            color: colors.textPrimary.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
