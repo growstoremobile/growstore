@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:growstore/features/cart/models/cart_item_model.dart';
+import 'package:growstore/shared/widgets/cached_product_image.dart';
 
 class CheckoutItemCard extends StatelessWidget {
   final CartItemModel item;
@@ -17,11 +18,15 @@ class CheckoutItemCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                item.imageUrl,
+              child: SizedBox(
                 width: 70,
                 height: 70,
-                fit: BoxFit.cover,
+                child: GrowCachedProductImage(
+                  imageUrl: item.imageUrl,
+                  backgroundColor: Colors.transparent,
+                  iconColor: theme.colorScheme.primary,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
 

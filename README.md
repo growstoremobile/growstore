@@ -2,6 +2,11 @@
 
 Aplicativo de e-commerce desenvolvido em Flutter para Android e iOS. O projeto integra Firebase para autenticação, endereços e pedidos; Supabase para o catálogo de produtos; Hive para dados locais; MobX para estado reativo; e GetIt para injeção de dependências.
 
+## 🖼️ Tela (Preview)
+
+
+<img src="assets/growdev.gif" alt="Demonstração do App" width="300"/>
+
 ## Funcionalidades
 
 - Autenticação com e-mail e senha pelo Firebase Authentication.

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:growstore/features/orders/stores/order_store.dart';
 import 'package:growstore/features/cart/stores/cart/cart_store.dart';
 import 'package:growstore/features/cart/utils/cart_currency.dart';
 import 'package:growstore/features/orders/models/order_model.dart';
@@ -19,22 +21,16 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final _repository = GetIt.I<OrderRepository>();
-
-  final _cartStore = GetIt.I<CartStore>();
-
-  late Future<List<OrderModel>> _ordersFuture;
+  final _orderStore = GetIt.I<OrderStore>();
 
   @override
   void initState() {
     super.initState();
-    _ordersFuture = _repository.getOrders();
+    _orderStore.refreshOrders();
   }
 
   void _reload() {
-    setState(() {
-      _ordersFuture = _repository.getOrders();
-    });
+    _orderStore.refreshOrders();
   }
 
   @override
@@ -68,26 +64,25 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   Widget _buildBody(OrderLayoutColors colors) {
-    return FutureBuilder<List<OrderModel>>(
-      future: _ordersFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+    return Observer(
+      builder: (context) {
+        if (_orderStore.isLoading && _orderStore.orders.isEmpty) {
           return Center(
             child: CircularProgressIndicator(color: colors.primary),
           );
         }
 
-        if (snapshot.hasError) {
+        if (_orderStore.error != null && _orderStore.orders.isEmpty) {
           return _OrdersState(
             colors: colors,
             icon: Icons.wifi_off_rounded,
             title: 'Erro ao carregar pedidos',
-            description: 'Tente novamente em alguns instantes.',
+            description: _orderStore.error ?? 'Tente novamente em alguns instantes.',
             onRetry: _reload,
           );
         }
 
-        final orders = snapshot.data ?? const [];
+        final orders = _orderStore.orders;
 
         if (orders.isEmpty) {
           return _OrdersState(
@@ -99,21 +94,25 @@ class _OrdersPageState extends State<OrdersPage> {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          itemCount: orders.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final order = orders[index];
+        return RefreshIndicator(
+          color: colors.primary,
+          onRefresh: () => _orderStore.refreshOrders(),
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            itemCount: orders.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final order = orders[index];
 
-            return _OrderHistoryCard(
-              order: order,
-              colors: colors,
-              onTap: () => Navigator.of(
-                context,
-              ).pushNamed('/orderDetail', arguments: order.id),
-            );
-          },
+              return _OrderHistoryCard(
+                order: order,
+                colors: colors,
+                onTap: () => Navigator.of(
+                  context,
+                ).pushNamed('/orderDetail', arguments: order.id),
+              );
+            },
+          ),
         );
       },
     );
